@@ -1,0 +1,15 @@
+services:
+  app:
+    command: sh init.sh
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      NODE_ENV: development
+    env_file:
+      - .env
