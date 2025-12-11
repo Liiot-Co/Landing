@@ -1,6 +1,7 @@
 services:
   app:
     command: sh init.sh
+    restart: always 
     build:
       context: .
       dockerfile: Dockerfile

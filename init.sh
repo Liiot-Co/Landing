@@ -21,7 +21,6 @@ echo "--------------------------------------------------------"
 echo "  🚀 Iniciando el servidor Astro..."
 echo "  Puerto Interno (SERVER_PORT): $SERVER_PORT"
 echo "  Modo Debug (DEBUG): $DEBUG_MODE"
-echo "  Host: 0.0.0.0 (Requerido para Docker)"
 echo "--------------------------------------------------------"
 
 # 3. Iniciar el servidor Astro o entrar en modo Debug

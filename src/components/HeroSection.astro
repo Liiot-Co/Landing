@@ -1,0 +1,123 @@
+---
+import { ArrowRight, Play } from "lucide-astro";
+import Button from "./ui/button.astro";
+---
+
+<section
+	class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+>
+	{/* Interactive Canvas - Descomentar si tienes el componente */}
+	{/* Subtle background grid (Unchanged) */}
+	<div
+		class="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-position-[4rem_4rem] [radial-gradient(radial_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-10 pointer-events-none"
+	>
+	</div>
+
+	{/* Gradient orbs (Unchanged) */}
+	<div
+		class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/8 rounded-full blur-3xl pointer-events-none"
+	>
+	</div>
+	<div
+		class="absolute bottom-1/4 -right-20 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none"
+	>
+	</div>
+	<div
+		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-secondary/5 to-transparent rounded-full blur-3xl pointer-events-none"
+	>
+	</div>
+
+	<div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+		<div class="max-w-4xl mx-auto text-center">
+			{/* 2. HEADING (ID present) */}
+			<h1
+				id="hero-heading"
+				class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight opacity-0 translate-y-4"
+			>
+				<span class="text-gradient accent-glow">Automatiza</span>
+				<br />
+				Trabajo Inteligente.
+			</h1>
+
+			<p
+				id="hero-paragraph"
+				class="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto opacity-0 translate-y-4"
+			>
+				Streamline your workflow with our suite of powerful tools. Built for
+				teams that demand excellence, precision, and speed.
+			</p>
+
+			<div
+				id="hero-buttons"
+				class="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 translate-y-4"
+			>
+				<Button
+					size="lg"
+					class="bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group px-12 py-7 text-lg font-semibold shadow-xl shadow-secondary/30 rounded-xl"
+				>
+					Request Demo
+					<ArrowRight
+						class="ml-2 h-6 w-6 transition-transform group-hover:translate-x-1"
+					/>
+				</Button>
+				<Button
+					size="lg"
+					variant="outline"
+					class="border-primary/30 hover:bg-primary/10 hover:border-primary/50 px-8 py-6 text-base group"
+				>
+					<Play class="mr-2 h-5 w-5 text-primary" />
+					Watch Demo
+				</Button>
+			</div>
+
+			{/* 5. TRUST TEXT (ID present) */}
+			<div
+				id="hero-trust"
+				class="mt-16 text-sm text-muted-foreground opacity-0"
+			>
+				Trusted by 10,000+ teams worldwide
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	// Importamos la función 'animate' de la librería motion
+	import { animate, stagger } from "motion";
+
+	// Definimos las propiedades finales de la animación
+	const fadeUp = { opacity: 1, transform: "none" };
+	const transition = { duration: 0.5, easing: "ease-out" };
+
+	// Secuencia de animaciones:
+	// NOTE: Removed failing '#hero-badge' animation.
+
+	animate("#hero-heading", fadeUp, { ...transition, delay: 0.1 });
+
+	animate("#hero-paragraph", fadeUp, { ...transition, delay: 0.2 });
+
+	// FIX: Uncommented the #hero-buttons animation
+	animate("#hero-buttons", fadeUp, { ...transition, delay: 0.3 });
+
+	// El texto de confianza tenía una duración de 0.6s en el original
+	animate("#hero-trust", { opacity: 1 }, { duration: 0.6, delay: 0.4 });
+</script>
+
+<style>
+	/* Utilidad para texto con gradiente */
+	.text-gradient {
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-image: linear-gradient(
+			to right,
+			hsl(var(--secondary)),
+			hsl(var(--primary))
+		);
+	}
+
+	/* Efecto de resplandor para el texto */
+	.accent-glow {
+		text-shadow: 0 0 20px hsla(var(--primary), 0.5);
+	}
+</style>
