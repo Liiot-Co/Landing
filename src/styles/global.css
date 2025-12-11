@@ -4,173 +4,133 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans:
-    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-html,
-body {
-  @apply bg-background text-foreground;
-  /* Aplicamos directamente las variables semánticas */
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+html, body {
+  @apply bg-background text-foreground antialiased;
+  @media (prefers-color-scheme: dark) { color-scheme: dark; }
 }
 
 :root {
-  /* --- MODO CLARO: Limpio, Aireado y Nítido --- */
+  /* --- BRAND IDENTITY: ETHEREAL LAVENDER (Hue 292) --- */
+  
+  /* Backgrounds: Tintados sutilmente hacia el lavanda para cohesión */
+  --background: oklch(0.99 0.002 292);
+  --foreground: oklch(0.12 0.03 292); /* Deep Violet Black */
 
-  /* Fondo casi blanco puro para máxima limpieza */
-  --background: oklch(0.99 0 0);
-
-  /* Texto principal: Gris muy oscuro con un toque sutil de azul para armonía (no negro puro) */
-  --foreground: oklch(0.20 0.02 260);
-
-  /* Tarjetas blancas puras para destacar sobre el fondo sutil */
+  /* Surfaces: Blanco puro para contraste nítido ("Paper-like") */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.20 0.02 260);
-
+  --card-foreground: oklch(0.12 0.03 292);
+  
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0.02 260);
+  --popover-foreground: oklch(0.12 0.03 292);
 
-  /* Primary: Cyan Vibrante (#00A5CE) */
-  --primary: oklch(0.65 0.16 230);
+  /* BRAND: #9282d1 -> OKLCH(0.64 0.11 292) */
+  --primary: oklch(0.64 0.11 292);
   --primary-foreground: oklch(1 0 0);
-  /* Texto blanco en botones primarios */
 
-  /* Secondary: Gris muy suave para elementos de soporte */
-  --secondary: oklch(0.97 0 0);
-  /* CAMBIO: Texto neutro (gris oscuro) en lugar de morado para mayor discreción y legibilidad */
-  --secondary-foreground: oklch(0.20 0.02 260);
+  /* ACCENT: Previous Primary (Cyan) -> OKLCH(0.65 0.16 230) */
+  --accent: oklch(0.65 0.16 230);
+  --accent-foreground: oklch(1 0 0);
 
-  /* Muted: Para fondos de elementos deshabilitados o secundarios */
-  --muted: oklch(0.96 0.01 260);
-  --muted-foreground: oklch(0.55 0.02 260);
-  /* Gris medio para texto secundario */
+  /* Secondary: Gris frío tintado */
+  --secondary: oklch(0.96 0.01 292);
+  --secondary-foreground: oklch(0.25 0.04 292);
 
-  /* Accent: Lavanda Suave - Fondo claro que permite texto oscuro */
-  /* CAMBIO: Variante clara (L=0.94) para permitir texto negro encima */
-  --accent: oklch(0.94 0.04 290);
-  /* CAMBIO: Texto oscuro sobre el fondo lavanda para máximo contraste */
-  --accent-foreground: oklch(0.20 0.02 260);
+  /* Muted: Para jerarquía visual baja */
+  --muted: oklch(0.96 0.01 292);
+  --muted-foreground: oklch(0.55 0.04 292);
 
-  --destructive: oklch(0.58 0.22 27.29);
+  --destructive: oklch(0.59 0.20 20);
   --destructive-foreground: oklch(0.98 0 0);
 
-  /* Bordes sutiles para estructura sin ruido visual */
-  --border: oklch(0.92 0.01 260);
-  --input: oklch(0.92 0.01 260);
+  /* Borders: Sutiles, no negros */
+  --border: oklch(0.92 0.01 292);
+  --input: oklch(0.92 0.01 292);
+  --ring: oklch(0.64 0.11 292); /* Primary ring */
 
-  /* El anillo de foco usa el color primario pero con transparencia si se aplica opacidad */
-  --ring: oklch(0.65 0.16 230);
+  /* Data Viz */
+  --chart-1: oklch(0.64 0.11 292); /* Primary */
+  --chart-2: oklch(0.65 0.16 230); /* Accent */
+  --chart-3: oklch(0.82 0.10 320); /* Soft Pink */
+  --chart-4: oklch(0.55 0.12 250); /* Deep Blue */
+  --chart-5: oklch(0.75 0.14 150); /* Soft Teal */
 
-  /* Gráficos congruentes con la marca */
-  --chart-1: oklch(0.65 0.16 230);
-  /* Primary */
-  --chart-2: oklch(0.35 0.19 290);
-  /* Accent */
-  --chart-3: oklch(0.50 0.16 245);
-  /* Mezcla */
-  --chart-4: oklch(0.43 0.16 259.82);
-  --chart-5: oklch(0.29 0.07 261.2);
-
-  --sidebar: oklch(0.98 0 0);
-  --sidebar-foreground: oklch(0.20 0.02 260);
-  --sidebar-primary: oklch(0.65 0.16 230);
+  --sidebar: oklch(0.985 0.002 292);
+  --sidebar-foreground: oklch(0.20 0.03 292);
+  --sidebar-primary: oklch(0.64 0.11 292);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.94 0.04 290);
-  /* Lavanda suave en sidebar también */
-  --sidebar-accent-foreground: oklch(0.20 0.02 260);
-  --sidebar-border: oklch(0.92 0.01 260);
-  --sidebar-ring: oklch(0.65 0.16 230);
+  --sidebar-accent: oklch(0.96 0.01 292);
+  --sidebar-accent-foreground: oklch(0.20 0.03 292);
+  --sidebar-border: oklch(0.92 0.01 292);
+  --sidebar-ring: oklch(0.64 0.11 292);
 
-  --font-sans: Inter, sans-serif;
-  --font-serif: Source Serif 4, serif;
-  --font-mono: IBM Plex Mono, monospace;
-
-  /* Radio de 8px (0.5rem) para una estética moderna y amigable */
   --radius: 0.5rem;
 
-  /* Sombras base */
-  --shadow-2xs: 0 1px 3px 0px oklch(0 0 0 / 0.05);
-  --shadow-xs: 0 1px 3px 0px oklch(0 0 0 / 0.05);
-  --shadow-sm: 0 1px 3px 0px oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
-  --shadow: 0 1px 3px 0px oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
-  --shadow-md: 0 1px 3px 0px oklch(0 0 0 / 0.1), 0 2px 4px -1px oklch(0 0 0 / 0.1);
-  --shadow-lg: 0 1px 3px 0px oklch(0 0 0 / 0.1), 0 4px 6px -1px oklch(0 0 0 / 0.1);
-  --shadow-xl: 0 1px 3px 0px oklch(0 0 0 / 0.1), 0 8px 10px -1px oklch(0 0 0 / 0.1);
-  --shadow-2xl: 0 1px 3px 0px oklch(0 0 0 / 0.25);
+  /* Shadows: Tintadas con índigo para realismo sucio */
+  --shadow-sm: 0 1px 2px 0 oklch(0.12 0.03 292 / 0.05);
+  --shadow: 0 1px 3px 0 oklch(0.12 0.03 292 / 0.1), 0 1px 2px -1px oklch(0.12 0.03 292 / 0.1);
+  --shadow-md: 0 4px 6px -1px oklch(0.12 0.03 292 / 0.1), 0 2px 4px -2px oklch(0.12 0.03 292 / 0.1);
+  --shadow-lg: 0 10px 15px -3px oklch(0.12 0.03 292 / 0.1), 0 4px 6px -4px oklch(0.12 0.03 292 / 0.1);
 }
 
 .dark {
-  /* --- MODO OSCURO: Profundo, Sofisticado y "Gema" --- */
+  /* --- DARK MODE: DEEP COSMIC OBSIDIAN --- */
+  
+  /* Background: No negro puro, sino un violeta grisáceo muy profundo */
+  --background: oklch(0.14 0.02 292);
+  --foreground: oklch(0.98 0.005 292);
 
-  /* Background: #151515 -> OKLCH(0.18 0 0) - Base sólida y oscura */
-  --background: oklch(0.18 0 0);
+  /* Card: Elevación ligera mediante luminosidad */
+  --card: oklch(0.17 0.025 292);
+  --card-foreground: oklch(0.98 0.005 292);
+  
+  --popover: oklch(0.17 0.025 292);
+  --popover-foreground: oklch(0.98 0.005 292);
 
-  /* Foreground: Blanco casi puro para legibilidad óptima */
-  --foreground: oklch(0.98 0 0);
-
-  /* Card: Ligeramente más claro que el fondo (#1E1E1E aprox) para crear capas sin bordes */
-  --card: oklch(0.21 0 0);
-  --card-foreground: oklch(0.98 0 0);
-
-  --popover: oklch(0.21 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-
-  /* Primary: Cyan (#00A5CE) - Brilla intensamente sobre el oscuro */
-  --primary: oklch(0.65 0.16 230);
+  /* Primary: Se mantiene vibrante sobre oscuro */
+  --primary: oklch(0.64 0.11 292);
   --primary-foreground: oklch(1 0 0);
 
-  /* Secondary: Un gris oscuro para botones secundarios */
-  --secondary: oklch(0.26 0 0);
+  /* Accent: Glow effect */
+  --accent: oklch(0.65 0.16 230);
+  --accent-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.22 0.03 292);
   --secondary-foreground: oklch(0.98 0 0);
 
-  /* Muted: Fondo sutil para elementos desactivados */
-  --muted: oklch(0.26 0 0);
-  --muted-foreground: oklch(0.70 0 0);
-  /* Gris claro para texto secundario */
+  --muted: oklch(0.22 0.03 292);
+  --muted-foreground: oklch(0.70 0.02 292);
 
-  /* Accent: Morado Oscuro (#4F1085) para modo oscuro, con texto blanco */
-  /* Aquí el fondo oscuro permite texto blanco, manteniendo contraste */
-  --accent: oklch(0.35 0.19 290);
-  --accent-foreground: oklch(0.98 0 0);
-
-  --destructive: oklch(0.64 0.21 25.39);
+  --destructive: oklch(0.60 0.18 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  /* Bordes muy sutiles, apenas visibles para definir límites */
-  --border: oklch(0.26 0 0);
-  --input: oklch(0.26 0 0);
-  --ring: oklch(0.65 0.16 230);
+  /* Borders: Muy sutiles, mezcla de opacidad */
+  --border: oklch(0.25 0.03 292);
+  --input: oklch(0.25 0.03 292);
+  --ring: oklch(0.64 0.11 292);
 
-  --chart-1: oklch(0.65 0.16 230);
-  --chart-2: oklch(0.35 0.19 290);
-  --chart-3: oklch(0.69 0.17 255.59);
-  --chart-4: oklch(0.43 0.16 259.82);
-  --chart-5: oklch(0.29 0.07 261.2);
+  --chart-1: oklch(0.64 0.11 292);
+  --chart-2: oklch(0.65 0.16 230);
+  --chart-3: oklch(0.75 0.12 320);
+  --chart-4: oklch(0.50 0.14 250);
+  --chart-5: oklch(0.70 0.15 150);
 
-  --sidebar: oklch(0.16 0 0);
-  /* Ligeramente diferente al bg principal */
+  --sidebar: oklch(0.12 0.02 292);
   --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.65 0.16 230);
+  --sidebar-primary: oklch(0.64 0.11 292);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.26 0 0);
+  --sidebar-accent: oklch(0.22 0.03 292);
   --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.26 0 0);
-  --sidebar-ring: oklch(0.65 0.16 230);
-
-  /* Sombras adaptadas al modo oscuro (más difusas y oscuras) */
-  --shadow-2xs: 0 1px 3px 0px oklch(0 0 0 / 0.3);
-  --shadow-xs: 0 1px 3px 0px oklch(0 0 0 / 0.3);
-  --shadow-sm: 0 1px 3px 0px oklch(0 0 0 / 0.3), 0 1px 2px -1px oklch(0 0 0 / 0.3);
-  --shadow: 0 1px 3px 0px oklch(0 0 0 / 0.3), 0 1px 2px -1px oklch(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.3), 0 2px 4px -1px oklch(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.3), 0 4px 6px -2px oklch(0 0 0 / 0.3);
-  --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.3), 0 10px 10px -5px oklch(0 0 0 / 0.3);
-  --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.5);
+  --sidebar-border: oklch(0.25 0.03 292);
+  --sidebar-ring: oklch(0.64 0.11 292);
+  
+  /* Sombras oscuras y profundas para modo noche */
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.4);
+  --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.4), 0 1px 2px -1px oklch(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -1px oklch(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.4), 0 4px 6px -4px oklch(0 0 0 / 0.4);
 }
 
 @theme inline {
@@ -207,114 +167,30 @@ body {
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
-
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-
-  --shadow-2xs: var(--shadow-2xs);
-  --shadow-xs: var(--shadow-xs);
+  
   --shadow-sm: var(--shadow-sm);
   --shadow: var(--shadow);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased;
-    /* Antialiased para tipografía más fina */
-  }
+  * { @apply border-border outline-ring/50; }
+  
+  /* Smooth Scroll y selección de texto acorde a marca */
+  html { scroll-behavior: smooth; }
+  ::selection { @apply bg-primary/20 text-primary; }
 }
 
 @layer utilities {
-
-  /* Sombras "Elegantes" con más difusión y suavidad */
-  .shadow-elegant {
-    box-shadow:
-      0 1px 2px 0 rgb(0 0 0 / 0.05),
-      0 1px 3px -1px rgb(0 0 0 / 0.05);
-  }
-
-  .shadow-elegant-md {
-    box-shadow:
-      0 4px 6px -1px rgb(0 0 0 / 0.06),
-      0 2px 4px -2px rgb(0 0 0 / 0.04);
-  }
-
-  .shadow-elegant-lg {
-    box-shadow:
-      0 12px 16px -4px rgb(0 0 0 / 0.08),
-      0 4px 6px -4px rgb(0 0 0 / 0.04);
-  }
-
-  .dark .shadow-elegant {
-    box-shadow:
-      0 1px 2px 0 rgb(0 0 0 / 0.4),
-      0 1px 3px -1px rgb(0 0 0 / 0.4);
-  }
-
-  .dark .shadow-elegant-md {
-    box-shadow:
-      0 4px 6px -1px rgb(0 0 0 / 0.4),
-      0 2px 4px -2px rgb(0 0 0 / 0.3);
-  }
-
-  .dark .shadow-elegant-lg {
-    box-shadow:
-      0 12px 16px -4px rgb(0 0 0 / 0.4),
-      0 4px 6px -4px rgb(0 0 0 / 0.3);
-  }
-
-  .transition-smooth {
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .transition-smooth-slow {
-    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes modal-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-@layer base {
-  [data-state='open'] {
-    animation: modal-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  [data-state='closed'] {
-    animation: modal-out 200ms cubic-bezier(0.4, 0, 1, 1);
+  .transition-all-smooth { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+  
+  /* Elevación sutil Glassmorphism para elementos flotantes */
+  .glass-panel {
+    @apply bg-background/80 backdrop-blur-md border border-border/50 shadow-lg;
   }
 }
