@@ -1,13 +1,22 @@
 ---
+import FinalCTA from "@/components/FinalCTA.astro";
 import HeroSection from "@/components/HeroSection.astro";
-import Layout from "../components/layouts/Layout.astro";
+import Layout from "@/components/layouts/Layout.astro";
+import ProductSpotlight from "@/components/ProductSpotlight.astro";
+import WhyChooseUs from "@/components/WhyChooseUs.astro";
+import Footer from "@/components/Footer.astro";
+import ScrollFollowWidget from "@/components/ScrollFollowWidget.astro";
+import Navigation from "@/components/Navigation.astro";
 ---
 
 <Layout>
-	<main class="bg-background min-h-screen">
+	<Navigation />
+	<ScrollFollowWidget />
+	<main id="hero" class="bg-background min-h-screen">
 		<HeroSection />
-		<!-- <ProductSpotlight />
+		<ProductSpotlight />
 		<WhyChooseUs />
-		<FinalCTA /> -->
+		<FinalCTA />
 	</main>
+	<Footer />
 </Layout>
