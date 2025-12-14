@@ -1,0 +1,212 @@
+---
+// Este componente no requiere lógica en el frontmatter
+// Toda la lógica de la animación se maneja en el script del cliente.
+const CANVAS_ID = "interactive-hero-canvas";
+---
+
+<canvas
+  id={CANVAS_ID}
+  class="absolute inset-0 w-full h-full pointer-events-auto"
+  style="opacity: 1;"
+></canvas>
+
+<script define:vars={{ CANVAS_ID }}>
+    // Usamos una función que se llama cuando el DOM está listo
+    document.addEventListener("astro:load", () => {
+        const canvas = document.getElementById(CANVAS_ID);
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        // --- Configuración del Efecto ---
+        const PARTICLE_COUNT = 60; // Más partículas
+        const CONNECTION_DISTANCE = 120; // Más distancia para conexiones
+        const MOUSE_INTERACTION_RADIUS = 200; // Radio de interacción del ratón
+        const COLORS = [
+            "rgba(0, 165, 206, 0.4)", // Primary (Cyan) - Más brillante
+            "rgba(209, 160, 85, 0.3)", // Secondary (Golden)
+            "rgba(255, 255, 255, 0.2)", // White
+        ];
+        const PRIMARY_COLOR_LINE = "rgba(0, 165, 206, 1)"; // Color puro para el brillo
+
+        let particles = [];
+        let mouse = { x: 0, y: 0 };
+        let animationFrameId;
+
+        // Clase o función constructora para una partícula (Mejor organización)
+        class Particle {
+            constructor() {
+                this.reset();
+                // Velocidad inicial más rápida
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 1.5; // Tamaño ligeramente mayor
+                this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+            }
+
+            update() {
+                // Interacción con el ratón: ATRACCIÓN SUAVE
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < MOUSE_INTERACTION_RADIUS) {
+                    const forceFactor = (MOUSE_INTERACTION_RADIUS - distance) / MOUSE_INTERACTION_RADIUS;
+                    
+                    // **Atracción** sutil al ratón (0.01)
+                    this.vx += (dx / distance) * forceFactor * 0.01;
+                    this.vy += (dy / distance) * forceFactor * 0.01;
+                    
+                    // **Repulsión** si están demasiado cerca (evita aglomeración)
+                    if (distance < 50) {
+                        this.vx -= (dx / distance) * forceFactor * 0.05;
+                        this.vy -= (dy / distance) * forceFactor * 0.05;
+                    }
+                }
+
+                // Aplicar velocidad con amortiguación
+                this.vx *= 0.985; // Menos fricción (más estela/movimiento)
+                this.vy *= 0.985;
+
+                // Actualizar posición
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Envolver alrededor de los bordes
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                
+                // Agregar un pequeño brillo a las partículas cian
+                if (this.color.includes("0, 165, 206")) {
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = PRIMARY_COLOR_LINE;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                
+                ctx.fill();
+            }
+        }
+        
+        // Función para mantener el canvas del mismo tamaño que su contenedor
+        const updateSize = () => {
+            const parent = canvas.parentElement;
+            if (parent) {
+                canvas.width = parent.offsetWidth;
+                canvas.height = parent.offsetHeight;
+            } else {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            initializeParticles();
+        };
+
+        // Inicializar partículas
+        const initializeParticles = () => {
+            particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle());
+        };
+        
+        // Mouse move handler
+        const handleMouseMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+            };
+        };
+
+        // Bucle de animación
+        const animate = () => {
+            if (!ctx || !canvas) return;
+
+            // **Efecto de estela:** En lugar de limpiar todo (clearRect), dibujamos
+            // un rectángulo negro semi-transparente. Esto deja un rastro sutil.
+            ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; // Ajusta el 0.1 para cambiar la longitud de la estela
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+            // 1. Actualizar y dibujar partículas
+            particles.forEach((particle) => {
+                particle.update();
+                particle.draw();
+            });
+            
+            // Restablecer sombra después de dibujar partículas
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = "transparent";
+
+            // 2. Dibujar conexiones (antes o después de las partículas, pero con menos opacidad)
+            ctx.lineWidth = 1;
+            
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach((p2) => {
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < CONNECTION_DISTANCE) {
+                        // Opacidad basada en la distancia (cerca es más opaco)
+                        const opacity = (CONNECTION_DISTANCE - distance) / CONNECTION_DISTANCE * 0.4;
+
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        
+                        // Color principal de la línea con la opacidad calculada
+                        ctx.strokeStyle = `rgba(0, 165, 206, ${opacity})`;
+                        
+                        // **Efecto de brillo en la conexión cercana al ratón**
+                        const avgX = (p1.x + p2.x) / 2;
+                        const avgY = (p1.y + p2.y) / 2;
+                        const distToMouse = Math.sqrt((avgX - mouse.x)**2 + (avgY - mouse.y)**2);
+                        
+                        if (distToMouse < 150) {
+                            const glowFactor = (150 - distToMouse) / 150;
+                            ctx.shadowBlur = 10 * glowFactor;
+                            ctx.shadowColor = PRIMARY_COLOR_LINE;
+                            ctx.stroke();
+                            // Restablecer para el siguiente trazo
+                            ctx.shadowBlur = 0;
+                        } else {
+                            ctx.stroke();
+                        }
+                    }
+                });
+            });
+
+
+            animationFrameId = requestAnimationFrame(animate);
+        };
+
+        // Configuración inicial y listeners
+        updateSize();
+        window.addEventListener("resize", updateSize);
+        canvas.addEventListener("mousemove", handleMouseMove);
+        
+        // Iniciar el bucle
+        animate();
+
+        // Limpieza al desmontar
+        return () => {
+            window.removeEventListener("resize", updateSize);
+            canvas.removeEventListener("mousemove", handleMouseMove);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, { once: true }); 
+</script>

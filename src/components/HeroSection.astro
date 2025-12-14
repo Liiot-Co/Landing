@@ -1,12 +1,14 @@
 ---
 import { ArrowRight, Play } from "lucide-astro";
-import Button from "./ui/button.astro";
+import Button from "@/components/ui/button.astro";
+import HeroCanvas from "@/components/HeroCanvas.astro";
 ---
 
 <section
 	class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
 >
 	{/* Interactive Canvas - Descomentar si tienes el componente */}
+	<HeroCanvas />
 	{/* Subtle background grid (Unchanged) */}
 	<div
 		class="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-position-[4rem_4rem] [radial-gradient(radial_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-10 pointer-events-none"
@@ -34,7 +36,7 @@ import Button from "./ui/button.astro";
 				id="hero-heading"
 				class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight opacity-0 translate-y-4"
 			>
-				<span class="text-gradient accent-glow">Automatiza</span>
+				<span class="text-primary">Automatiza</span>
 				<br />
 				Trabajo Inteligente.
 			</h1>
@@ -83,7 +85,7 @@ import Button from "./ui/button.astro";
 
 <script>
 	// Importamos la función 'animate' de la librería motion
-	import { animate, stagger } from "motion";
+	import { animate } from "motion";
 
 	// Definimos las propiedades finales de la animación
 	const fadeUp = { opacity: 1, transform: "none" };
