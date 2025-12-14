@@ -1,0 +1,136 @@
+---
+// Importaciones de iconos de Lucide-Astro
+import { Shield, Zap, Users, Award, TrendingUp, Lock } from 'lucide-astro';
+
+const benefits = [
+    {
+        icon: Shield,
+        title: "Enterprise Security",
+        description: "Secure infrastructure with encrypted data handling.",
+    },
+    {
+        icon: Zap,
+        title: "Lightning Fast",
+        description: "Reliable and stable performance for operational continuity.",
+    },
+    {
+        icon: Users,
+        title: "Team-First Design",
+        description: "Built for collaboration with real-time sync and seamless integrations.",
+    },
+    {
+        icon: Award,
+        title: "Expert Support",
+        description: "Designed to ensure accuracy and consistency in workflows.",
+    },
+    {
+        icon: TrendingUp,
+        title: "Scales With You",
+        description: "Our infrastructure grows with your needs.",
+    },
+    {
+        icon: Lock,
+        title: "Data Ownership",
+        description: "Your data is yours. Export anytime, no vendor lock-in.",
+    },
+];
+
+// Definición de selectores
+const SECTION_ID = "why-choose-us";
+const HEADER_ID = "why-choose-us-header";
+---
+
+<section id={SECTION_ID} class="py-24 lg:py-28 bg-card/50 relative overflow-hidden">
+    <!-- GeometricAccent Replacement (Simulado con SVG para evitar dependencias externas) -->
+    <div class="absolute top-0 left-0 text-primary/5 pointer-events-none">
+       <svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <circle cx="250" cy="250" r="200" stroke="currentColor" stroke-width="40" />
+         <circle cx="250" cy="250" r="100" stroke="currentColor" stroke-width="20" stroke-opacity="0.5" />
+       </svg>
+    </div>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        
+        {/* HEADER (Animación simple de fade-up) */}
+        <div 
+          id={HEADER_ID} 
+          class="text-center mb-16 opacity-0 translate-y-4"
+        >
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+            Why Choose <span class="text-gradient">Our Platform</span>
+          </h2>
+          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Powerful tools designed for teams that demand excellence, precision, and speed.
+          </p>
+        </div>
+
+        {/* BENEFITS GRID (Animación escalonada con stagger) */}
+        <div
+          id="benefit-grid-container"
+          class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
+        >
+          {benefits.map((benefit, index) => (
+            <div
+              class="benefit-card group relative opacity-0 translate-y-4"
+              data-index={index}
+            >
+              <div class="h-full p-8 rounded-2xl border border-border bg-card hover:shadow-lg hover:border-primary/30 hover:brightness-110 hover:scale-[1.03] transition-all duration-300">
+                <div class="w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-all duration-300">
+                  <benefit.icon class="w-7 h-7 text-primary" />
+                </div>
+                <h3 class="text-xl font-semibold mb-3">
+                  {benefit.title}
+                </h3>
+                <p class="text-muted-foreground leading-relaxed">
+                  {benefit.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+    </div>
+</section>
+
+<script>
+    import { animate, inView, stagger, type StaggerOrigin } from "motion";
+
+    // Selectores definidos en el frontmatter (Astro las inyecta)
+    const SECTION_ID = "#why-choose-us";
+    const HEADER_ID = "#why-choose-us-header";
+    const ITEM_CLASS = ".benefit-card"; 
+
+    // Estados Finales (Reseteamos transforms)
+    const fadeUp = { opacity: 1, transform: "none" };
+
+    // Configuración de animación
+    const headerOpts = { duration: 0.5, easing: "ease-out" };
+    const itemOpts = { duration: 0.4, easing: "ease-out" };
+
+    // Trigger de la animación cuando la sección entra en el viewport
+    inView(SECTION_ID, (element) => {
+        
+        // 1. Animación del Header
+        animate(HEADER_ID, fadeUp, headerOpts);
+
+        // 2. Animación Escalonda (Stagger) de las tarjetas de Beneficios
+        const items = element.querySelectorAll(ITEM_CLASS);
+        
+        // La animación escalonada se activa después de un pequeño delay (ej: 0.2s)
+        animate(items, fadeUp, { 
+            delay: stagger(0.08, { from: "start" as StaggerOrigin }),
+            duration: 0.4,
+            ease: "easeOut" as const,
+        });
+
+    }, { margin: "-100px 0px 0px 0px" }); // Margin similar al original de Framer Motion
+</script>
+
+<style>
+  /* Utilidad para texto con gradiente si no está definida globalmente */
+  .text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(to right, hsl(var(--primary)) 20%, hsl(var(--secondary)));
+  }
+</style>
