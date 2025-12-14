@@ -1,0 +1,311 @@
+---
+import { ArrowRight, Users } from 'lucide-astro';
+import Button from "@/components/ui/button.astro";
+
+const WIDGET_ID = "scroll-follow-widget";
+const CONTENT_ID = "scroll-follow-content";
+
+// Initial content for hero section
+const initialContent = {
+    icon: Users,
+    title: "Transform Your Workflow",
+    description: "See how your team can optimize schedules",
+    bullets: [
+        "Smart automation that saves time",
+        "Designed for team collaboration",
+        "Scales with your needs",
+    ],
+    quote: "Built for modern teams",
+};
+---
+
+<!-- WIDGET PRINCIPAL -->
+<div 
+  id={WIDGET_ID}
+  class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 hidden sm:block opacity-0 translate-x-5 pointer-events-none transition-opacity duration-300"
+  aria-hidden="true"
+  data-current-section="hero"
+>
+  <div class="w-72 md:w-80 bg-card/95 backdrop-blur-sm border border-secondary/20 rounded-2xl p-6 shadow-xl relative">
+    
+    <!-- Contenido dinámico -->
+    <div id={CONTENT_ID}>
+      <!-- El contenido inicial será el default (hero) -->
+      {(() => {
+        const Icon = initialContent.icon;
+        return (
+          <>
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary/20 to-primary/10 border border-secondary/30 flex items-center justify-center">
+                <Icon class="w-5 h-5 text-secondary" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-sm">{initialContent.title}</h3>
+                <p class="text-xs text-muted-foreground">{initialContent.description}</p>
+              </div>
+            </div>
+
+            <!-- Bullets -->
+            <div class="space-y-2 mb-4">
+              {initialContent.bullets.map((bullet) => (
+                <div class="flex items-start space-x-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 flex-shrink-0" />
+                  <p class="text-xs text-muted-foreground">{bullet}</p>
+                </div>
+              ))}
+            </div>
+
+            <!-- Quote -->
+            <div class="bg-gradient-to-r from-secondary/10 to-primary/5 rounded-lg p-3 mb-4 border border-secondary/20">
+              <p class="text-xs italic text-foreground/80">"{initialContent.quote}"</p>
+            </div>
+            
+            <!-- Button -->
+            <Button
+              asChild
+              class="w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group py-5 text-base font-semibold"
+              size="default"
+            >
+              <a href="#" class="inline-flex items-center justify-center">
+                Request Demo
+                <ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </a>
+            </Button>
+          </>
+        );
+      })()}
+    </div>
+    
+    <!-- Progress indicator with gradient -->
+    <div class="mt-4 flex space-x-1" id="progress-indicator">
+      <!-- Los indicadores se manejan en el script de JS -->
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Estilos para el efecto de resplandor sutil */
+  .card-glow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 40px rgba(var(--secondary), 0.05);
+  }
+
+  /* Clases de utilidad para el script de JS */
+  .progress-active {
+    background-image: linear-gradient(to right, hsl(var(--secondary)), hsl(var(--primary)));
+    background-color: transparent !important;
+  }
+</style>
+
+<script>
+  import { animate } from "motion";
+  
+  // IDs y constantes
+  const WIDGET_ID = "scroll-follow-widget";
+  const CONTENT_ID = "scroll-follow-content";
+  
+  // CORRECCIÓN: IDs actualizados para coincidir con los componentes reales
+  // 'hero' -> Debe existir un <section id="hero"> o similar en tu página principal
+  // 'product-spotlight' -> ID del componente ProductSpotlight
+  // 'why-choose-us' -> ID del componente WhyChooseUs (Benefits)
+  // 'final-cta' -> ID del componente FinalCTA (Testimonials/Final)
+  const sectionIds = ["hero", "product-spotlight", "why-choose-us", "final-cta"];
+  // Datos y mapeo de iconos
+  const iconMap = {
+    Calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`,
+    Shield: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    Users: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    Star: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+  };
+  
+  const contentData = (sectionId) => {
+    switch (sectionId) {
+        case "product-spotlight":
+            return {
+                iconName: 'Calendar',
+                title: "Schedule Grid",
+                description: "Optimize team schedules automatically",
+                bullets: [
+                    "AI-powered calendar optimization",
+                    "Real-time team coordination",
+                    "Automated time tracking",
+                ],
+                quote: "Saves hours every week",
+            };
+        case "why-choose-us":
+            return {
+                iconName: 'Shield',
+                title: "Enterprise Security",
+                description: "Secure infrastructure with encrypted data",
+                bullets: [
+                    "Bank-level encryption standards",
+                    "99.99% uptime guarantee",
+                    "Data ownership & export anytime",
+                ],
+                quote: "Reliable and stable",
+            };
+        case "final-cta":
+            return {
+                iconName: 'Star',
+                title: "Proven Results",
+                description: "Trusted by 10,000+ teams",
+                bullets: [
+                    "40% productivity increase",
+                    "Seamless implementation",
+                    "24/7 expert support",
+                ],
+                quote: "Best investment made",
+            };
+        default: // hero
+            return {
+                iconName: 'Users',
+                title: "Transform Your Workflow",
+                description: "See how your team can optimize schedules",
+                bullets: [
+                    "Smart automation that saves time",
+                    "Designed for team collaboration",
+                    "Scales with your needs",
+                ],
+                quote: "Built for modern teams",
+            };
+    }
+  };
+
+  // Setup principal
+  document.addEventListener("astro:load", () => {
+    const widget = document.getElementById(WIDGET_ID);
+    const contentContainer = document.getElementById(CONTENT_ID);
+    const progressIndicatorContainer = document.getElementById("progress-indicator");
+    
+    // Crear indicadores dinámicamente si no existen
+    if (progressIndicatorContainer && progressIndicatorContainer.children.length === 0) {
+      progressIndicatorContainer.innerHTML = sectionIds.map(id => 
+          `<div data-section="${id}" class="h-1 flex-1 rounded-full transition-all duration-300 bg-border"></div>`
+      ).join('');
+    }
+    const progressIndicators = progressIndicatorContainer?.children;
+
+    if (!widget || !contentContainer || !progressIndicators) {
+      // Si faltan elementos del widget, no hacemos nada (puede ser normal en algunas páginas)
+      return; 
+    }
+
+    let currentSection = 'hero';
+    let isVisible = false;
+    let sectionBounds = [];
+
+    // Calcular límites de las secciones presentes en la página
+    const calculateSectionBounds = () => {
+      sectionBounds = sectionIds.map(id => {
+        const element = document.getElementById(id);
+        if (!element) return { id, start: -1, end: -1 };
+        
+        const top = element.offsetTop;
+        const height = element.offsetHeight;
+        return {
+          id,
+          start: top - window.innerHeight / 3,
+          end: top + height - window.innerHeight / 3,
+        };
+      }).filter(b => b.start !== -1);
+    };
+    
+    // Renderizado del contenido
+    const renderContent = (sectionId) => {
+      const content = contentData(sectionId);
+      const IconSVG = (iconMap[content.iconName] || iconMap.Users);
+      
+      // Reconstruimos el HTML del contenido
+      // Nota: El botón usa clases hardcoded para asegurar el estilo
+      const newHTML = `
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary/20 to-primary/10 border border-secondary/30 flex items-center justify-center">
+            ${IconSVG}
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm">${content.title}</h3>
+            <p class="text-xs text-muted-foreground">${content.description}</p>
+          </div>
+        </div>
+
+        <div class="space-y-2 mb-4">
+          ${content.bullets.map(bullet => `
+            <div class="flex items-start space-x-2">
+              <div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 flex-shrink-0" />
+              <p class="text-xs text-muted-foreground">${bullet}</p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="bg-gradient-to-r from-secondary/10 to-primary/5 rounded-lg p-3 mb-4 border border-secondary/20">
+          <p class="text-xs italic text-foreground/80">"${content.quote}"</p>
+        </div>
+
+        <a href="#"
+          class="w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group py-5 text-base font-semibold inline-flex items-center justify-center rounded-md"
+        >
+          Request Demo
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1 lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      `;
+
+      animate(contentContainer, { opacity: 0, y: 10 }, { duration: 0.2 }).finished.then(() => {
+          contentContainer.innerHTML = newHTML;
+          animate(contentContainer, { opacity: 1, y: 0 }, { duration: 0.3 });
+      });
+    };
+
+    // Manejador de Scroll
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+
+      // Mostrar después de scrollear un poco (200px para ser más permisivo)
+      const newIsVisible = scrollPosition > 200;
+
+      if (newIsVisible !== isVisible) {
+        isVisible = newIsVisible;
+        if (isVisible) {
+          widget.classList.remove('pointer-events-none');
+          widget.setAttribute('aria-hidden', 'false');
+          animate(widget, { opacity: 1, x: 0 }, { duration: 0.3 });
+        } else {
+          widget.classList.add('pointer-events-none');
+          widget.setAttribute('aria-hidden', 'true');
+          animate(widget, { opacity: 0, x: 20 }, { duration: 0.3 });
+        }
+      }
+      
+      let newSection = 'hero';
+      // Encontrar la sección actual
+      for (const bound of sectionBounds) {
+        if (scrollPosition >= bound.start && scrollPosition < bound.end) {
+          newSection = bound.id;
+          break;
+        }
+      }
+
+      if (newSection !== currentSection) {
+        currentSection = newSection;
+        renderContent(currentSection);
+        widget.setAttribute('data-current-section', currentSection);
+
+        Array.from(progressIndicators).forEach(indicator => {
+          if (indicator instanceof HTMLElement) {
+            if (indicator.dataset.section === currentSection) {
+              indicator.classList.add('progress-active');
+            } else {
+              indicator.classList.remove('progress-active');
+            }
+          }
+        });
+      }
+    };
+    
+    // Inicialización
+    calculateSectionBounds();
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", calculateSectionBounds);
+    
+    handleScroll();
+  }, { once: true });
+</script>
