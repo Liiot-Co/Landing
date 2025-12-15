@@ -1,212 +1,235 @@
 ---
-// Este componente no requiere lógica en el frontmatter
-// Toda la lógica de la animación se maneja en el script del cliente.
 const CANVAS_ID = "interactive-hero-canvas";
 ---
 
-<canvas
-  id={CANVAS_ID}
-  class="absolute inset-0 w-full h-full pointer-events-auto"
-  style="opacity: 1;"
-></canvas>
+<div class="absolute inset-0 w-full h-full bg-black">
+    <canvas
+      id={CANVAS_ID}
+      class="block w-full h-full outline-none cursor-crosshair"
+    ></canvas>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 pointer-events-none"></div>
+</div>
 
-<script define:vars={{ CANVAS_ID }}>
-    // Usamos una función que se llama cuando el DOM está listo
-    document.addEventListener("astro:load", () => {
-        const canvas = document.getElementById(CANVAS_ID);
-        if (!canvas) return;
+<script>
+    // Importamos Three.js desde un CDN optimizado para ESM (sin build steps complejos)
+    import * as THREE from 'https://esm.sh/three@0.160.0';
 
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
+    const CANVAS_ID = "interactive-hero-canvas";
 
-        // --- Configuración del Efecto ---
-        const PARTICLE_COUNT = 60; // Más partículas
-        const CONNECTION_DISTANCE = 120; // Más distancia para conexiones
-        const MOUSE_INTERACTION_RADIUS = 200; // Radio de interacción del ratón
-        const COLORS = [
-            "rgba(0, 165, 206, 0.4)", // Primary (Cyan) - Más brillante
-            "rgba(209, 160, 85, 0.3)", // Secondary (Golden)
-            "rgba(255, 255, 255, 0.2)", // White
-        ];
-        const PRIMARY_COLOR_LINE = "rgba(0, 165, 206, 1)"; // Color puro para el brillo
+    // --- CONFIGURACIÓN DE COLORES (Normalizados 0.0 - 1.0 para GLSL) ---
+    // Cyan: #00A5CE -> R:0.0, G:0.647, B:0.808
+    // Gold: #D1A055 -> R:0.82, G:0.627, B:0.333
+    const COLOR_PRIMARY = new THREE.Vector3(0.0, 0.647, 0.808); 
+    const COLOR_SECONDARY = new THREE.Vector3(0.82, 0.627, 0.333); 
+    const BG_COLOR = 0x050505; // Fondo muy oscuro, casi negro
 
-        let particles = [];
-        let mouse = { x: 0, y: 0 };
-        let animationFrameId;
+    class WebGLHero {
+        constructor() {
+            this.canvas = document.getElementById(CANVAS_ID);
+            if (!this.canvas) return;
 
-        // Clase o función constructora para una partícula (Mejor organización)
-        class Particle {
-            constructor() {
-                this.reset();
-                // Velocidad inicial más rápida
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-            }
+            this.scene = null;
+            this.camera = null;
+            this.renderer = null;
+            this.material = null;
+            this.mesh = null;
+            this.mouse = new THREE.Vector2(0, 0);
+            this.clock = new THREE.Clock();
 
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2.5 + 1.5; // Tamaño ligeramente mayor
-                this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-                this.vx = (Math.random() - 0.5) * 0.3;
-                this.vy = (Math.random() - 0.5) * 0.3;
-            }
+            this.init();
+        }
 
-            update() {
-                // Interacción con el ratón: ATRACCIÓN SUAVE
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+        init() {
+            // 1. Setup Básico
+            this.scene = new THREE.Scene();
+            this.scene.background = new THREE.Color(BG_COLOR);
 
-                if (distance < MOUSE_INTERACTION_RADIUS) {
-                    const forceFactor = (MOUSE_INTERACTION_RADIUS - distance) / MOUSE_INTERACTION_RADIUS;
-                    
-                    // **Atracción** sutil al ratón (0.01)
-                    this.vx += (dx / distance) * forceFactor * 0.01;
-                    this.vy += (dy / distance) * forceFactor * 0.01;
-                    
-                    // **Repulsión** si están demasiado cerca (evita aglomeración)
-                    if (distance < 50) {
-                        this.vx -= (dx / distance) * forceFactor * 0.05;
-                        this.vy -= (dy / distance) * forceFactor * 0.05;
-                    }
-                }
+            // Cámara con perspectiva para profundidad
+            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+            this.camera.position.set(0, 10, 15); // Elevada y mirando hacia abajo
+            this.camera.lookAt(0, 0, 0);
 
-                // Aplicar velocidad con amortiguación
-                this.vx *= 0.985; // Menos fricción (más estela/movimiento)
-                this.vy *= 0.985;
+            this.renderer = new THREE.WebGLRenderer({
+                canvas: this.canvas,
+                antialias: true,
+                alpha: true
+            });
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-                // Actualizar posición
-                this.x += this.vx;
-                this.y += this.vy;
+            // 2. Geometría (Un plano denso de partículas)
+            // 120x120 segmentos = 14,400 puntos de datos
+            const geometry = new THREE.PlaneGeometry(50, 40, 120, 120);
 
-                // Envolver alrededor de los bordes
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
+            // 3. SHADER MATERIAL (La magia ocurre aquí)
+            // Usamos GLSL para calcular la posición y color de cada pixel en la GPU
+            this.material = new THREE.ShaderMaterial({
+                vertexShader: this.vertexShader(),
+                fragmentShader: this.fragmentShader(),
+                uniforms: {
+                    uTime: { value: 0 },
+                    uMouse: { value: new THREE.Vector2(0, 0) },
+                    uColorPrimary: { value: COLOR_PRIMARY },
+                    uColorSecondary: { value: COLOR_SECONDARY },
+                    uHover: { value: 0 } // Intensidad de interacción
+                },
+                transparent: true,
+                blending: THREE.AdditiveBlending, // Hace que los colores brillen al superponerse
+                depthWrite: false,
+                side: THREE.DoubleSide
+            });
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                
-                // Agregar un pequeño brillo a las partículas cian
-                if (this.color.includes("0, 165, 206")) {
-                    ctx.shadowBlur = 5;
-                    ctx.shadowColor = PRIMARY_COLOR_LINE;
-                } else {
-                    ctx.shadowBlur = 0;
-                }
-                
-                ctx.fill();
-            }
-        }
-        
-        // Función para mantener el canvas del mismo tamaño que su contenedor
-        const updateSize = () => {
-            const parent = canvas.parentElement;
-            if (parent) {
-                canvas.width = parent.offsetWidth;
-                canvas.height = parent.offsetHeight;
-            } else {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            initializeParticles();
-        };
+            // Creamos Nube de Puntos en lugar de malla sólida para el look "Tech"
+            this.mesh = new THREE.Points(geometry, this.material);
+            // Rotamos para que parezca un terreno/horizonte
+            this.mesh.rotation.x = -Math.PI / 2.5; 
+            this.scene.add(this.mesh);
 
-        // Inicializar partículas
-        const initializeParticles = () => {
-            particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle());
-        };
-        
-        // Mouse move handler
-        const handleMouseMove = (e) => {
-            const rect = canvas.getBoundingClientRect();
-            mouse = {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
-            };
-        };
+            // 4. Eventos
+            window.addEventListener('resize', this.onResize.bind(this));
+            window.addEventListener('mousemove', this.onMouseMove.bind(this));
 
-        // Bucle de animación
-        const animate = () => {
-            if (!ctx || !canvas) return;
+            // 5. Iniciar Loop
+            this.animate();
+        }
 
-            // **Efecto de estela:** En lugar de limpiar todo (clearRect), dibujamos
-            // un rectángulo negro semi-transparente. Esto deja un rastro sutil.
-            ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; // Ajusta el 0.1 para cambiar la longitud de la estela
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // --- GLSL VERTEX SHADER ---
+        // Controla la posición de cada punto (Olas, montañas digitales)
+        vertexShader() {
+            return `
+                uniform float uTime;
+                uniform vec2 uMouse;
+                varying vec2 vUv;
+                varying float vElevation;
 
+                // Función simple de ruido pseudo-aleatorio
+                float random(vec2 st) {
+                    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+                }
 
-            // 1. Actualizar y dibujar partículas
-            particles.forEach((particle) => {
-                particle.update();
-                particle.draw();
-            });
-            
-            // Restablecer sombra después de dibujar partículas
-            ctx.shadowBlur = 0;
-            ctx.shadowColor = "transparent";
+                void main() {
+                    vUv = uv;
+                    vec3 pos = position;
 
-            // 2. Dibujar conexiones (antes o después de las partículas, pero con menos opacidad)
-            ctx.lineWidth = 1;
-            
-            particles.forEach((p1, i) => {
-                particles.slice(i + 1).forEach((p2) => {
-                    const dx = p1.x - p2.x;
-                    const dy = p1.y - p2.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    // 1. Movimiento de Ola Principal (Seno/Coseno combinados)
+                    float wave1 = sin(pos.x * 0.5 + uTime * 0.5) * 1.5;
+                    float wave2 = cos(pos.y * 0.3 + uTime * 0.3) * 1.0;
+                    
+                    // 2. Interacción con el Mouse (Onda gravitacional)
+                    // Convertimos coordenadas de mundo a pantalla aproximada para distancia
+                    float dist = distance(uv, uMouse);
+                    // Efecto de "levantamiento" cerca del mouse
+                    float interaction = smoothstep(0.4, 0.0, dist) * 3.0;
 
-                    if (distance < CONNECTION_DISTANCE) {
-                        // Opacidad basada en la distancia (cerca es más opaco)
-                        const opacity = (CONNECTION_DISTANCE - distance) / CONNECTION_DISTANCE * 0.4;
+                    // 3. Ruido de detalle "Tech" (vibración rápida)
+                    float noise = random(pos.xy + uTime * 0.05) * 0.1;
 
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        
-                        // Color principal de la línea con la opacidad calculada
-                        ctx.strokeStyle = `rgba(0, 165, 206, ${opacity})`;
-                        
-                        // **Efecto de brillo en la conexión cercana al ratón**
-                        const avgX = (p1.x + p2.x) / 2;
-                        const avgY = (p1.y + p2.y) / 2;
-                        const distToMouse = Math.sqrt((avgX - mouse.x)**2 + (avgY - mouse.y)**2);
-                        
-                        if (distToMouse < 150) {
-                            const glowFactor = (150 - distToMouse) / 150;
-                            ctx.shadowBlur = 10 * glowFactor;
-                            ctx.shadowColor = PRIMARY_COLOR_LINE;
-                            ctx.stroke();
-                            // Restablecer para el siguiente trazo
-                            ctx.shadowBlur = 0;
-                        } else {
-                            ctx.stroke();
-                        }
-                    }
-                });
-            });
+                    // Aplicar elevación en Z
+                    pos.z += wave1 + wave2 + interaction + noise;
 
+                    // Guardamos la elevación para usarla en el color (fragment shader)
+                    vElevation = pos.z;
 
-            animationFrameId = requestAnimationFrame(animate);
-        };
+                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                    
+                    // Tamaño de partícula dinámico: más grandes si están cerca de la cámara (perspective)
+                    gl_PointSize = 3.5 * (10.0 / -mvPosition.z);
+                    
+                    // Redondear partículas en hardware
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `;
+        }
 
-        // Configuración inicial y listeners
-        updateSize();
-        window.addEventListener("resize", updateSize);
-        canvas.addEventListener("mousemove", handleMouseMove);
-        
-        // Iniciar el bucle
-        animate();
+        // --- GLSL FRAGMENT SHADER ---
+        // Controla el color y el brillo de cada pixel
+        fragmentShader() {
+            return `
+                uniform vec3 uColorPrimary;
+                uniform vec3 uColorSecondary;
+                varying float vElevation;
+                varying vec2 vUv;
 
-        // Limpieza al desmontar
-        return () => {
-            window.removeEventListener("resize", updateSize);
-            canvas.removeEventListener("mousemove", handleMouseMove);
-            cancelAnimationFrame(animationFrameId);
-        };
-    }, { once: true }); 
+                void main() {
+                    // Hacer los puntos redondos en vez de cuadrados
+                    float strength = distance(gl_PointCoord, vec2(0.5));
+                    strength = 1.0 - strength;
+                    strength = pow(strength, 3.0); // Difuminar bordes (glow)
+
+                    // Mezclar colores basado en la altura (vElevation)
+                    // Puntos bajos = Cyan, Puntos altos = Dorado
+                    float mixStrength = (vElevation + 2.0) * 0.25;
+                    vec3 color = mix(uColorPrimary, uColorSecondary, mixStrength);
+
+                    // Añadir un destello blanco en los picos más altos (sparkle)
+                    float sparkle = smoothstep(0.8, 1.0, strength) * step(0.9, mixStrength);
+                    color += vec3(sparkle);
+
+                    // Opacidad basada en la distancia al centro (vignette sutil)
+                    float alpha = strength * (smoothstep(0.0, 0.1, vUv.x) * smoothstep(1.0, 0.9, vUv.x));
+
+                    gl_FragColor = vec4(color, alpha);
+                }
+            `;
+        }
+
+        onMouseMove(event) {
+            // Normalizar mouse de 0 a 1 para el shader
+            this.mouse.x = event.clientX / window.innerWidth;
+            this.mouse.y = 1.0 - (event.clientY / window.innerHeight); // Invertir Y para texturas UV
+            
+            if(this.material) {
+                // Hacemos una transición suave (lerp) hacia la nueva posición en el loop de animación
+                // pero aquí actualizamos el target. Por simplicidad en shader lo pasamos directo:
+                this.material.uniforms.uMouse.value.set(this.mouse.x, this.mouse.y);
+            }
+        }
+
+        onResize() {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        animate() {
+            requestAnimationFrame(this.animate.bind(this));
+            
+            const elapsedTime = this.clock.getElapsedTime();
+
+            if (this.material) {
+                this.material.uniforms.uTime.value = elapsedTime;
+            }
+
+            // Rotación sutil de todo el sistema para dinamismo
+            if (this.mesh) {
+                this.mesh.rotation.z = Math.sin(elapsedTime * 0.1) * 0.1;
+            }
+
+            this.renderer.render(this.scene, this.camera);
+        }
+    }
+
+    // Inicialización segura con Astro
+    document.addEventListener('astro:page-load', () => {
+        const canvas = document.getElementById(CANVAS_ID);
+        // Verificar si ya se inicializó para evitar duplicados en navegaciones SPA
+        if (canvas && !canvas.classList.contains('initialized')) {
+            new WebGLHero();
+            canvas.classList.add('initialized');
+        }
+    });
+
+    // Fallback para carga inicial normal
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+         const canvas = document.getElementById(CANVAS_ID);
+         if (canvas && !canvas.classList.contains('initialized')) {
+            new WebGLHero();
+            canvas.classList.add('initialized');
+        }
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            new WebGLHero();
+             document.getElementById(CANVAS_ID)?.classList.add('initialized');
+        });
+    }
 </script>
