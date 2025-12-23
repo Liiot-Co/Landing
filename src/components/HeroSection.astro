@@ -53,15 +53,27 @@ import HeroCanvas from "@/components/HeroCanvas.astro";
 				id="hero-buttons"
 				class="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 translate-y-4"
 			>
-				<Button
-					size="lg"
-					class="bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group px-12 py-7 text-lg font-semibold shadow-xl shadow-secondary/30 rounded-xl"
+				<button
+					class="relative px-12 py-7 text-lg font-semibold rounded-xl
+						bg-[var(--accent)]
+						text-[var(--accent-foreground)]
+						hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
+						shadow-xl shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
+						overflow-hidden group cta-button-accent
+						transition-all duration-300"
 				>
-					Solicitar Demo
-					<ArrowRight
-						class="ml-2 h-6 w-6 transition-transform group-hover:translate-x-1"
-					/>
-				</Button>
+					<span class="relative z-10 flex items-center justify-center gap-2">
+						Solicitar Demo
+						<ArrowRight
+							class="h-6 w-6 transition-transform group-hover:translate-x-1"
+						/>
+					</span>
+					<span
+						class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
+							bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
+							animate-shimmer pointer-events-none">
+					</span>
+				</button>
 				<Button
 					size="lg"
 					variant="outline"
@@ -106,18 +118,6 @@ import HeroCanvas from "@/components/HeroCanvas.astro";
 </script>
 
 <style>
-	/* Utilidad para texto con gradiente */
-	.text-gradient {
-		background-clip: text;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-image: linear-gradient(
-			to right,
-			hsl(var(--secondary)),
-			hsl(var(--primary))
-		);
-	}
-
 	/* Efecto de resplandor para el texto */
 	.accent-glow {
 		text-shadow: 0 0 20px hsla(var(--primary), 0.5);

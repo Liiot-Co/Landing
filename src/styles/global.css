@@ -5,6 +5,10 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  
+  /* Accent color for bg-accent utility */
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 }
 
 html, body {
@@ -29,7 +33,7 @@ html, body {
         --primary-foreground: oklch(0.99 0 0);
 
         /* Accent: Human Vitality & Action (Vibrante pero legible) */
-        --accent: oklch(0.84 0.16 165);
+        --accent: oklch(0.6794 0.1973 165);
         --accent-foreground: oklch(0.20 0.08 165);
 
         --secondary: oklch(0.95 0.02 268);
@@ -47,7 +51,7 @@ html, body {
 
         /* Data Viz */
         --chart-1: oklch(0.42 0.18 268);
-        --chart-2: oklch(0.84 0.16 165);
+        --chart-2: oklch(0.6794 0.1973 165);
         --chart-3: oklch(0.65 0.14 240);
         --chart-4: oklch(0.45 0.12 280);
         --chart-5: oklch(0.75 0.13 185);
@@ -146,5 +150,58 @@ html, body {
   /* Elevación sutil Glassmorphism para elementos flotantes */
   .glass-panel {
     @apply bg-background/80 backdrop-blur-md border border-border/50 shadow-lg;
+  }
+
+  /* Text gradient utility - Using webkit example provided */
+  .text-gradient {
+    background: -webkit-linear-gradient(var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* CTA Button Accent - Fixed rendering */
+  .cta-button-accent {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .cta-button-accent::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--primary)));
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.7;
+    filter: blur(12px);
+    pointer-events: none;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
   }
 }

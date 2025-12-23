@@ -1,0 +1,263 @@
+---
+import Layout from "@/components/layouts/Layout.astro";
+import Navigation from "@/components/Navigation.astro";
+import Footer from "@/components/Footer.astro";
+import { ArrowRight, Mail, User, MessageSquare, Building, Calendar, Phone } from 'lucide-astro';
+import Button from "@/components/ui/button.astro";
+
+const FORM_ID = "demo-request-form";
+const CONTAINER_ID = "demo-container";
+const CONTENT_ID = "demo-content";
+---
+
+<Layout>
+	<Navigation />
+	<main class="bg-background min-h-screen pt-20">
+		<section class="py-24 lg:py-32 relative overflow-hidden">
+			{/* Background effects */}
+			<div class="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none"></div>
+			<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-secondary/8 to-transparent rounded-full blur-[100px] pointer-events-none"></div>
+
+			<div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+				<div
+					id={CONTAINER_ID}
+					class="max-w-4xl mx-auto opacity-0 translate-y-4"
+				>
+					<div class="bg-card/50 backdrop-blur-sm border border-secondary/20 rounded-3xl p-8 lg:p-12">
+						
+						{/* Header */}
+						<div id={CONTENT_ID} class="text-center mb-10 opacity-0">
+							<h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+								Solicite su <span class="text-gradient">Demo Gratuita</span>
+							</h1>
+							<p class="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+								Descubra cómo nuestra plataforma puede transformar los procesos de su empresa. 
+								Complete el formulario y nuestro equipo se pondrá en contacto con usted en menos de 24 horas.
+							</p>
+							
+							{/* Benefits */}
+							<div class="flex flex-wrap justify-center gap-6 mb-8">
+								<div class="flex items-center space-x-2 text-sm text-muted-foreground">
+									<Calendar class="w-5 h-5 text-primary" />
+									<span>Demo personalizada</span>
+								</div>
+								<div class="flex items-center space-x-2 text-sm text-muted-foreground">
+									<Phone class="w-5 h-5 text-primary" />
+									<span>Respuesta en 24h</span>
+								</div>
+								<div class="flex items-center space-x-2 text-sm text-muted-foreground">
+									<Mail class="w-5 h-5 text-primary" />
+									<span>Sin compromiso</span>
+								</div>
+							</div>
+						</div>
+
+						{/* Demo Request Form */}
+						<form 
+							id={FORM_ID}
+							class="space-y-6"
+							method="POST"
+							action="/api/request-demo"
+						>
+							<div class="grid sm:grid-cols-2 gap-6">
+								{/* Nombre */}
+								<div class="space-y-2">
+									<label for="name" class="text-sm font-medium text-foreground flex items-center gap-2">
+										<User class="w-4 h-4 text-primary" />
+										Nombre Completo *
+									</label>
+									<input
+										type="text"
+										id="name"
+										name="name"
+										required
+										class="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+										placeholder="Juan Pérez"
+									/>
+								</div>
+
+								{/* Empresa */}
+								<div class="space-y-2">
+									<label for="company" class="text-sm font-medium text-foreground flex items-center gap-2">
+										<Building class="w-4 h-4 text-primary" />
+										Empresa *
+									</label>
+									<input
+										type="text"
+										id="company"
+										name="company"
+										required
+										class="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+										placeholder="Mi Empresa S.A."
+									/>
+								</div>
+							</div>
+
+							<div class="grid sm:grid-cols-2 gap-6">
+								{/* Email */}
+								<div class="space-y-2">
+									<label for="email" class="text-sm font-medium text-foreground flex items-center gap-2">
+										<Mail class="w-4 h-4 text-primary" />
+										Correo Electrónico *
+									</label>
+									<input
+										type="email"
+										id="email"
+										name="email"
+										required
+										class="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+										placeholder="juan.perez@empresa.com"
+									/>
+								</div>
+
+								{/* Teléfono */}
+								<div class="space-y-2">
+									<label for="phone" class="text-sm font-medium text-foreground flex items-center gap-2">
+										<Phone class="w-4 h-4 text-primary" />
+										Teléfono
+									</label>
+									<input
+										type="tel"
+										id="phone"
+										name="phone"
+										class="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+										placeholder="+34 600 000 000"
+									/>
+								</div>
+							</div>
+
+							{/* Mensaje */}
+							<div class="space-y-2">
+								<label for="message" class="text-sm font-medium text-foreground flex items-center gap-2">
+									<MessageSquare class="w-4 h-4 text-primary" />
+									Cuéntenos sobre su proyecto *
+								</label>
+								<textarea
+									id="message"
+									name="message"
+									required
+									rows="5"
+									class="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
+									placeholder="¿Qué desafíos enfrenta su empresa? ¿Cómo podemos ayudarle a optimizar sus procesos?"
+								></textarea>
+							</div>
+
+							{/* Submit Button */}
+							<div class="pt-4">
+								<Button
+									type="submit"
+									size="lg"
+									class="relative w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group px-8 py-6 text-lg font-semibold shadow-xl shadow-secondary/30 rounded-xl overflow-hidden cta-button-accent"
+								>
+									<div class="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/30 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer"></div>
+									<span class="relative z-10 flex items-center justify-center">
+										Solicitar Demo Gratuita
+										<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+									</span>
+								</Button>
+							</div>
+
+							{/* Success/Error Messages */}
+							<div id="form-message" class="hidden text-center text-sm"></div>
+						</form>
+
+						{/* Additional Info */}
+						<div class="mt-8 pt-8 border-t border-border">
+							<p class="text-sm text-muted-foreground text-center">
+								¿Prefiere hablar directamente? Contáctenos en{" "}
+								<a href="mailto:hello@softwareco.com" class="text-primary hover:underline font-medium">
+									hello@softwareco.com
+								</a>
+								{" "}o llámenos al{" "}
+								<a href="tel:+34600000000" class="text-primary hover:underline font-medium">
+									+34 600 000 000
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>
+
+<script>
+	import { animate, inView } from "motion";
+
+	const CONTAINER_ID = "#demo-container";
+	const CONTENT_ID = "#demo-content";
+	const FORM_ID = "#demo-request-form";
+	const MESSAGE_ID = "#form-message";
+
+	// Animations
+	inView(CONTAINER_ID, () => {
+		animate(CONTAINER_ID, { opacity: 1, transform: "none" }, { duration: 0.5, easing: "ease-out" });
+		animate(CONTENT_ID, { opacity: 1 }, { duration: 0.5, delay: 0.1, easing: "ease-out" });
+	}, { margin: "-100px 0px 0px 0px" });
+
+	// Form handling
+	const form = document.querySelector(FORM_ID);
+	const messageDiv = document.querySelector(MESSAGE_ID);
+
+	if (form) {
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			const formData = new FormData(form);
+			const submitButton = form.querySelector('button[type="submit"]');
+			const originalText = submitButton?.querySelector('span')?.textContent;
+
+			// Disable button
+			if (submitButton) {
+				submitButton.disabled = true;
+				const span = submitButton.querySelector('span');
+				if (span) span.textContent = 'Enviando solicitud...';
+			}
+
+			try {
+				// In a real implementation, you would send this to your API
+				// For now, we'll simulate a successful submission
+				await new Promise(resolve => setTimeout(resolve, 1500));
+
+				// Show success message
+				if (messageDiv) {
+					messageDiv.className = 'text-center text-sm text-green-600 dark:text-green-400';
+					messageDiv.textContent = '¡Solicitud enviada con éxito! Nuestro equipo se pondrá en contacto con usted en menos de 24 horas.';
+					messageDiv.classList.remove('hidden');
+				}
+
+				// Reset form
+				form.reset();
+
+				// Hide message after 5 seconds
+				setTimeout(() => {
+					if (messageDiv) messageDiv.classList.add('hidden');
+				}, 5000);
+
+			} catch (error) {
+				// Show error message
+				if (messageDiv) {
+					messageDiv.className = 'text-center text-sm text-red-600 dark:text-red-400';
+					messageDiv.textContent = 'Hubo un error al enviar su solicitud. Por favor, intente nuevamente o contáctenos directamente.';
+					messageDiv.classList.remove('hidden');
+				}
+			} finally {
+				// Re-enable button
+				if (submitButton) {
+					submitButton.disabled = false;
+					const span = submitButton.querySelector('span');
+					if (span && originalText) span.textContent = originalText;
+				}
+			}
+		});
+	}
+</script>
+
+<style>
+	/* Form input focus styles */
+	#demo-request-form input:focus,
+	#demo-request-form textarea:focus {
+		box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+	}
+</style>

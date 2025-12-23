@@ -58,15 +58,27 @@ const initialContent = {
               <p class="text-xs italic text-foreground/80">"{initialContent.quote}"</p>
             </div>
             
-            <Button
-              asChild
-              class="w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group py-5 text-base font-semibold"
+            <a
+              href="/request-demo"
+              class="relative w-full py-5 text-base font-semibold rounded-md
+                bg-[var(--accent)]
+                text-[var(--accent-foreground)]
+                hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
+                shadow-lg shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
+                overflow-hidden group cta-button-accent
+                transition-all duration-300
+                inline-flex items-center justify-center gap-2"
             >
-        <a href="/request-demo" class="inline-flex items-center justify-center w-full">
+              <span class="relative z-10 flex items-center">
                 Solicitar Demo
                 <ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </a>
-            </Button>
+              </span>
+              <span
+                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
+                  bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
+                  animate-shimmer pointer-events-none">
+              </span>
+            </a>
     </div>
     
     <!-- Indicadores de Progreso -->
@@ -234,9 +246,26 @@ const initialContent = {
           <p class="text-xs italic text-foreground/80">"${data.quote}"</p>
         </div>
 
-        <a href="/request-demo" class="w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group py-5 text-base font-semibold inline-flex items-center justify-center rounded-md transition-all">
-          Solicitar Demo
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <a 
+          href="/request-demo" 
+          class="relative w-full py-5 text-base font-semibold rounded-md
+            bg-[var(--accent)]
+            text-[var(--accent-foreground)]
+            hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
+            shadow-lg shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
+            overflow-hidden group cta-button-accent
+            transition-all duration-300
+            inline-flex items-center justify-center gap-2"
+        >
+          <span class="relative z-10 flex items-center">
+            Solicitar Demo
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+          <span
+            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
+              bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
+              animate-shimmer pointer-events-none">
+          </span>
         </a>
       `;
 
