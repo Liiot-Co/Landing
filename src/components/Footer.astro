@@ -4,19 +4,19 @@ import { Github, Twitter, Linkedin, Mail } from 'lucide-astro';
 const currentYear = new Date().getFullYear();
 
 const footerLinks = {
-  Product: [
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Schedule Grid", href: "/products" },
+  Producto: [
+    { name: "Características", href: "#features" },
+    { name: "Precios", href: "#pricing" },
+    { name: "Plataforma Empresarial", href: "/products" },
   ],
-  Company: [
-    { name: "About", href: "#about" },
-    { name: "Careers", href: "#careers" },
-    { name: "Contact", href: "#contact" },
+  Empresa: [
+    { name: "Acerca de", href: "#about" },
+    { name: "Carreras", href: "#careers" },
+    { name: "Contacto", href: "#contact" },
   ],
-  Resources: [
-    { name: "Documentation", href: "#docs" },
-    { name: "Help Center", href: "#help" },
+  Recursos: [
+    { name: "Documentación", href: "#docs" },
+    { name: "Centro de Ayuda", href: "#help" },
     { name: "Blog", href: "#blog" },
   ],
 };
@@ -41,7 +41,7 @@ const socialLinks = [
           <span class="text-xl font-bold">HemAI</span>
         </div>
         <p class="text-muted-foreground text-sm mb-6">
-          Building innovative software solutions for modern businesses.
+          Construyendo soluciones de software innovadoras para empresas modernas.
         </p>
         <div class="flex space-x-4">
           {socialLinks.map((social) => {
@@ -83,14 +83,14 @@ const socialLinks = [
     <div class="pt-8 border-t border-border">
       <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <p class="text-sm text-muted-foreground">
-          © {currentYear} SoftwareCo. All rights reserved.
+          © {currentYear} SoftwareCo. Todos los derechos reservados.
         </p>
         <div class="flex space-x-6">
           <a href="#privacy" class="text-sm text-muted-foreground hover:text-primary transition-colors">
-            Privacy Policy
+            Política de Privacidad
           </a>
           <a href="#terms" class="text-sm text-muted-foreground hover:text-primary transition-colors">
-            Terms of Service
+            Términos de Servicio
           </a>
         </div>
       </div>

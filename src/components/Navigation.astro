@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 // --- Datos ---
 const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "Products", path: "/products" },
+  { name: "Inicio", path: "/" },
+  { name: "Productos", path: "/products" },
 ];
 
 // Obtenemos el path actual para la renderización inicial del estado activo
@@ -29,7 +29,7 @@ const MOBILE_MENU_ID = "mobile-menu";
           <span class="text-primary-foreground font-bold text-lg">S</span>
         </div>
         <span class="text-xl sm:text-2xl font-bold text-foreground">
-          SoftwareCo
+          HemAI
         </span>
       </a>
 
@@ -52,7 +52,7 @@ const MOBILE_MENU_ID = "mobile-menu";
           </a>
         ))}
         <Button asChild class="bg-primary text-primary-foreground hover:bg-primary/90">
-          <a href="#demo">Get Started</a>
+          <a href="#demo">Comenzar</a>
         </Button>
       </div>
 
@@ -88,8 +88,8 @@ const MOBILE_MENU_ID = "mobile-menu";
             {link.name}
           </a>
         ))}
-        <Button asChild class="bg-primary text-primary-foreground hover:bg-primary/90 w-full">
-          <a href="#demo">Get Started</a>
+        <Button asChild class="bg-red text-primary-foreground hover:bg-red/90 w-full">
+          <a href="#demo">Comenzar</a>
         </Button>   
       </div>
     </div>

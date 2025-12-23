@@ -12,14 +12,14 @@ const logicalSections = ["hero", "product", "benefits", "testimonials"];
 // Contenido inicial para SSR (SEO y carga rápida)
 const initialContent = {
     icon: Users,
-    title: "Transform Your Workflow",
-    description: "See how your team can optimize schedules",
+    title: "Transforme su Empresa",
+    description: "Descubra cómo optimizar los procesos de su equipo",
     bullets: [
-        "Smart automation that saves time",
-        "Designed for team collaboration",
-        "Scales with your needs",
+        "Automatización inteligente que ahorra tiempo y costos",
+        "Diseñado para colaboración empresarial eficiente",
+        "Escala según las necesidades de su negocio",
     ],
-    quote: "Built for modern teams",
+    quote: "Construido para empresas modernas",
 };
 ---
 
@@ -35,38 +35,38 @@ const initialContent = {
     <!-- Contenedor de Contenido Dinámico -->
     <div id={CONTENT_ID}>
       {/* Renderizado inicial estático */}
-      <div class="flex items-center space-x-3 mb-4">
-      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary/20 to-primary/10 border border-secondary/30 flex items-center justify-center">
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary/20 to-primary/10 border border-secondary/30 flex items-center justify-center">
         <Users class="w-5 h-5 text-secondary" />
-      </div>
-        <div>
-          <h3 class="font-semibold text-sm">{initialContent.title}</h3>
-          <p class="text-xs text-muted-foreground">{initialContent.description}</p>
-        </div>
-      </div>
+              </div>
+              <div>
+                <h3 class="font-semibold text-sm">{initialContent.title}</h3>
+                <p class="text-xs text-muted-foreground">{initialContent.description}</p>
+              </div>
+            </div>
 
-      <div class="space-y-2 mb-4">
-        {initialContent.bullets.map((bullet) => (
-          <div class="flex items-start space-x-2">
-            <div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 flex-shrink-0" />
-            <p class="text-xs text-muted-foreground">{bullet}</p>
-          </div>
-        ))}
-      </div>
+            <div class="space-y-2 mb-4">
+              {initialContent.bullets.map((bullet) => (
+                <div class="flex items-start space-x-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 flex-shrink-0" />
+                  <p class="text-xs text-muted-foreground">{bullet}</p>
+                </div>
+              ))}
+            </div>
 
-      <div class="bg-gradient-to-r from-secondary/10 to-primary/5 rounded-lg p-3 mb-4 border border-secondary/20">
-        <p class="text-xs italic text-foreground/80">"{initialContent.quote}"</p>
-      </div>
-
-      <Button
-        asChild
-        class="w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group py-5 text-base font-semibold"
-      >
+            <div class="bg-gradient-to-r from-secondary/10 to-primary/5 rounded-lg p-3 mb-4 border border-secondary/20">
+              <p class="text-xs italic text-foreground/80">"{initialContent.quote}"</p>
+            </div>
+            
+            <Button
+              asChild
+              class="w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group py-5 text-base font-semibold"
+            >
         <a href="/request-demo" class="inline-flex items-center justify-center w-full">
-          Request Demo
-          <ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-        </a>
-      </Button>
+                Solicitar Demo
+                <ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </a>
+            </Button>
     </div>
     
     <!-- Indicadores de Progreso -->
@@ -115,53 +115,53 @@ const initialContent = {
   const getContent = (key: string) => {
     switch (key) {
       case "product":
-        return {
+            return {
           iconName: "Calendar",
-          title: "Schedule Grid",
-          description: "Optimize team schedules automatically",
-          bullets: [
-            "AI-powered calendar optimization",
-            "Real-time team coordination",
-            "Automated time tracking",
-          ],
-          quote: "Saves hours every week",
-        };
+                title: "Planificación Empresarial",
+                description: "Optimice los horarios de su equipo automáticamente",
+                bullets: [
+                    "Optimización de calendarios con IA",
+                    "Coordinación de equipos en tiempo real",
+                    "Seguimiento automático de tiempo y productividad",
+                ],
+                quote: "Ahorra horas cada semana",
+            };
       case "benefits":
-        return {
+            return {
           iconName: "Shield",
-          title: "Enterprise Security",
-          description: "Secure infrastructure with encrypted data",
-          bullets: [
-            "Bank-level encryption standards",
-            "99.99% uptime guarantee",
-            "Data ownership & export anytime",
-          ],
-          quote: "Reliable and stable",
-        };
+                title: "Seguridad Empresarial",
+                description: "Infraestructura segura con datos cifrados",
+                bullets: [
+                    "Estándares de cifrado nivel bancario",
+                    "Garantía de 99.99% de tiempo de actividad",
+                    "Propiedad de datos y exportación en cualquier momento",
+                ],
+                quote: "Confiable y estable",
+            };
       case "testimonials":
-        return {
+            return {
           iconName: "Star",
-          title: "Proven Results",
-          description: "Trusted by 10,000+ teams",
-          bullets: [
-            "40% productivity increase",
-            "Seamless implementation",
-            "24/7 expert support",
-          ],
-          quote: "Best investment made",
-        };
-      default: // hero
-        return {
+                title: "Resultados Comprobados",
+                description: "Confiado por más de 10,000 empresas",
+                bullets: [
+                    "Aumento de productividad del 40%",
+                    "Implementación sin interrupciones",
+                    "Soporte experto 24/7",
+                ],
+                quote: "La mejor inversión realizada",
+            };
+        default: // hero
+            return {
           iconName: "Users",
-          title: "Transform Your Workflow",
-          description: "See how your team can optimize schedules",
-          bullets: [
-            "Smart automation that saves time",
-            "Designed for team collaboration",
-            "Scales with your needs",
-          ],
-          quote: "Built for modern teams",
-        };
+                title: "Transforme su Empresa",
+                description: "Descubra cómo optimizar los procesos de su equipo",
+                bullets: [
+                    "Automatización inteligente que ahorra tiempo y costos",
+                    "Diseñado para colaboración empresarial eficiente",
+                    "Escala según las necesidades de su negocio",
+                ],
+                quote: "Construido para empresas modernas",
+            };
     }
   };
 
@@ -189,7 +189,7 @@ const initialContent = {
     if (!widget || !contentContainer) {
       // Retry if elements not found
       setTimeout(initScrollWidget, 100);
-      return;
+      return; 
     }
 
     let currentSectionKey = 'hero';
@@ -208,7 +208,7 @@ const initialContent = {
     const updateWidgetContent = (key: string) => {
       const data = getContent(key);
       const iconSvg = (iconMap[data.iconName as keyof typeof iconMap] || iconMap.Users);
-
+      
       // Generamos el HTML usando las clases correctas (bg-gradient-to-r)
       const html = `
         <div class="flex items-center space-x-3 mb-4">
@@ -235,7 +235,7 @@ const initialContent = {
         </div>
 
         <a href="/request-demo" class="w-full bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group py-5 text-base font-semibold inline-flex items-center justify-center rounded-md transition-all">
-          Request Demo
+          Solicitar Demo
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
       `;
@@ -249,7 +249,7 @@ const initialContent = {
           // Forzar reflow para asegurar que los estilos se apliquen
           contentContainer.offsetHeight;
           animate(contentContainer, { opacity: 1, x: 0 }, { duration: 0.3 });
-        });
+      });
       } else {
         // Si no hay contenido, establecerlo directamente
         contentContainer.innerHTML = html;
@@ -262,10 +262,10 @@ const initialContent = {
     const onScroll = () => {
       const scrollY = window.scrollY;
       const windowH = window.innerHeight;
-      
+
       // 1. Visibilidad: Mostrar widget si hemos pasado el 30% del primer viewport
       const shouldBeVisible = scrollY > (windowH * 0.3);
-      
+
       if (shouldBeVisible !== isVisible) {
         isVisible = shouldBeVisible;
         if (isVisible) {
@@ -278,7 +278,7 @@ const initialContent = {
           animate(widget, { opacity: 0, x: 20 }, { duration: 0.3 });
         }
       }
-
+      
       // Si no es visible, no gastamos recursos calculando secciones
       if (!isVisible) return;
 
@@ -337,14 +337,14 @@ const initialContent = {
           if (key === activeKey) {
             el.classList.add('progress-active');
             el.classList.remove('bg-border');
-          } else {
+            } else {
             el.classList.remove('progress-active');
             el.classList.add('bg-border');
           }
         });
       }
     };
-
+    
     // Inicialización de eventos
     const scrollHandler = () => onScroll();
     const resizeHandler = () => {

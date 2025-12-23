@@ -5,7 +5,7 @@ const CANVAS_ID = "interactive-hero-canvas";
 <div class="absolute inset-0 w-full h-full bg-black">
     <canvas
       id={CANVAS_ID}
-      class="block w-full h-full outline-none cursor-crosshair"
+      class="block w-full h-full outline-none"
     ></canvas>
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 pointer-events-none"></div>
 </div>
@@ -17,10 +17,12 @@ const CANVAS_ID = "interactive-hero-canvas";
     const CANVAS_ID = "interactive-hero-canvas";
 
     // --- CONFIGURACIÓN DE COLORES (Normalizados 0.0 - 1.0 para GLSL) ---
-    // Cyan: #00A5CE -> R:0.0, G:0.647, B:0.808
-    // Gold: #D1A055 -> R:0.82, G:0.627, B:0.333
-    const COLOR_PRIMARY = new THREE.Vector3(0.0, 0.647, 0.808); 
-    const COLOR_SECONDARY = new THREE.Vector3(0.82, 0.627, 0.333); 
+    // Cyan:rgb(37, 61, 173) -> R:0.0, G:0.647, B:0.808
+    // Gold:rgb(65, 235, 176) -> R:0.82, G:0.627, B:0.333
+    // Bg: #050505
+    const COLOR_PRIMARY   = new THREE.Vector3(0.145, 0.239, 0.678); // Cyan
+    const COLOR_SECONDARY = new THREE.Vector3(0.255, 0.922, 0.690); // Gold
+
     const BG_COLOR = 0x050505; // Fondo muy oscuro, casi negro
 
     class WebGLHero {
@@ -233,3 +235,9 @@ const CANVAS_ID = "interactive-hero-canvas";
         });
     }
 </script>
+
+<style>
+canvas {
+    opacity: 0.7;
+}
+</style>

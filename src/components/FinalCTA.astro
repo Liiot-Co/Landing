@@ -11,9 +11,9 @@ const BUTTON_ID = "cta-button";
 const BENEFIT_CLASS = ".cta-benefit-item";
 
 const benefits = [
-  "See how it works for your team",
-  "Personalized walkthrough",
-  "No commitment required",
+  "Vea cómo funciona para su empresa",
+  "Recorrido personalizado con su equipo",
+  "Sin compromiso, sin tarjeta de crédito",
 ];
 ---
 
@@ -28,7 +28,7 @@ const benefits = [
   </div>
   
   {/* Background effects with gradient blend */}
-  <div class="absolute inset-0 bg-linear-to-br from-secondary/8 via-transparent to-primary/5 pointer-events-none" />
+  <div class="absolute inset-0 bg-gradient-to-br from-secondary/8 via-transparent to-primary/5 pointer-events-none" />
   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-secondary/8 to-transparent rounded-full blur-[100px] pointer-events-none" />
 
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -43,10 +43,10 @@ const benefits = [
         {/* INNER CONTENT (H2, P) - Animación con delay 0.1s */}
         <div id={CONTENT_ID} class="opacity-0">
           <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-            Ready to <span class="text-gradient">transform</span> your workflow?
+            ¿Listo para <span class="text-gradient">transformar</span> su empresa?
           </h2>
           <p class="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Discover how our platform can optimize your team's workflow and boost productivity.
+            Descubra cómo nuestra plataforma puede optimizar los procesos de su equipo, aumentar la productividad y reducir costos operativos hasta en un 40%.
           </p>
 
           {/* Benefits with secondary accent - Animación escalonada (stagger) con delay 0.2s */}
@@ -69,15 +69,15 @@ const benefits = [
         >
           <Button
             size="lg"
-            class="bg-linear-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group px-14 py-8 text-xl font-semibold shadow-xl shadow-secondary/30 rounded-xl"
+            class="bg-gradient-to-r from-secondary to-secondary/70 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/60 group px-14 py-8 text-xl font-semibold shadow-xl shadow-secondary/30 rounded-xl"
           >
-            Request Demo
+            Solicitar Demo Gratuita
             <ArrowRight class="ml-3 h-6 w-6 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>
 
         <p class="text-sm text-muted-foreground mt-8">
-          Questions? Contact us at{" "}
+          ¿Preguntas? Contáctenos en{" "}
           <a href="mailto:hello@softwareco.com" class="text-secondary hover:underline">
             hello@softwareco.com
           </a>
