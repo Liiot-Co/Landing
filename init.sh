@@ -27,7 +27,7 @@ echo "--------------------------------------------------------"
 # --------------------------------------------------
 
 # Verifica si la variable DEBUG_MODE (basada en la variable DEBUG) tiene contenido (-n)
-if [ -n "$DEBUG_MODE" ]; then
+if [ -n "$DEBUG_MODE" == "true" ]; then
     echo "  ⚠️  Modo DEBUG activado. El servidor NO se iniciará automáticamente."
     echo "  El contenedor se mantendrá vivo con 'tail -f /dev/null'."
     echo "  Usa 'make shell' y ejecuta 'bun dev' manualmente si lo necesitas."
