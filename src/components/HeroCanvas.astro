@@ -16,7 +16,6 @@ const CANVAS_ID = "silk-grain-canvas";
 <script>
   const CANVAS_ID = "silk-grain-canvas";
 
-  // Helper: Parses CSS color (OKLCH, HSL, etc.) into normalized [r, g, b] for WebGL
   function getWebGLColor(
     varName: string,
     fallback: [number, number, number],
@@ -48,25 +47,36 @@ const CANVAS_ID = "silk-grain-canvas";
     private canvas: HTMLCanvasElement | null = null;
     private gl: WebGLRenderingContext | null = null;
     private program: WebGLProgram | null = null;
+
+    // --- CONFIGURATION ---
+    private config = {
+      speed: 1.0, // Multiplier for animation speed (1.0 is default)
+      spread: 2.0, // Zoom/Scale of the waves (higher = more zoomed out)
+      quality: 0.75, // Canvas resolution scale (0.5 to 1.0) - balances performance
+    };
+
     private locations: {
       time: WebGLUniformLocation | null;
       resolution: WebGLUniformLocation | null;
       bg: WebGLUniformLocation | null;
       primary: WebGLUniformLocation | null;
       secondary: WebGLUniformLocation | null;
+      speed: WebGLUniformLocation | null;
+      spread: WebGLUniformLocation | null;
     } | null = null;
 
-    private colors: {
-      bg: [number, number, number];
-      primary: [number, number, number];
-      secondary: [number, number, number];
-    } = {
-      bg: [0.09, 0.07, 0.14],
-      primary: [0.46, 0.15, 0.88],
-      secondary: [0.96, 0.3, 0.01],
+    private colors = {
+      bg: [0.09, 0.07, 0.14] as [number, number, number],
+      primary: [0.46, 0.15, 0.88] as [number, number, number],
+      secondary: [0.96, 0.3, 0.01] as [number, number, number],
     };
 
-    private startTime: number = 0;
+    private isPlaying: boolean = false;
+    private timeAcc: number = 0;
+    private lastTime: number = 0;
+
+    private io: IntersectionObserver | null = null;
+    private mo: MutationObserver | null = null;
 
     constructor() {
       this.canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement;
@@ -85,46 +95,76 @@ const CANVAS_ID = "silk-grain-canvas";
       }
 
       this.initShader();
+
+      // Initial updates
+      this.gl.useProgram(this.program);
       this.updateColors();
       this.resize();
 
+      // Event Listeners
       window.addEventListener("resize", () => this.resize());
 
-      // Watch for theme changes (dark/light mode, etc.)
-      const observer = new MutationObserver(() => this.updateColors());
-      observer.observe(document.documentElement, {
+      // Watch for theme changes
+      this.mo = new MutationObserver(() => this.updateColors());
+      this.mo.observe(document.documentElement, {
         attributes: true,
         attributeFilter: ["class", "style"],
       });
 
-      this.startTime = Date.now();
-      this.animate();
+      // Pause rendering when off-screen to save battery/CPU
+      this.io = new IntersectionObserver(
+        (entries) => {
+          this.isPlaying = entries[0].isIntersecting;
+          if (this.isPlaying) {
+            this.lastTime = performance.now();
+            requestAnimationFrame((t) => this.animate(t));
+          }
+        },
+        { threshold: 0 },
+      );
+      this.io.observe(this.canvas);
     }
 
     private updateColors() {
+      if (!this.gl || !this.locations) return;
+      this.gl.useProgram(this.program);
+
       this.colors.bg = getWebGLColor("--background", [0.09, 0.07, 0.14]);
       this.colors.primary = getWebGLColor("--primary", [0.46, 0.15, 0.88]);
       this.colors.secondary = getWebGLColor("--secondary", [0.96, 0.3, 0.01]);
+
+      // Update uniforms only when colors change
+      this.gl.uniform3fv(this.locations.bg, this.colors.bg);
+      this.gl.uniform3fv(this.locations.primary, this.colors.primary);
+      this.gl.uniform3fv(this.locations.secondary, this.colors.secondary);
+
+      // Update config uniforms
+      this.gl.uniform1f(this.locations.speed, this.config.speed);
+      this.gl.uniform1f(this.locations.spread, this.config.spread);
     }
 
     private resize() {
-      if (!this.canvas || !this.gl) return;
+      if (!this.canvas || !this.gl || !this.locations) return;
+      this.gl.useProgram(this.program);
 
       const dpr = window.devicePixelRatio || 1;
-      const scale = 0.75; // Performance vs quality balance
-
-      this.canvas.width = window.innerWidth * dpr * scale;
-      this.canvas.height = window.innerHeight * dpr * scale;
+      this.canvas.width = window.innerWidth * dpr * this.config.quality;
+      this.canvas.height = window.innerHeight * dpr * this.config.quality;
 
       this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+
+      // Update resolution uniform only on resize
+      this.gl.uniform2f(
+        this.locations.resolution,
+        this.canvas.width,
+        this.canvas.height,
+      );
     }
 
     private initShader() {
       if (!this.gl) return;
-
       const gl = this.gl;
 
-      // Vertex Shader
       const vsSource = `
         attribute vec2 a_position;
         void main() {
@@ -132,7 +172,6 @@ const CANVAS_ID = "silk-grain-canvas";
         }
       `;
 
-      // Fragment Shader (improved from your version)
       const fsSource = `
         precision highp float;
         
@@ -142,6 +181,13 @@ const CANVAS_ID = "silk-grain-canvas";
         uniform vec3 u_colorBg;
         uniform vec3 u_colorPrimary;
         uniform vec3 u_colorSecondary;
+        
+        uniform float u_speed;
+        uniform float u_spread;
+
+        // Precomputed rotation matrix for cos(0.5), sin(0.5)
+        const mat2 rot = mat2(0.87758, 0.47942, -0.47942, 0.87758);
+        const vec2 shift = vec2(100.0);
 
         float random(vec2 st) {
           return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
@@ -161,8 +207,6 @@ const CANVAS_ID = "silk-grain-canvas";
         float fbm(vec2 st) {
           float v = 0.0;
           float a = 0.5;
-          vec2 shift = vec2(100.0);
-          mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
           for (int i = 0; i < 5; ++i) {
             v += a * noise(st);
             st = rot * st * 1.0 + shift;
@@ -174,9 +218,9 @@ const CANVAS_ID = "silk-grain-canvas";
         void main() {
           vec2 st = gl_FragCoord.xy / u_resolution.xy;
           st.x *= u_resolution.x / u_resolution.y;
-          st *= 2.0;                    // wider folds
+          st *= u_spread; // Configurable fold width
 
-          float t = u_time * 0.15;
+          float t = u_time * 0.15 * u_speed; // Configurable speed
 
           // Domain Warping
           vec2 q = vec2(0.0);
@@ -229,7 +273,6 @@ const CANVAS_ID = "silk-grain-canvas";
 
       gl.useProgram(this.program);
 
-      // Fullscreen quad
       const positionBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.bufferData(
@@ -248,6 +291,8 @@ const CANVAS_ID = "silk-grain-canvas";
         bg: gl.getUniformLocation(this.program, "u_colorBg"),
         primary: gl.getUniformLocation(this.program, "u_colorPrimary"),
         secondary: gl.getUniformLocation(this.program, "u_colorSecondary"),
+        speed: gl.getUniformLocation(this.program, "u_speed"),
+        spread: gl.getUniformLocation(this.program, "u_spread"),
       };
     }
 
@@ -270,25 +315,31 @@ const CANVAS_ID = "silk-grain-canvas";
       return shader;
     }
 
-    private animate() {
-      if (!this.gl || !this.program || !this.locations) return;
+    private animate(timestamp: number) {
+      if (!this.gl || !this.program || !this.locations || !this.isPlaying)
+        return;
 
-      requestAnimationFrame(() => this.animate());
+      requestAnimationFrame((t) => this.animate(t));
 
-      const time = (Date.now() - this.startTime) / 1000;
+      // Calculate safe delta time to prevent jarring jumps
+      let delta = timestamp - this.lastTime;
+      this.lastTime = timestamp;
 
-      this.gl.uniform1f(this.locations.time, time);
-      this.gl.uniform2f(
-        this.locations.resolution,
-        this.canvas!.width,
-        this.canvas!.height,
-      );
+      // Cap delta if tab was inactive briefly without triggering intersection observer
+      if (delta > 100) delta = 16.66;
 
-      this.gl.uniform3fv(this.locations.bg, this.colors.bg);
-      this.gl.uniform3fv(this.locations.primary, this.colors.primary);
-      this.gl.uniform3fv(this.locations.secondary, this.colors.secondary);
+      this.timeAcc += delta * 0.001;
 
+      // ONLY update the time uniform per frame
+      this.gl.uniform1f(this.locations.time, this.timeAcc);
       this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+    }
+
+    // Cleanup method for frameworks that unmount components (e.g. Astro View Transitions)
+    public destroy() {
+      this.isPlaying = false;
+      if (this.io && this.canvas) this.io.unobserve(this.canvas);
+      if (this.mo) this.mo.disconnect();
     }
   }
 
