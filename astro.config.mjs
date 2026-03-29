@@ -7,12 +7,14 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      watch: {
+        usePolling: true,
+      }
+    },
   },
   server: {
     host: true,
     allowedHosts: true,
-    watch: {
-      usePolling: true,
-    },
-  },
+  }
 });
