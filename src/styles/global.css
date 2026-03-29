@@ -7,22 +7,27 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-html, body {
+html,
+body {
   @apply bg-background text-foreground antialiased;
-  @media (prefers-color-scheme: dark) { color-scheme: dark; }
+
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
 }
 
 :root {
   /* --- LIGHT MODE: ETHEREAL DAYLIGHT --- */
-  
+
   /* Background: A very soft "Porcelain" purple-white. Not clinical white, but warm and airy. */
   --background: oklch(0.985 0.003 292);
-  --foreground: oklch(0.20 0.04 292); /* Softer Charcoal-Violet for easier reading than pure black */
+  --foreground: oklch(0.20 0.04 292);
+  /* Softer Charcoal-Violet for easier reading than pure black */
 
   /* Surfaces: Pure White to make content "pop" against the soft background */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.20 0.04 292);
-  
+
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.20 0.04 292);
 
@@ -53,10 +58,10 @@ html, body {
   --ring: oklch(0.64 0.11 292);
 
   /* Data Viz - Pastel Adjusted */
-  --chart-1: oklch(0.64 0.11 292); 
+  --chart-1: oklch(0.64 0.11 292);
   --chart-2: oklch(0.72 0.16 50);
-  --chart-3: oklch(0.85 0.10 320); 
-  --chart-4: oklch(0.60 0.12 250); 
+  --chart-3: oklch(0.85 0.10 320);
+  --chart-4: oklch(0.60 0.12 250);
   --chart-5: oklch(0.78 0.14 150);
 
   /* Sidebar: Distinct from background, but very bright */
@@ -82,13 +87,13 @@ html, body {
 
 .dark {
   /* --- DARK MODE: DEEP COSMIC OBSIDIAN (Unchanged structure, updated Accent) --- */
-  
+
   --background: oklch(0.14 0.02 292);
   --foreground: oklch(0.98 0.005 292);
 
   --card: oklch(0.17 0.025 292);
   --card-foreground: oklch(0.98 0.005 292);
-  
+
   --popover: oklch(0.17 0.025 292);
   --popover-foreground: oklch(0.98 0.005 292);
 
@@ -126,7 +131,7 @@ html, body {
   --sidebar-accent-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.25 0.03 292);
   --sidebar-ring: oklch(0.64 0.11 292);
-  
+
   --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.4);
   --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.4), 0 1px 2px -1px oklch(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -1px oklch(0 0 0 / 0.4);
@@ -171,7 +176,7 @@ html, body {
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  
+
   --shadow-sm: var(--shadow-sm);
   --shadow: var(--shadow);
   --shadow-md: var(--shadow-md);
@@ -179,8 +184,10 @@ html, body {
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
-  
+  * {
+    @apply border-border outline-ring/50;
+  }
+
   html {
     scroll-behavior: smooth;
     scrollbar-gutter: stable;
@@ -188,8 +195,7 @@ html, body {
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in oklab, var(--color-border) 82%, var(--color-background))
-      transparent;
+    scrollbar-color: color-mix(in oklab, var(--color-border) 82%, var(--color-background)) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -216,17 +222,22 @@ html, body {
     background: transparent;
   }
 
-  ::selection { @apply bg-primary/20 text-primary; }
+  ::selection {
+    @apply bg-primary/20 text-primary;
+  }
 }
 
 
 @layer utilities {
-  .transition-all-smooth { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-  
+  .transition-all-smooth {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   /* Elevación sutil Glassmorphism para elementos flotantes */
   .glass-panel {
-    @apply bg-background/80 backdrop-blur-[12px] border border-border/50 shadow-lg;
+    @apply bg-background/80 backdrop-blur-md border border-border/50 shadow-lg;
   }
+
   /* Text gradient utility - Using webkit example provided */
   .text-gradient {
     background: -webkit-linear-gradient(var(--primary), var(--secondary));
@@ -235,48 +246,4 @@ html, body {
     -webkit-text-fill-color: transparent;
   }
 
-  /* CTA Button Accent - Fixed rendering */
-  .cta-button-accent {
-    position: relative;
-    isolation: isolate;
-  }
-
-  .cta-button-accent::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--primary)));
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
-    border-radius: inherit;
-    z-index: -1;
-    opacity: 0.7;
-    filter: blur(12px);
-    pointer-events: none;
-  }
-
-  @keyframes gradient-shift {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
-  }
-
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
 }
