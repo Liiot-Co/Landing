@@ -10,11 +10,11 @@ import {
   Shield, 
   BarChart3, 
   CheckCircle2, 
-  ArrowRight, 
   Layers,
   Sparkles
 } from 'lucide-astro';
 import Button from "@/components/ui/button.astro";
+import FinalCTAButton from "@/components/FinalCTAButton.astro";
 
 const GALLERY_ID = "features-grid";
 const HEADER_ID = "products-header";
@@ -56,27 +56,14 @@ const HEADER_ID = "products-header";
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              class="relative px-8 h-12 text-lg font-bold rounded-lg
-                bg-[var(--accent)]
-                text-[var(--accent-foreground)]
-                hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
-                shadow-lg shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
-                overflow-hidden group cta-button-accent
-                transition-all duration-300"
-            >
-              <span class="relative z-10">Comenzar Prueba Gratis</span>
-              <span
-                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
-                  bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
-                  animate-shimmer pointer-events-none">
-              </span>
-            </button>
+            <FinalCTAButton size="compact" showArrow={false}>
+              Comenzar Prueba Gratis
+            </FinalCTAButton>
             <Button 
               variant="outline" 
               size="lg" 
               class="bg-background/50 backdrop-blur-sm border-input px-8 h-12 rounded-lg text-lg"
-              style="--hover-bg: oklch(from var(--accent) l c h / 0.05);"
+              style="--hover-bg: oklch(from var(--primary) l c h / 0.05);"
             >
               Agendar Demo
             </Button>

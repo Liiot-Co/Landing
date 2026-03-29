@@ -1,7 +1,6 @@
 ---
-import { ArrowRight, Users, Calendar, Shield, Star } from 'lucide-astro';
-// Asegúrate de que esta ruta sea correcta para tu proyecto
-import Button from "@/components/ui/button.astro";
+import { Users, Calendar, Shield, Star } from 'lucide-astro';
+import FinalCTAButton from "@/components/FinalCTAButton.astro";
 
 const WIDGET_ID = "scroll-follow-widget";
 const CONTENT_ID = "scroll-follow-content";
@@ -58,27 +57,9 @@ const initialContent = {
               <p class="text-xs italic text-foreground/80">"{initialContent.quote}"</p>
             </div>
             
-            <a
-              href="/request-demo"
-              class="relative w-full py-5 text-base font-semibold rounded-md
-                bg-[var(--accent)]
-                text-[var(--accent-foreground)]
-                hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
-                shadow-lg shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
-                overflow-hidden group cta-button-accent
-                transition-all duration-300
-                inline-flex items-center justify-center gap-2"
-            >
-              <span class="relative z-10 flex items-center">
-                Solicitar Demo
-                <ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </span>
-              <span
-                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
-                  bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
-                  animate-shimmer pointer-events-none">
-              </span>
-            </a>
+            <FinalCTAButton href="/request-demo" size="widget">
+              Solicitar Demo
+            </FinalCTAButton>
     </div>
     
     <!-- Indicadores de Progreso -->
@@ -111,6 +92,7 @@ const initialContent = {
 
 <script>
   import { animate } from "motion";
+  import { FINAL_CTA_WIDGET_ANCHOR_CLASS } from "@/constants/finalCtaButton";
   
   const WIDGET_ID = "scroll-follow-widget";
   const CONTENT_ID = "scroll-follow-content";
@@ -248,23 +230,17 @@ const initialContent = {
 
         <a 
           href="/request-demo" 
-          class="relative w-full py-5 text-base font-semibold rounded-md
-            bg-[var(--accent)]
-            text-[var(--accent-foreground)]
-            hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
-            shadow-lg shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
-            overflow-hidden group cta-button-accent
-            transition-all duration-300
-            inline-flex items-center justify-center gap-2"
+          class="${FINAL_CTA_WIDGET_ANCHOR_CLASS}"
         >
           <span class="relative z-10 flex items-center">
-            Solicitar Demo
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <span class="cta-button-text">Solicitar Demo</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </span>
           <span
             class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
               bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
-              animate-shimmer pointer-events-none">
+              animate-shimmer pointer-events-none"
+            aria-hidden="true">
           </span>
         </a>
       `;

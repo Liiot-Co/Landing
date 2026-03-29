@@ -1,7 +1,8 @@
 ---
-import { ArrowRight, Play } from "lucide-astro";
+import { Play } from "lucide-astro";
 import Button from "@/components/ui/button.astro";
 import HeroCanvas from "@/components/HeroCanvas.astro";
+import FinalCTAButton from "@/components/FinalCTAButton.astro";
 ---
 
 <section
@@ -36,44 +37,25 @@ import HeroCanvas from "@/components/HeroCanvas.astro";
 				id="hero-heading"
 				class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight opacity-0 translate-y-4"
 			>
-				<span class="text-primary">Automatiza</span>
+				<span class="text-white">Automatiza</span>
 				<br />
 				Trabajo Inteligente.
 			</h1>
 
 			<p
 				id="hero-paragraph"
-				class="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto opacity-0 translate-y-4"
+				class="text-lg sm:text-xl text-white mb-10 max-w-2xl mx-auto opacity-0 translate-y-4"
 			>
-				Optimice los procesos de su empresa con nuestra plataforma inteligente. 
-				Diseñada para equipos que buscan eficiencia, precisión y resultados medibles.
+				Optimice los procesos de su empresa con nuestra plataforma
+				inteligente. Diseñada para equipos que buscan eficiencia,
+				precisión y resultados medibles.
 			</p>
 
 			<div
 				id="hero-buttons"
 				class="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 translate-y-4"
 			>
-				<button
-					class="relative px-12 py-7 text-lg font-semibold rounded-xl
-						bg-[var(--accent)]
-						text-[var(--accent-foreground)]
-						hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
-						shadow-xl shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
-						overflow-hidden group cta-button-accent
-						transition-all duration-300"
-				>
-					<span class="relative z-10 flex items-center justify-center gap-2">
-						Solicitar Demo
-						<ArrowRight
-							class="h-6 w-6 transition-transform group-hover:translate-x-1"
-						/>
-					</span>
-					<span
-						class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
-							bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
-							animate-shimmer pointer-events-none">
-					</span>
-				</button>
+				<FinalCTAButton size="hero">Solicitar Demo</FinalCTAButton>
 				<Button
 					size="lg"
 					variant="outline"
@@ -82,14 +64,6 @@ import HeroCanvas from "@/components/HeroCanvas.astro";
 					<Play class="mr-2 h-5 w-5 text-primary" />
 					Ver Demo
 				</Button>
-			</div>
-
-			{/* 5. TRUST TEXT (ID present) */}
-			<div
-				id="hero-trust"
-				class="mt-16 text-sm text-muted-foreground opacity-0"
-			>
-				Confiado por más de 10,000 empresas en todo el mundo
 			</div>
 		</div>
 	</div>
@@ -112,9 +86,6 @@ import HeroCanvas from "@/components/HeroCanvas.astro";
 
 	// FIX: Uncommented the #hero-buttons animation
 	animate("#hero-buttons", fadeUp, { ...transition, delay: 0.3 });
-
-	// El texto de confianza tenía una duración de 0.6s en el original
-	animate("#hero-trust", { opacity: 1 }, { duration: 0.6, delay: 0.4 });
 </script>
 
 <style>

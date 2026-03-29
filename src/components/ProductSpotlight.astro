@@ -1,8 +1,6 @@
 ---
-import { Calendar, Users, Clock, ArrowRight } from 'lucide-astro';
-// Asumimos que tienes el componente Button.astro en la misma carpeta.
-// Si no, puedes cambiar esto por un elemento <button> o <a> estándar con clases.
-import Button from '@/components/ui/button.astro';
+import { Calendar, Users, Clock } from 'lucide-astro';
+import FinalCTAButton from '@/components/FinalCTAButton.astro';
 
 const features = [
     {
@@ -87,29 +85,11 @@ const features = [
                         </div>
                     ))}
 
-                    <a href="/products" class="inline-block mt-4">
-                        <button
-                          class="relative px-6 py-3 text-base font-semibold rounded-md
-                            bg-[var(--accent)]
-                            text-[var(--accent-foreground)]
-                            hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
-                            shadow-lg shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
-                            overflow-hidden group cta-button-accent
-                            transition-all duration-300
-                            w-full sm:w-auto
-                            inline-flex items-center justify-center gap-2"
-                        >
-                          <span class="relative z-10 flex items-center">
+                    <div class="inline-block mt-4">
+                        <FinalCTAButton href="/products" size="spotlight">
                             Conocer Más Sobre Nuestra Plataforma
-                            <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                          </span>
-                          <span
-                            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
-                              bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
-                              animate-shimmer pointer-events-none">
-                          </span>
-                        </button>
-                    </a>
+                        </FinalCTAButton>
+                    </div>
                 </div>
             </div>
         </div>
