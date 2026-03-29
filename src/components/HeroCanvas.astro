@@ -1,246 +1,288 @@
 ---
-const CANVAS_ID = "liiot-branding-canvas";
+const CANVAS_ID = "silk-grain-canvas";
 ---
 
-<div
-    class="absolute inset-0 w-full h-full overflow-hidden bg-[#05010a] pointer-events-none hero-canvas-fade-out"
->
-    <div
-        class="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,color-mix(in_oklch,var(--primary)_32%,black)_0%,transparent_48%),radial-gradient(circle_at_82%_20%,color-mix(in_oklch,var(--accent)_24%,black)_0%,transparent_44%),linear-gradient(160deg,#05010a_0%,color-mix(in_oklch,var(--primary)_16%,black)_56%,#020106_100%)]"
-    >
-    </div>
-    <div class="absolute inset-0 w-full h-full pointer-events-none">
-        <canvas id={CANVAS_ID} class="block w-full h-full"></canvas>
-        <div
-            class="absolute inset-0 opacity-[0.04] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"
-        >
-        </div>
-    </div>
+<div class="absolute inset-0 w-full h-full bg-background overflow-hidden">
+  <canvas
+    id={CANVAS_ID}
+    class="block absolute inset-0 w-full h-full outline-none z-0"></canvas>
+
+  <div
+    class="absolute inset-0 bg-linear-to-b from-transparent via-background/40 to-background pointer-events-none z-10"
+  >
+  </div>
 </div>
 
 <script>
-    // @ts-ignore - loaded from CDN for runtime use in Astro component script
-    import * as THREE from "https://esm.sh/three@0.160.0";
+  const CANVAS_ID = "silk-grain-canvas";
 
-    class LiiotBrandingEffect {
-        canvas: HTMLCanvasElement;
-        renderer: any;
-        scene: any;
-        camera: any;
-        material: any;
+  // Helper: Parses OKLCH into normalized WebGL RGB arrays [R, G, B] between 0.0 and 1.0
+  function getWebGLColor(varName: string, fallbackRgbArray: string) {
+    if (typeof window === "undefined") return fallbackRgbArray;
 
-        mouse: any;
-        targetMouse: any;
+    const styles = getComputedStyle(document.documentElement);
+    const rawValue = styles.getPropertyValue(varName).trim();
+    if (!rawValue) return fallbackRgbArray;
 
-        constructor(canvas: HTMLCanvasElement) {
-            this.canvas = canvas;
-            this.init();
-        }
+    const tempElement = document.createElement("div");
+    tempElement.style.color = rawValue;
+    document.body.appendChild(tempElement);
 
-        private getThemeColors() {
-            const rootStyle = getComputedStyle(document.documentElement);
+    const computedColor = getComputedStyle(tempElement).color;
+    document.body.removeChild(tempElement);
 
-            const parseColor = (varName: string, fallbackHex: string) => {
-                const cssValue = rootStyle.getPropertyValue(varName).trim();
-                const colorToParse = cssValue || fallbackHex;
+    const match = computedColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+      return [
+        parseInt(match[1]) / 255.0,
+        parseInt(match[2]) / 255.0,
+        parseInt(match[3]) / 255.0,
+      ];
+    }
+    return fallbackRgbArray;
+  }
 
-                const tempCanvas = document.createElement("canvas");
-                tempCanvas.width = 1;
-                tempCanvas.height = 1;
-                const ctx = tempCanvas.getContext("2d");
+  class SilkGrainShader {
+    constructor() {
+      this.canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement;
+      if (!this.canvas) return;
 
-                if (ctx) {
-                    ctx.fillStyle = fallbackHex;
-                    ctx.fillStyle = colorToParse;
-                    ctx.fillRect(0, 0, 1, 1);
+      // Performance optimizations: no antialiasing needed because of heavy grain, no depth buffer
+      this.gl = this.canvas.getContext("webgl", {
+        alpha: false,
+        antialias: false,
+        depth: false,
+      });
 
-                    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-                    return new THREE.Color(`rgb(${r}, ${g}, ${b})`);
+      if (!this.gl) return;
+
+      this.colors = {
+        bg: [0.09, 0.07, 0.14], // Deep Purple-Black fallback
+        primary: [0.46, 0.15, 0.88], // Vibrant Purple fallback
+        secondary: [0.96, 0.3, 0.01], // Orange fallback
+      };
+
+      this.initShader();
+      this.updateColors();
+      this.resize();
+
+      window.addEventListener("resize", () => this.resize());
+      const observer = new MutationObserver(() => this.updateColors());
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class", "style"],
+      });
+
+      this.startTime = Date.now();
+      this.animate();
+    }
+
+    updateColors() {
+      // Getting your precise LIIOT OKLCH variables
+      this.colors.bg = getWebGLColor("--background", [0.09, 0.07, 0.14]);
+      this.colors.primary = getWebGLColor("--primary", [0.46, 0.15, 0.88]);
+      this.colors.secondary = getWebGLColor("--secondary", [0.96, 0.3, 0.01]);
+    }
+
+    resize() {
+      // Rendering at device scale, but using CSS to handle the container size
+      const dpr = window.devicePixelRatio || 1;
+      // Rendering at 75% resolution to save GPU while maintaining crisp grain
+      const scale = 0.75;
+
+      this.canvas.width = window.innerWidth * dpr * scale;
+      this.canvas.height = window.innerHeight * dpr * scale;
+      this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    initShader() {
+      const gl = this.gl;
+
+      // --- VERTEX SHADER ---
+      const vsSource = `
+                attribute vec2 a_position;
+                void main() {
+                    gl_Position = vec4(a_position, 0.0, 1.0);
+                }
+            `;
+
+      // --- FRAGMENT SHADER ---
+      // This contains the "Domain Warping" math that creates the silky folds
+      const fsSource = `
+                precision highp float;
+                
+                uniform vec2 u_resolution;
+                uniform float u_time;
+                
+                uniform vec3 u_colorBg;
+                uniform vec3 u_colorPrimary;
+                uniform vec3 u_colorSecondary;
+
+                // Random function for grain and noise
+                float random(vec2 st) {
+                    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
                 }
 
-                return new THREE.Color(fallbackHex);
-            };
+                // 2D Value Noise
+                float noise(vec2 st) {
+                    vec2 i = floor(st);
+                    vec2 f = fract(st);
+                    float a = random(i);
+                    float b = random(i + vec2(1.0, 0.0));
+                    float c = random(i + vec2(0.0, 1.0));
+                    float d = random(i + vec2(1.0, 1.0));
+                    vec2 u = f * f * (3.0 - 2.0 * f);
+                    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                }
 
-            return {
-                primary: parseColor("--primary", "#28004f"),
-                accent: parseColor("--accent", "#f54d02"),
-                secondary: parseColor("--secondary", "#c3b6d2"),
-                bg: parseColor("--background", "#05010a"),
-            };
-        }
+                // Fractional Brownian Motion (creates the complex shapes)
+                float fbm(vec2 st) {
+                    float v = 0.0;
+                    float a = 0.5;
+                    vec2 shift = vec2(100.0);
+                    // Rotational matrix to reduce grid artifacts
+                    mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+                    for (int i = 0; i < 5; ++i) {
+                        v += a * noise(st);
+                        st = rot * st * 1.0 + shift;
+                        a *= 0.5;
+                    }
+                    return v;
+                }
 
-        init() {
-            const colors = this.getThemeColors();
-            this.scene = new THREE.Scene();
-            this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-            this.mouse = new THREE.Vector2(0.5, 0.5);
-            this.targetMouse = new THREE.Vector2(0.5, 0.5);
+                void main() {
+                    vec2 st = gl_FragCoord.xy / u_resolution.xy;
+                    st.x *= u_resolution.x / u_resolution.y;
+                    
+                    // Zoom out to make folds wider
+                    st *= 2.0; 
 
-            this.renderer = new THREE.WebGLRenderer({
-                canvas: this.canvas,
-                antialias: true,
-                alpha: true,
-            });
+                    float t = u_time * 0.15; // Slow movement for viscosity
 
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
-            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                    // DOMAIN WARPING (The magic that creates "folds" instead of "bubbles")
+                    vec2 q = vec2(0.);
+                    q.x = fbm(st + vec2(t * 0.5));
+                    q.y = fbm(st + vec2(1.0));
 
-            this.material = new THREE.ShaderMaterial({
-                uniforms: {
-                    uTime: { value: 0 },
-                    uMouse: { value: this.mouse },
-                    uColor1: { value: colors.primary },
-                    uColor2: { value: colors.accent },
-                    uColor3: { value: colors.secondary },
-                    uColorBg: { value: colors.bg },
-                },
-                vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = vec4(position, 1.0);
-          }
-        `,
-                fragmentShader: `
-          uniform float uTime;
-          uniform vec2 uMouse;
-          uniform vec3 uColor1;
-          uniform vec3 uColor2;
-          uniform vec3 uColor3;
-          uniform vec3 uColorBg;
-          varying vec2 vUv;
+                    vec2 r = vec2(0.);
+                    r.x = fbm(st + 1.0 * q + vec2(1.7, 9.2) + t * 0.15);
+                    r.y = fbm(st + 1.0 * q + vec2(8.3, 2.8) + t * 0.12);
 
-          // Texture generator
-          float random(vec2 st) {
-              return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-          }
+                    float f = fbm(st + r * 6.);
 
-          float hash21(vec2 p) {
-            p = fract(p * vec2(234.34, 824.21));
-            p += dot(p, p + 34.45);
-            return fract(p.x * p.y);
-          }
+                    // COLOR COMPOSITION
+                    // 1. Base is deep dark background
+                    vec3 color = u_colorBg;
 
-          float noise(vec2 p) {
-            vec2 i = floor(p);
-            vec2 f = fract(p);
-            vec2 u = f * f * (3.0 - 2.0 * f);
-            float a = hash21(i);
-            float b = hash21(i + vec2(1.0, 0.0));
-            float c = hash21(i + vec2(0.0, 1.0));
-            float d = hash21(i + vec2(1.0, 1.0));
-            return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-          }
+                    // 2. The Purple Silky Ribbons
+                    // By using smoothstep subtraction, we create bands (ribbons) of color rather than blobs
+                    float purpleFold = smoothstep(0.1, 0.6, f) - smoothstep(0.5, 0.9, f);
+                    color = mix(color, u_colorPrimary, purpleFold * 1.5);
 
-          float blob(vec2 uv, vec2 center, float radius) {
-            float d = distance(uv, center);
-            return smoothstep(radius, 0.0, d);
-          }
+                    // 3. The Orange Intersections
+                    // Uses a slightly offset noise to create high-contrast color collisions
+                    float f2 = fbm(st + q * 1.5 - t * 0.1);
+                    float orangeFold = smoothstep(0.4, 0.9, f2) * smoothstep(0.3, 0.8, f);
+                    color = mix(color, u_colorSecondary, orangeFold * 2.0);
 
-          void main() {
-            vec2 uv = vUv;
-            float t = uTime * 0.035;
-            
-            // Interaction: Mouse distorts the fluid space instead of dragging the blobs
-            vec2 m = uMouse * 0.5;
-            float flowDistortion = noise(uv * 3.0 + vec2(t * 0.5, m.x)) * 0.12;
-            vec2 distortedUv = uv + vec2(flowDistortion, noise(uv * 3.0 - vec2(m.y, t * 0.5)) * 0.12);
+                    // FAKE 3D VOLUME (Ambient Occlusion)
+                    // Multiplies the color by the noise height to create deep shadows in the "valleys"
+                    color *= mix(0.1, 1.0, f);
 
-            // Autonomous drifting anchors (no mouse parallax here anymore)
-            vec2 c1 = vec2(0.24 + 0.08 * sin(t * 1.3), 0.72 + 0.06 * cos(t * 0.9));
-            vec2 c2 = vec2(0.52 + 0.10 * sin(t * 0.8 + 1.2), 0.50 + 0.07 * cos(t * 1.1));
-            vec2 c3 = vec2(0.84 + 0.06 * cos(t * 0.7 + 2.4), 0.20 + 0.05 * sin(t * 1.0));
-            vec2 c4 = vec2(0.72 + 0.06 * sin(t * 0.6), 0.82 + 0.04 * cos(t * 1.2));
+                    // Final output
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
 
-            float purpleA = blob(distortedUv, c1, 0.78);
-            float purpleB = blob(distortedUv, c2, 0.72);
-            float orangeA = blob(distortedUv, c3, 0.88);
-            float softWhite = blob(distortedUv, c4, 0.95);
+      const vertexShader = this.compileShader(gl.VERTEX_SHADER, vsSource);
+      const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER, fsSource);
 
-            float n = noise(distortedUv * 2.1 + vec2(t * 0.6, -t * 0.45));
-            float distort = (n - 0.5) * 0.08;
+      this.program = gl.createProgram();
+      gl.attachShader(this.program, vertexShader);
+      gl.attachShader(this.program, fragmentShader);
+      gl.linkProgram(this.program);
+      gl.useProgram(this.program);
 
-            float purpleMix = clamp(purpleA * 0.52 + purpleB * 0.36 + distort, 0.0, 1.0);
-            float orangeMix = clamp(orangeA * 0.42 + distort * 0.6, 0.0, 1.0);
-            float hazeMix = clamp(softWhite * 0.16, 0.0, 0.16);
+      // Two triangles making up a full-screen quad
+      const positionBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([
+          -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
+        ]),
+        gl.STATIC_DRAW,
+      );
 
-            vec3 color = mix(uColorBg, uColor1, purpleMix);
-            color = mix(color, uColor2, orangeMix);
-            color = mix(color, uColor3, hazeMix);
+      const positionLocation = gl.getAttribLocation(this.program, "a_position");
+      gl.enableVertexAttribArray(positionLocation);
+      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-            // Texture: Apply fine film grain
-            float grain = (random(uv + t) - 0.5) * 0.05;
-            color += grain;
-
-            color = mix(uColorBg, color, 0.88);
-
-            gl_FragColor = vec4(color, 1.0);
-          }
-        `,
-            });
-
-            this.scene.add(
-                new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.material),
-            );
-
-            window.addEventListener("mousemove", (e) => {
-                this.targetMouse.x = e.clientX / window.innerWidth;
-                this.targetMouse.y = 1.0 - e.clientY / window.innerHeight;
-            });
-
-            window.addEventListener("resize", () => {
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            this.animate();
-        }
-
-        animate() {
-            requestAnimationFrame(() => this.animate());
-            this.mouse.lerp(this.targetMouse, 0.05);
-            this.material.uniforms.uMouse.value = this.mouse;
-            this.material.uniforms.uTime.value += 0.01;
-            this.renderer.render(this.scene, this.camera);
-        }
+      this.locations = {
+        time: gl.getUniformLocation(this.program, "u_time"),
+        resolution: gl.getUniformLocation(this.program, "u_resolution"),
+        bg: gl.getUniformLocation(this.program, "u_colorBg"),
+        primary: gl.getUniformLocation(this.program, "u_colorPrimary"),
+        secondary: gl.getUniformLocation(this.program, "u_colorSecondary"),
+      };
     }
 
-    const initHeroCanvas = () => {
-        const canvas = document.getElementById("liiot-branding-canvas");
-        if (canvas instanceof HTMLCanvasElement && !canvas.dataset.loaded) {
-            new LiiotBrandingEffect(canvas);
-            canvas.dataset.loaded = "true";
-        }
-    };
-
-    document.addEventListener("astro:page-load", initHeroCanvas);
-    if (document.readyState === "complete") {
-        initHeroCanvas();
-    } else {
-        window.addEventListener("load", initHeroCanvas);
+    compileShader(type, source) {
+      const shader = this.gl.createShader(type);
+      this.gl.shaderSource(shader, source);
+      this.gl.compileShader(shader);
+      if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+        console.error(this.gl.getShaderInfoLog(shader));
+        return null;
+      }
+      return shader;
     }
+
+    animate() {
+      requestAnimationFrame(() => this.animate());
+
+      const gl = this.gl;
+      const time = (Date.now() - this.startTime) / 1000.0;
+
+      gl.uniform1f(this.locations.time, time);
+      gl.uniform2f(
+        this.locations.resolution,
+        this.canvas.width,
+        this.canvas.height,
+      );
+
+      gl.uniform3fv(this.locations.bg, this.colors.bg);
+      gl.uniform3fv(this.locations.primary, this.colors.primary);
+      gl.uniform3fv(this.locations.secondary, this.colors.secondary);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+  }
+
+  const initCanvas = () => {
+    const canvas = document.getElementById(CANVAS_ID);
+    if (canvas && !canvas.hasAttribute("data-initialized")) {
+      new SilkGrainShader();
+      canvas.setAttribute("data-initialized", "true");
+    }
+  };
+
+  document.addEventListener("astro:page-load", initCanvas);
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    initCanvas();
+  } else {
+    document.addEventListener("DOMContentLoaded", initCanvas);
+  }
 </script>
 
 <style>
-    canvas {
-        filter: blur(6px) saturate(1.03) contrast(1.04);
-    }
-
-    /*
-     * Fade the *entire* hero canvas layer to transparent near the bottom.
-     * This reveals the underlying `main` content background and avoids an abrupt edge.
-     */
-    .hero-canvas-fade-out {
-        -webkit-mask-image: linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, 1) 0%,
-            rgba(0, 0, 0, 1) 62%,
-            rgba(0, 0, 0, 0) 100%
-        );
-        mask-image: linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, 1) 0%,
-            rgba(0, 0, 0, 1) 62%,
-            rgba(0, 0, 0, 0) 100%
-        );
-    }
+  /* No blur filter needed! The shader does the math exactly right for the folds,
+       and the grain is built straight into the pixels for maximum performance. */
+  canvas {
+    transform: translateZ(0);
+    will-change: transform;
+  }
 </style>
