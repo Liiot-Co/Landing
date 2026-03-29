@@ -9,6 +9,11 @@ interface Props {
     | "link";
   size?: "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg";
   asChild?: boolean;
+  // Forwarded to the underlying <button> (common for submit CTAs).
+  type?: "button" | "submit" | "reset";
+  // Allow inline styles to be passed from pages.
+  style?: string;
+  disabled?: boolean;
   class?: string;
 }
 

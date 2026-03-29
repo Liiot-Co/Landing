@@ -1,4 +1,6 @@
 ---
+import FinalCTAButton from "@/components/FinalCTAButton.astro";
+
 const CTA_ID = "cta";
 const benefits = [
   "Implementación rápida",
@@ -8,86 +10,88 @@ const benefits = [
 ---
 
 <section id={CTA_ID} class="py-24 lg:py-32 relative overflow-hidden">
-
   <!-- Geometric Accent -->
-  <div class="absolute top-0 left-0 text-secondary/5 pointer-events-none w-full h-1/4">
-    <svg width="100%" height="100%" viewBox="0 0 100 20" preserveAspectRatio="none">
-      <rect width="100" height="10" fill="currentColor" opacity="0.5" />
-      <rect y="10" width="100" height="10" fill="currentColor" opacity="0.2" />
+  <div
+    class="absolute top-0 left-0 text-secondary/5 pointer-events-none w-full h-1/4"
+  >
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 100 20"
+      preserveAspectRatio="none"
+    >
+      <rect width="100" height="10" fill="currentColor" opacity="0.5"></rect>
+      <rect y="10" width="100" height="10" fill="currentColor" opacity="0.2"
+      ></rect>
     </svg>
   </div>
 
   <!-- Background Effects -->
-  <div class="absolute inset-0 bg-gradient-to-br from-secondary/8 via-transparent to-primary/5 pointer-events-none"></div>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+  <div
+    class="absolute inset-0 bg-gradient-to-br from-secondary/8 via-transparent to-primary/5 pointer-events-none"
+  >
+  </div>
+  <div
+    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
               w-[600px] h-[600px] rounded-full blur-[100px]
               bg-[radial-gradient(circle,var(--secondary)_0%,transparent_70%)]
-              opacity-10 pointer-events-none"></div>
+              opacity-10 pointer-events-none"
+  >
+  </div>
 
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
     <div class="max-w-4xl mx-auto">
-      <div class="bg-card/50 backdrop-blur-sm border border-secondary/20 rounded-3xl p-12 lg:p-16 text-center">
-
+      <div
+        class="bg-card/50 backdrop-blur-sm border border-secondary/20 rounded-3xl p-12 lg:p-16 text-center"
+      >
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
           ¿Listo para <span class="text-gradient">transformar</span> su empresa?
         </h2>
 
         <p class="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-          Descubra cómo nuestra plataforma puede optimizar los procesos de su equipo,
-          aumentar la productividad y reducir costos operativos hasta en un 40%.
+          Descubra cómo nuestra plataforma puede optimizar los procesos de su
+          equipo, aumentar la productividad y reducir costos operativos hasta en
+          un 40%.
         </p>
 
         <!-- Benefits -->
         <div class="flex flex-wrap justify-center gap-6 mb-10">
-          {benefits.map((benefit) => (
-            <div class="flex items-center gap-2 text-sm text-muted-foreground">
-              <svg class="w-5 h-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M5 13l4 4L19 7" />
-              </svg>
-              <span>{benefit}</span>
-            </div>
-          ))}
+          {
+            benefits.map((benefit) => (
+              <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                <svg
+                  class="w-5 h-5 text-secondary"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span>{benefit}</span>
+              </div>
+            ))
+          }
         </div>
 
-        <!-- CTA Button -->
-        <button
-          class="relative px-14 py-8 text-xl font-semibold rounded-xl
-                bg-[var(--accent)]
-                text-[var(--accent-foreground)]
-                hover:bg-[color-mix(in_oklch,var(--accent)_85%,black)]
-                shadow-xl shadow-[color-mix(in_oklch,var(--accent)_30%,transparent)]
-                overflow-hidden group cta-button-accent
-                transition-all duration-300"
-        >
+        <FinalCTAButton size="section">
+          Solicitar Demo Gratuita
+        </FinalCTAButton>
 
-          <span class="relative z-10 flex items-center justify-center gap-3">
-            Solicitar Demo Gratuita
-            <svg class="w-6 h-6 transition-transform group-hover:translate-x-1"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M5 12h14M13 5l7 7-7 7" />
-            </svg>
-          </span>
-
-          <!-- Accent glow / shimmer -->
-          <span
-            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
-                  bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)]
-                  animate-shimmer pointer-events-none">
-          </span>
-        </button>
-  
         <p class="text-sm text-muted-foreground mt-8">
           ¿Preguntas? Contáctenos en
-          <a href="mailto:hello@softwareco.com" class="text-secondary hover:underline">
+          <a
+            href="mailto:hello@softwareco.com"
+            class="text-secondary hover:underline"
+          >
             hello@softwareco.com
           </a>
         </p>
-
       </div>
     </div>
-
   </div>
 </section>

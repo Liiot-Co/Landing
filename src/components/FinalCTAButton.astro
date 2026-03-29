@@ -1,0 +1,92 @@
+---
+import { ArrowRight } from "lucide-astro";
+import {
+  finalCtaButtonBase,
+  finalCtaButtonSizeClasses,
+  type FinalCtaButtonSize,
+} from "@/constants/finalCtaButton";
+
+interface Props {
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  size?: FinalCtaButtonSize;
+  class?: string;
+  /** Default: true for all sizes except `compact` */
+  showArrow?: boolean;
+}
+
+const {
+  href,
+  type = "button",
+  size = "section",
+  class: className = "",
+  showArrow,
+} = Astro.props;
+
+const showArrowResolved = showArrow ?? size !== "compact";
+
+const classes = [finalCtaButtonBase, finalCtaButtonSizeClasses[size], className]
+  .filter(Boolean)
+  .join(" ");
+
+const shimmerClass =
+  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)] animate-shimmer pointer-events-none";
+
+const innerWrapClass =
+  size === "section"
+    ? "relative z-10 flex items-center justify-center gap-3"
+    : size === "widget" || size === "spotlight"
+      ? "relative z-10 flex items-center"
+      : "relative z-10 flex items-center justify-center gap-2";
+
+const arrowClass =
+  size === "section"
+    ? "w-6 h-6"
+    : size === "hero"
+      ? "h-6 w-6"
+      : size === "form"
+        ? "h-5 w-5"
+        : size === "widget"
+          ? "ml-2 h-5 w-5"
+          : size === "spotlight"
+            ? "ml-2 h-4 w-4"
+            : "";
+---
+
+{
+  href ? (
+    <a href={href} class={classes}>
+      <span class={innerWrapClass}>
+        <span class="cta-button-text">
+          <slot />
+        </span>
+        {showArrowResolved && (
+          <ArrowRight
+            class:list={[
+              arrowClass,
+              "shrink-0 transition-transform group-hover:translate-x-1",
+            ]}
+          />
+        )}
+      </span>
+      <span class={shimmerClass} aria-hidden="true" />
+    </a>
+  ) : (
+    <button type={type} class={classes}>
+      <span class={innerWrapClass}>
+        <span class="cta-button-text">
+          <slot />
+        </span>
+        {showArrowResolved && (
+          <ArrowRight
+            class:list={[
+              arrowClass,
+              "shrink-0 transition-transform group-hover:translate-x-1",
+            ]}
+          />
+        )}
+      </span>
+      <span class={shimmerClass} aria-hidden="true" />
+    </button>
+  )
+}
