@@ -16,57 +16,81 @@ const CANVAS_ID = "silk-grain-canvas";
 <script>
   const CANVAS_ID = "silk-grain-canvas";
 
-  // Helper: Parses OKLCH into normalized WebGL RGB arrays [R, G, B] between 0.0 and 1.0
-  function getWebGLColor(varName: string, fallbackRgbArray: string) {
-    if (typeof window === "undefined") return fallbackRgbArray;
+  // Helper: Parses CSS color (OKLCH, HSL, etc.) into normalized [r, g, b] for WebGL
+  function getWebGLColor(
+    varName: string,
+    fallback: [number, number, number],
+  ): [number, number, number] {
+    if (typeof window === "undefined") return fallback;
 
     const styles = getComputedStyle(document.documentElement);
     const rawValue = styles.getPropertyValue(varName).trim();
-    if (!rawValue) return fallbackRgbArray;
+    if (!rawValue) return fallback;
 
-    const tempElement = document.createElement("div");
-    tempElement.style.color = rawValue;
-    document.body.appendChild(tempElement);
+    const temp = document.createElement("div");
+    temp.style.color = rawValue;
+    document.body.appendChild(temp);
+    const computed = getComputedStyle(temp).color;
+    document.body.removeChild(temp);
 
-    const computedColor = getComputedStyle(tempElement).color;
-    document.body.removeChild(tempElement);
-
-    const match = computedColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    const match = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
     if (match) {
       return [
-        parseInt(match[1]) / 255.0,
-        parseInt(match[2]) / 255.0,
-        parseInt(match[3]) / 255.0,
+        parseInt(match[1]) / 255,
+        parseInt(match[2]) / 255,
+        parseInt(match[3]) / 255,
       ];
     }
-    return fallbackRgbArray;
+    return fallback;
   }
 
   class SilkGrainShader {
+    private canvas: HTMLCanvasElement | null = null;
+    private gl: WebGLRenderingContext | null = null;
+    private program: WebGLProgram | null = null;
+    private locations: {
+      time: WebGLUniformLocation | null;
+      resolution: WebGLUniformLocation | null;
+      bg: WebGLUniformLocation | null;
+      primary: WebGLUniformLocation | null;
+      secondary: WebGLUniformLocation | null;
+    } | null = null;
+
+    private colors: {
+      bg: [number, number, number];
+      primary: [number, number, number];
+      secondary: [number, number, number];
+    } = {
+      bg: [0.09, 0.07, 0.14],
+      primary: [0.46, 0.15, 0.88],
+      secondary: [0.96, 0.3, 0.01],
+    };
+
+    private startTime: number = 0;
+
     constructor() {
       this.canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement;
       if (!this.canvas) return;
 
-      // Performance optimizations: no antialiasing needed because of heavy grain, no depth buffer
       this.gl = this.canvas.getContext("webgl", {
         alpha: false,
         antialias: false,
         depth: false,
+        preserveDrawingBuffer: true,
       });
 
-      if (!this.gl) return;
-
-      this.colors = {
-        bg: [0.09, 0.07, 0.14], // Deep Purple-Black fallback
-        primary: [0.46, 0.15, 0.88], // Vibrant Purple fallback
-        secondary: [0.96, 0.3, 0.01], // Orange fallback
-      };
+      if (!this.gl) {
+        console.warn("WebGL not supported");
+        return;
+      }
 
       this.initShader();
       this.updateColors();
       this.resize();
 
       window.addEventListener("resize", () => this.resize());
+
+      // Watch for theme changes (dark/light mode, etc.)
       const observer = new MutationObserver(() => this.updateColors());
       observer.observe(document.documentElement, {
         attributes: true,
@@ -77,146 +101,146 @@ const CANVAS_ID = "silk-grain-canvas";
       this.animate();
     }
 
-    updateColors() {
-      // Getting your precise LIIOT OKLCH variables
+    private updateColors() {
       this.colors.bg = getWebGLColor("--background", [0.09, 0.07, 0.14]);
       this.colors.primary = getWebGLColor("--primary", [0.46, 0.15, 0.88]);
       this.colors.secondary = getWebGLColor("--secondary", [0.96, 0.3, 0.01]);
     }
 
-    resize() {
-      // Rendering at device scale, but using CSS to handle the container size
+    private resize() {
+      if (!this.canvas || !this.gl) return;
+
       const dpr = window.devicePixelRatio || 1;
-      // Rendering at 75% resolution to save GPU while maintaining crisp grain
-      const scale = 0.75;
+      const scale = 0.75; // Performance vs quality balance
 
       this.canvas.width = window.innerWidth * dpr * scale;
       this.canvas.height = window.innerHeight * dpr * scale;
+
       this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    initShader() {
+    private initShader() {
+      if (!this.gl) return;
+
       const gl = this.gl;
 
-      // --- VERTEX SHADER ---
+      // Vertex Shader
       const vsSource = `
-                attribute vec2 a_position;
-                void main() {
-                    gl_Position = vec4(a_position, 0.0, 1.0);
-                }
-            `;
+        attribute vec2 a_position;
+        void main() {
+          gl_Position = vec4(a_position, 0.0, 1.0);
+        }
+      `;
 
-      // --- FRAGMENT SHADER ---
-      // This contains the "Domain Warping" math that creates the silky folds
+      // Fragment Shader (improved from your version)
       const fsSource = `
-                precision highp float;
-                
-                uniform vec2 u_resolution;
-                uniform float u_time;
-                
-                uniform vec3 u_colorBg;
-                uniform vec3 u_colorPrimary;
-                uniform vec3 u_colorSecondary;
+        precision highp float;
+        
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        
+        uniform vec3 u_colorBg;
+        uniform vec3 u_colorPrimary;
+        uniform vec3 u_colorSecondary;
 
-                // Random function for grain and noise
-                float random(vec2 st) {
-                    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-                }
+        float random(vec2 st) {
+          return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+        }
 
-                // 2D Value Noise
-                float noise(vec2 st) {
-                    vec2 i = floor(st);
-                    vec2 f = fract(st);
-                    float a = random(i);
-                    float b = random(i + vec2(1.0, 0.0));
-                    float c = random(i + vec2(0.0, 1.0));
-                    float d = random(i + vec2(1.0, 1.0));
-                    vec2 u = f * f * (3.0 - 2.0 * f);
-                    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-                }
+        float noise(vec2 st) {
+          vec2 i = floor(st);
+          vec2 f = fract(st);
+          float a = random(i);
+          float b = random(i + vec2(1.0, 0.0));
+          float c = random(i + vec2(0.0, 1.0));
+          float d = random(i + vec2(1.0, 1.0));
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        }
 
-                // Fractional Brownian Motion (creates the complex shapes)
-                float fbm(vec2 st) {
-                    float v = 0.0;
-                    float a = 0.5;
-                    vec2 shift = vec2(100.0);
-                    // Rotational matrix to reduce grid artifacts
-                    mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
-                    for (int i = 0; i < 5; ++i) {
-                        v += a * noise(st);
-                        st = rot * st * 1.0 + shift;
-                        a *= 0.5;
-                    }
-                    return v;
-                }
+        float fbm(vec2 st) {
+          float v = 0.0;
+          float a = 0.5;
+          vec2 shift = vec2(100.0);
+          mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+          for (int i = 0; i < 5; ++i) {
+            v += a * noise(st);
+            st = rot * st * 2.0 + shift;
+            a *= 0.5;
+          }
+          return v;
+        }
 
-                void main() {
-                    vec2 st = gl_FragCoord.xy / u_resolution.xy;
-                    st.x *= u_resolution.x / u_resolution.y;
-                    
-                    // Zoom out to make folds wider
-                    st *= 2.0; 
+        void main() {
+          vec2 st = gl_FragCoord.xy / u_resolution.xy;
+          st.x *= u_resolution.x / u_resolution.y;
+          st *= 2.0;                    // wider folds
 
-                    float t = u_time * 0.15; // Slow movement for viscosity
+          float t = u_time * 0.15;
 
-                    // DOMAIN WARPING (The magic that creates "folds" instead of "bubbles")
-                    vec2 q = vec2(0.);
-                    q.x = fbm(st + vec2(t * 0.5));
-                    q.y = fbm(st + vec2(1.0));
+          // Domain Warping
+          vec2 q = vec2(0.0);
+          q.x = fbm(st + vec2(t * 0.1));
+          q.y = fbm(st + vec2(1.0));
 
-                    vec2 r = vec2(0.);
-                    r.x = fbm(st + 1.0 * q + vec2(1.7, 9.2) + t * 0.15);
-                    r.y = fbm(st + 1.0 * q + vec2(8.3, 2.8) + t * 0.12);
+          vec2 r = vec2(0.0);
+          r.x = fbm(st + q + vec2(1.7, 9.2) + t * 0.15);
+          r.y = fbm(st + q + vec2(8.3, 2.8) + t * 0.12);
 
-                    float f = fbm(st + r * 6.);
+          float f = fbm(st + r * 2.5);
 
-                    // COLOR COMPOSITION
-                    // 1. Base is deep dark background
-                    vec3 color = u_colorBg;
+          vec3 color = u_colorBg;
 
-                    // 2. The Purple Silky Ribbons
-                    // By using smoothstep subtraction, we create bands (ribbons) of color rather than blobs
-                    float purpleFold = smoothstep(0.1, 0.6, f) - smoothstep(0.5, 0.9, f);
-                    color = mix(color, u_colorPrimary, purpleFold * 1.5);
+          // Purple ribbons
+          float purpleFold = smoothstep(0.1, 0.6, f) - smoothstep(0.5, 0.9, f);
+          color = mix(color, u_colorPrimary, purpleFold * 1.5);
 
-                    // 3. The Orange Intersections
-                    // Uses a slightly offset noise to create high-contrast color collisions
-                    float f2 = fbm(st + q * 1.5 - t * 0.1);
-                    float orangeFold = smoothstep(0.4, 0.9, f2) * smoothstep(0.3, 0.8, f);
-                    color = mix(color, u_colorSecondary, orangeFold * 2.0);
+          // Orange accents
+          float f2 = fbm(st + q * 1.5 - t * 0.1);
+          float orangeFold = smoothstep(0.4, 0.9, f2) * smoothstep(0.3, 0.8, f);
+          color = mix(color, u_colorSecondary, orangeFold * 2.0);
 
-                    // FAKE 3D VOLUME (Ambient Occlusion)
-                    // Multiplies the color by the noise height to create deep shadows in the "valleys"
-                    color *= mix(0.1, 1.0, f);
+          // Fake depth / ambient occlusion
+          color *= mix(0.12, 1.0, f);
 
-                    // Final output
-                    gl_FragColor = vec4(color, 1.0);
-                }
-            `;
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `;
 
       const vertexShader = this.compileShader(gl.VERTEX_SHADER, vsSource);
       const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER, fsSource);
 
+      if (!vertexShader || !fragmentShader) return;
+
       this.program = gl.createProgram();
+      if (!this.program) return;
+
       gl.attachShader(this.program, vertexShader);
       gl.attachShader(this.program, fragmentShader);
       gl.linkProgram(this.program);
+
+      if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+        console.error(
+          "Shader program link error:",
+          gl.getProgramInfoLog(this.program),
+        );
+        return;
+      }
+
       gl.useProgram(this.program);
 
-      // Two triangles making up a full-screen quad
+      // Fullscreen quad
       const positionBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.bufferData(
         gl.ARRAY_BUFFER,
-        new Float32Array([
-          -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
-        ]),
+        new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
         gl.STATIC_DRAW,
       );
 
-      const positionLocation = gl.getAttribLocation(this.program, "a_position");
-      gl.enableVertexAttribArray(positionLocation);
-      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+      const positionLoc = gl.getAttribLocation(this.program, "a_position");
+      gl.enableVertexAttribArray(positionLoc);
+      gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
       this.locations = {
         time: gl.getUniformLocation(this.program, "u_time"),
@@ -227,40 +251,52 @@ const CANVAS_ID = "silk-grain-canvas";
       };
     }
 
-    compileShader(type, source) {
+    private compileShader(type: number, source: string): WebGLShader | null {
+      if (!this.gl) return null;
       const shader = this.gl.createShader(type);
+      if (!shader) return null;
+
       this.gl.shaderSource(shader, source);
       this.gl.compileShader(shader);
+
       if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-        console.error(this.gl.getShaderInfoLog(shader));
+        console.error(
+          "Shader compile error:",
+          this.gl.getShaderInfoLog(shader),
+        );
+        this.gl.deleteShader(shader);
         return null;
       }
       return shader;
     }
 
-    animate() {
+    private animate() {
+      if (!this.gl || !this.program || !this.locations) return;
+
       requestAnimationFrame(() => this.animate());
 
-      const gl = this.gl;
-      const time = (Date.now() - this.startTime) / 1000.0;
+      const time = (Date.now() - this.startTime) / 1000;
 
-      gl.uniform1f(this.locations.time, time);
-      gl.uniform2f(
+      this.gl.uniform1f(this.locations.time, time);
+      this.gl.uniform2f(
         this.locations.resolution,
-        this.canvas.width,
-        this.canvas.height,
+        this.canvas!.width,
+        this.canvas!.height,
       );
 
-      gl.uniform3fv(this.locations.bg, this.colors.bg);
-      gl.uniform3fv(this.locations.primary, this.colors.primary);
-      gl.uniform3fv(this.locations.secondary, this.colors.secondary);
+      this.gl.uniform3fv(this.locations.bg, this.colors.bg);
+      this.gl.uniform3fv(this.locations.primary, this.colors.primary);
+      this.gl.uniform3fv(this.locations.secondary, this.colors.secondary);
 
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
     }
   }
 
+  // Initialize
   const initCanvas = () => {
-    const canvas = document.getElementById(CANVAS_ID);
+    const canvas = document.getElementById(
+      CANVAS_ID,
+    ) as HTMLCanvasElement | null;
     if (canvas && !canvas.hasAttribute("data-initialized")) {
       new SilkGrainShader();
       canvas.setAttribute("data-initialized", "true");
@@ -279,8 +315,6 @@ const CANVAS_ID = "silk-grain-canvas";
 </script>
 
 <style>
-  /* No blur filter needed! The shader does the math exactly right for the folds,
-       and the grain is built straight into the pixels for maximum performance. */
   canvas {
     transform: translateZ(0);
     will-change: transform;
