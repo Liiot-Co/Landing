@@ -5,10 +5,6 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  
-  /* Accent color for bg-accent utility */
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
 }
 
 html, body {
@@ -17,79 +13,125 @@ html, body {
 }
 
 :root {
-        /* hemai Brand: Primary #2C47B3 (Pantone 2728 C) */
-        /* hemai Brand: Accent #4BE7AB (Pantone 2253 C) */
-        
-        --background: oklch(0.99 0.004 268);
-        --foreground: oklch(0.12 0.06 268);
+  /* --- LIGHT MODE: ETHEREAL DAYLIGHT --- */
+  
+  /* Background: A very soft "Porcelain" purple-white. Not clinical white, but warm and airy. */
+  --background: oklch(0.985 0.003 292);
+  --foreground: oklch(0.20 0.04 292); /* Softer Charcoal-Violet for easier reading than pure black */
 
-        --card: oklch(1 0 0);
-        --card-foreground: oklch(0.12 0.06 268);
-        --popover: oklch(1 0 0);
-        --popover-foreground: oklch(0.12 0.06 268);
+  /* Surfaces: Pure White to make content "pop" against the soft background */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.04 292);
+  
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.04 292);
 
-        /* Primary: Precision & Authority (Refinado para AA+ en light) */
-        --primary: oklch(0.42 0.18 268);
-        --primary-foreground: oklch(0.99 0 0);
+  /* BRAND: Smooth Lavender */
+  --primary: oklch(0.64 0.11 292);
+  --primary-foreground: oklch(1 0 0);
 
-        /* Accent: Human Vitality & Action (Vibrante pero legible) */
-        --accent: oklch(0.6794 0.1973 165);
-        --accent-foreground: oklch(0.20 0.08 165);
+  /* ACCENT: Sunset Orange (High Vibrancy) 
+     Adjusted slightly lighter (L=0.72) for a friendlier look on light mode */
+  --accent: oklch(0.72 0.16 50);
+  --accent-foreground: oklch(0.14 0.02 292);
 
-        --secondary: oklch(0.95 0.02 268);
-        --secondary-foreground: oklch(0.30 0.06 268);
+  /* Secondary: Very light, barely-there gray-purple for hover states/buttons */
+  --secondary: oklch(0.97 0.01 292);
+  --secondary-foreground: oklch(0.35 0.04 292);
 
-        --muted: oklch(0.96 0.01 268);
-        --muted-foreground: oklch(0.50 0.05 268);
+  /* Muted: Subtle dividers or background text */
+  --muted: oklch(0.97 0.01 292);
+  --muted-foreground: oklch(0.55 0.04 292);
 
-        --destructive: oklch(0.55 0.22 25);
-        --destructive-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.59 0.20 20);
+  --destructive-foreground: oklch(0.98 0 0);
 
-        --border: oklch(0.91 0.02 268);
-        --input: oklch(0.91 0.02 268);
-        --ring: oklch(0.42 0.18 268);
+  /* Borders: Extremely light (L=0.94). 
+     This makes the UI look "cleaner" by removing heavy grid lines. */
+  --border: oklch(0.94 0.01 292);
+  --input: oklch(0.94 0.01 292);
+  --ring: oklch(0.64 0.11 292);
 
-        /* Data Viz */
-        --chart-1: oklch(0.42 0.18 268);
-        --chart-2: oklch(0.6794 0.1973 165);
-        --chart-3: oklch(0.65 0.14 240);
-        --chart-4: oklch(0.45 0.12 280);
-        --chart-5: oklch(0.75 0.13 185);
+  /* Data Viz - Pastel Adjusted */
+  --chart-1: oklch(0.64 0.11 292); 
+  --chart-2: oklch(0.72 0.16 50);
+  --chart-3: oklch(0.85 0.10 320); 
+  --chart-4: oklch(0.60 0.12 250); 
+  --chart-5: oklch(0.78 0.14 150);
 
-        --radius: 0.5rem;
-        --shadow: 0 10px 15px -3px oklch(0.12 0.06 268 / 0.1), 0 4px 6px -4px oklch(0.12 0.06 268 / 0.1);
-      }
+  /* Sidebar: Distinct from background, but very bright */
+  --sidebar: oklch(0.97 0.005 292);
+  --sidebar-foreground: oklch(0.30 0.04 292);
+  --sidebar-primary: oklch(0.64 0.11 292);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.94 0.01 292);
+  --sidebar-accent-foreground: oklch(0.20 0.03 292);
+  --sidebar-border: oklch(0.92 0.01 292);
+  --sidebar-ring: oklch(0.64 0.11 292);
 
-      .dark {
-        /* Fondo profundo con matiz de marca para cohesión */
-        --background: oklch(0.14 0.03 268);
-        --foreground: oklch(0.98 0.01 268);
+  --radius: 0.5rem;
 
-        --card: oklch(0.18 0.04 268);
-        --card-foreground: oklch(0.98 0.01 268);
-        
-        /* Primary en Dark: Elevamos Lightness para legibilidad AA */
-        --primary: oklch(0.62 0.16 268); 
-        --primary-foreground: oklch(0.05 0.02 268);
+  /* Shadows: TINTED PURPLE. 
+     Instead of grey shadows, we use low-opacity purple. 
+     This makes the white interface look "glowing" and high-end. */
+  --shadow-sm: 0 1px 2px 0 oklch(0.20 0.06 292 / 0.05);
+  --shadow: 0 1px 3px 0 oklch(0.20 0.06 292 / 0.08), 0 1px 2px -1px oklch(0.20 0.06 292 / 0.08);
+  --shadow-md: 0 4px 6px -1px oklch(0.20 0.06 292 / 0.08), 0 2px 4px -2px oklch(0.20 0.06 292 / 0.08);
+  --shadow-lg: 0 10px 15px -3px oklch(0.20 0.06 292 / 0.08), 0 4px 6px -4px oklch(0.20 0.06 292 / 0.08);
+}
 
-        --accent: oklch(0.84 0.16 165);
-        --accent-foreground: oklch(0.10 0.05 165);
+.dark {
+  /* --- DARK MODE: DEEP COSMIC OBSIDIAN (Unchanged structure, updated Accent) --- */
+  
+  --background: oklch(0.14 0.02 292);
+  --foreground: oklch(0.98 0.005 292);
 
-        --secondary: oklch(0.22 0.04 268);
-        --secondary-foreground: oklch(0.90 0.02 268);
+  --card: oklch(0.17 0.025 292);
+  --card-foreground: oklch(0.98 0.005 292);
+  
+  --popover: oklch(0.17 0.025 292);
+  --popover-foreground: oklch(0.98 0.005 292);
 
-        --muted: oklch(0.22 0.04 268);
-        --muted-foreground: oklch(0.65 0.03 268);
+  --primary: oklch(0.64 0.11 292);
+  --primary-foreground: oklch(1 0 0);
 
-        --border: oklch(0.26 0.04 268);
-        --input: oklch(0.26 0.04 268);
-      }
+  /* Accent: Neon Sunset */
+  --accent: oklch(0.70 0.18 50);
+  --accent-foreground: oklch(0.14 0.02 292);
 
-.theme-bg { background-color: var(--background); color: var(--foreground); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-.theme-card { background-color: var(--card); color: var(--card-foreground); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
-.theme-primary { background-color: var(--primary); color: var(--primary-foreground); }
-.theme-accent { background-color: var(--accent); color: var(--accent-foreground); }
-.theme-muted-bg { background-color: var(--muted); }
+  --secondary: oklch(0.22 0.03 292);
+  --secondary-foreground: oklch(0.98 0 0);
+
+  --muted: oklch(0.22 0.03 292);
+  --muted-foreground: oklch(0.70 0.02 292);
+
+  --destructive: oklch(0.60 0.18 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.25 0.03 292);
+  --input: oklch(0.25 0.03 292);
+  --ring: oklch(0.64 0.11 292);
+
+  --chart-1: oklch(0.64 0.11 292);
+  --chart-2: oklch(0.70 0.18 50);
+  --chart-3: oklch(0.75 0.12 320);
+  --chart-4: oklch(0.50 0.14 250);
+  --chart-5: oklch(0.70 0.15 150);
+
+  --sidebar: oklch(0.12 0.02 292);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.64 0.11 292);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.03 292);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.25 0.03 292);
+  --sidebar-ring: oklch(0.64 0.11 292);
+  
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.4);
+  --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.4), 0 1px 2px -1px oklch(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -1px oklch(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.4), 0 4px 6px -4px oklch(0 0 0 / 0.4);
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -139,10 +181,44 @@ html, body {
 @layer base {
   * { @apply border-border outline-ring/50; }
   
-  /* Smooth Scroll y selección de texto acorde a marca */
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--color-border) 82%, var(--color-background))
+      transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--color-border) 82%, var(--color-background));
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklab, var(--color-primary) 35%, var(--color-border));
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   ::selection { @apply bg-primary/20 text-primary; }
 }
+
 
 @layer utilities {
   .transition-all-smooth { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
