@@ -10,11 +10,17 @@ export default defineConfig({
     server: {
       watch: {
         usePolling: true,
+        interval: 100, // Prueba con 100ms para mayor velocidad
+        binaryInterval: 300,
+      },
+      hmr: {
+        clientPort: process.env.SERVER_PORT, // Force the browser to connect to this port on localhost
       }
     },
   },
   server: {
     host: true,
+    port: process.env.SERVER_PORT,
     allowedHosts: true,
   }
 });

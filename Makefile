@@ -1,6 +1,6 @@
 # Variables
 COMPOSE_FILE = docker-compose.yml
-PROJECT_NAME = hema-landing
+PROJECT_NAME = liiot-landing
 SERVICE_NAME = app
 # Comando base de Docker Compose
 DOCKER_COMPOSE = docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME)

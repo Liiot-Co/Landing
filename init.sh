@@ -7,9 +7,9 @@
 # 1. Definir valores por defecto si no están configurados en el entorno.
 # -------------------------------------------------------------------
 # Puerto en el que Astro escuchará dentro del contenedor (por defecto 4321)
-SERVER_PORT=${SERVER_PORT:-4321}
+SERVER_PORT=${SERVER_PORT}
 # Nivel de depuración (útil para Node.js). Si se establece, activa el modo de mantenimiento/debug.
-DEBUG_MODE=${DEBUG:-""}
+DEBUG_MODE=${DEBUG}
 
 # 2. Exportar variables de entorno (útil si se necesitan en otros comandos o en la app)
 # ---------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ echo "--------------------------------------------------------"
 # --------------------------------------------------
 
 # Verifica si la variable DEBUG_MODE (basada en la variable DEBUG) tiene contenido (-n)
-if [ -n "$DEBUG_MODE" == "true" ]; then
+if [ "$DEBUG_MODE" == "true" ]; then
     echo "  ⚠️  Modo DEBUG activado. El servidor NO se iniciará automáticamente."
     echo "  El contenedor se mantendrá vivo con 'tail -f /dev/null'."
     echo "  Usa 'make shell' y ejecuta 'bun dev' manualmente si lo necesitas."
