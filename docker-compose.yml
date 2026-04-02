@@ -11,6 +11,6 @@ services:
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${ENVIRONMENT}
     env_file:
       - .env

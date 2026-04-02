@@ -29,8 +29,9 @@ const classes = [finalCtaButtonBase, finalCtaButtonSizeClasses[size], className]
   .filter(Boolean)
   .join(" ");
 
-const shimmerClass =
-  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.35),transparent)] animate-shimmer pointer-events-none";
+// An internal soft radial glow that slowly reveals itself on hover
+const innerGlowClass =
+  "absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_0%,transparent_70%)] pointer-events-none";
 
 const innerWrapClass =
   size === "section"
@@ -40,53 +41,56 @@ const innerWrapClass =
       : "relative z-10 flex items-center justify-center gap-2";
 
 const arrowClass =
-  size === "section"
+  size === "section" || size === "hero"
     ? "w-6 h-6"
-    : size === "hero"
-      ? "h-6 w-6"
-      : size === "form"
-        ? "h-5 w-5"
-        : size === "widget"
-          ? "ml-2 h-5 w-5"
-          : size === "spotlight"
-            ? "ml-2 h-4 w-4"
-            : "";
+    : size === "form" || size === "widget"
+      ? "h-5 w-5"
+      : size === "spotlight"
+        ? "h-4 w-4"
+        : "";
+
+// Added tracking transition for the luxury editorial feel
+const textClass =
+  (size === "section" || size === "hero" ? "text-lg" : "text-base") +
+  " transition-all duration-700 ease-out group-hover:tracking-[0.02em]";
 ---
 
 {
   href ? (
     <a href={href} class={classes}>
       <span class={innerWrapClass}>
-        <span class="cta-button-text">
+        <span class={textClass}>
           <slot />
         </span>
         {showArrowResolved && (
           <ArrowRight
             class:list={[
               arrowClass,
-              "shrink-0 transition-transform group-hover:translate-x-1",
+              size === "widget" || size === "spotlight" ? "ml-2" : "",
+              "shrink-0 opacity-80 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-x-1.5",
             ]}
           />
         )}
       </span>
-      <span class={shimmerClass} aria-hidden="true" />
+      <span class={innerGlowClass} aria-hidden="true" />
     </a>
   ) : (
     <button type={type} class={classes}>
       <span class={innerWrapClass}>
-        <span class="cta-button-text">
+        <span class={textClass}>
           <slot />
         </span>
         {showArrowResolved && (
           <ArrowRight
             class:list={[
               arrowClass,
-              "shrink-0 transition-transform group-hover:translate-x-1",
+              size === "widget" || size === "spotlight" ? "ml-2" : "",
+              "shrink-0 opacity-80 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-x-1.5",
             ]}
           />
         )}
       </span>
-      <span class={shimmerClass} aria-hidden="true" />
+      <span class={innerGlowClass} aria-hidden="true" />
     </button>
   )
 }

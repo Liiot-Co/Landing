@@ -50,8 +50,8 @@ const CANVAS_ID = "silk-grain-canvas";
 
     // --- CONFIGURATION ---
     private config = {
-      speed: 1.0, // Multiplier for animation speed (1.0 is default)
-      spread: 2.0, // Zoom/Scale of the waves (higher = more zoomed out)
+      speed: 2.0, // Multiplier for animation speed (1.0 is default)
+      spread: 3.0, // Zoom/Scale of the waves (higher = more zoomed out)
       quality: 0.75, // Canvas resolution scale (0.5 to 1.0) - balances performance
     };
 
@@ -241,7 +241,7 @@ const CANVAS_ID = "silk-grain-canvas";
 
           // Orange accents
           float f2 = fbm(st + q * 1.5 - t * 0.01);
-          float orangeFold = smoothstep(0.4, 0.9, f2) * smoothstep(0.3, 0.8, f);
+          float orangeFold = smoothstep(0.4, 0.5, f2) * smoothstep(0.3, 0.8, f);
           color = mix(color, u_colorSecondary, orangeFold * 2.0);
 
           // Fake depth / ambient occlusion
