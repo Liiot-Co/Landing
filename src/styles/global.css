@@ -44,9 +44,9 @@ body {
   --secondary: oklch(0.97 0.01 292);
   --secondary-foreground: oklch(0.35 0.04 292);
 
-  /* Muted: Subtle dividers or background text */
+  /* Muted: Subtle dividers or background text — higher contrast for body copy */
   --muted: oklch(0.97 0.01 292);
-  --muted-foreground: oklch(0.55 0.04 292);
+  --muted-foreground: oklch(0.42 0.04 292);
 
   --destructive: oklch(0.59 0.20 20);
   --destructive-foreground: oklch(0.98 0 0);
@@ -75,6 +75,10 @@ body {
   --sidebar-ring: oklch(0.64 0.11 292);
 
   --radius: 0.5rem;
+
+  /* Brand marketing gradient (lavender → sunset) — matches #7C3AED → #EA580C feel in OKLch */
+  --gradient-brand: linear-gradient(135deg, oklch(0.52 0.22 292) 0%, oklch(0.58 0.2 50) 100%);
+  --gradient-brand-soft: linear-gradient(135deg, oklch(0.64 0.11 292 / 0.12) 0%, oklch(0.7 0.16 50 / 0.1) 100%);
 
   /* Shadows: TINTED PURPLE. 
      Instead of grey shadows, we use low-opacity purple. 
@@ -108,7 +112,7 @@ body {
   --secondary-foreground: oklch(0.98 0 0);
 
   --muted: oklch(0.22 0.03 292);
-  --muted-foreground: oklch(0.70 0.02 292);
+  --muted-foreground: oklch(0.78 0.03 292);
 
   --destructive: oklch(0.60 0.18 25);
   --destructive-foreground: oklch(0.98 0 0);
@@ -190,7 +194,15 @@ body {
 
   html {
     scroll-behavior: smooth;
+    /* scroll-padding aligns in-view sections with the fixed nav when using #anchors */
+    scroll-padding-top: 5rem;
     scrollbar-gutter: stable;
+  }
+
+  @media (min-width: 640px) {
+    html {
+      scroll-padding-top: 5.5rem;
+    }
   }
 
   * {
@@ -233,17 +245,161 @@ body {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Elevación sutil Glassmorphism para elementos flotantes */
+  /* Glass panels — consistent radius + blur sitewide (no drop shadow) */
   .glass-panel {
-    @apply bg-background/80 backdrop-blur-md border border-border/50 shadow-lg;
+    @apply rounded-2xl bg-card/75 backdrop-blur-xl border border-border/50;
   }
 
-  /* Text gradient utility - Using webkit example provided */
+  /* Legacy elevated card — prefer .landing-card for marketing surfaces */
+  .card-elevated {
+    @apply relative isolate rounded-2xl border border-border/50 bg-card/90 backdrop-blur-xl;
+    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms ease;
+  }
+
+  .card-elevated:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--color-primary) 15%, var(--color-border));
+  }
+
+  /* Section labels — typography only, no pill/chip */
+  .section-eyebrow {
+    @apply text-xs font-semibold tracking-[0.2em] uppercase text-accent;
+  }
+
+  /* Subtle brand wash for section backgrounds */
+  .bg-gradient-brand-soft {
+    background-image: var(--gradient-brand-soft);
+  }
+
+  /* Text gradient — purple → orange */
   .text-gradient {
-    background: -webkit-linear-gradient(var(--primary), var(--secondary));
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
+  /* Editorial headline — massive & tight */
+  .headline-editorial {
+    @apply font-black tracking-tighter leading-none;
+  }
+
+  /* Marketing cards — glass surface + radial border follows pointer (see mouse-border.ts) */
+  .landing-card {
+    --mx: 50%;
+    --my: 50%;
+    @apply relative isolate rounded-2xl border border-transparent backdrop-blur-sm;
+    transition:
+      border-color 300ms ease,
+      filter 0.2s ease;
+  }
+
+  .landing-card > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  .landing-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, var(--color-primary) 55%, transparent),
+      color-mix(in oklab, var(--color-accent) 50%, transparent),
+      transparent 52%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .landing-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Primary CTA — linear luxury gradient + subtle sheen */
+  .btn-brand-gradient {
+    background-image: linear-gradient(
+      110deg,
+      color-mix(in oklab, var(--color-primary) 88%, black) 0%,
+      color-mix(in oklab, var(--color-accent) 82%, black) 48%,
+      color-mix(in oklab, var(--color-primary) 88%, black) 100%
+    );
+    background-size: 170% 170%;
+    background-position: 16% 50%;
+    @apply relative isolate text-white font-semibold border-0 overflow-hidden;
+    transition:
+      transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
+      filter 300ms ease,
+      background-position 400ms ease;
+  }
+
+  .btn-brand-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      color-mix(in oklab, white 24%, transparent) 50%,
+      transparent 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .btn-brand-gradient:hover {
+    @apply scale-[1.03];
+    filter: brightness(1.08);
+    background-position: 88% 50%;
+  }
+
+  .btn-brand-gradient:hover::before {
+    opacity: 1;
+  }
+
+  .btn-brand-gradient:active {
+    @apply scale-[0.98];
+  }
+
+  /* Noise texture overlay — apply to ::after of a container */
+  .noise-overlay {
+    position: relative;
+  }
+  .noise-overlay::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
 }

@@ -2,15 +2,23 @@
 import "@/styles/global.css";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Liiot | Ease to Future</title>
-	</head>
-	<body class="dark">
-		<slot />
-	</body>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Liiot Hedul | Inteligencia aplicada al flujo real</title>
+    <meta
+      name="description"
+      content="Plataforma B2B de gestión de personal y turnos rotativos para hospitales y empresas de seguridad."
+    />
+  </head>
+  <body class="dark noise-overlay">
+    <slot />
+    <script>
+      import "@/scripts/mouse-border.ts";
+      import "@/scripts/landing-motion.ts";
+    </script>
+  </body>
 </html>
