@@ -13,6 +13,8 @@ interface Props {
   class?: string;
   /** Default: true for all sizes except `compact` */
   showArrow?: boolean;
+  target?: string;
+  rel?: string;
 }
 
 const {
@@ -21,7 +23,12 @@ const {
   size = "section",
   class: className = "",
   showArrow,
+  target,
+  rel: relProp,
 } = Astro.props;
+
+const rel =
+  relProp ?? (target === "_blank" ? "noopener noreferrer" : undefined);
 
 const showArrowResolved = showArrow ?? size !== "compact";
 
@@ -29,35 +36,42 @@ const classes = [finalCtaButtonBase, finalCtaButtonSizeClasses[size], className]
   .filter(Boolean)
   .join(" ");
 
-// An internal soft radial glow that slowly reveals itself on hover
-const innerGlowClass =
-  "absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_0%,transparent_70%)] pointer-events-none";
-
 const innerWrapClass =
   size === "section"
-    ? "relative z-10 flex items-center justify-center gap-3"
+    ? "relative z-20 flex items-center justify-center gap-3"
     : size === "widget" || size === "spotlight"
-      ? "relative z-10 flex items-center"
-      : "relative z-10 flex items-center justify-center gap-2";
+      ? "relative z-20 flex items-center gap-2"
+      : "relative z-20 flex items-center justify-center gap-2";
 
-const arrowClass =
+const arrowSizeClass =
   size === "section" || size === "hero"
-    ? "w-6 h-6"
+    ? "w-5 h-5"
     : size === "form" || size === "widget"
-      ? "h-5 w-5"
+      ? "h-4 w-4"
       : size === "spotlight"
-        ? "h-4 w-4"
+        ? "h-3.5 w-3.5"
         : "";
 
-// Added tracking transition for the luxury editorial feel
 const textClass =
-  (size === "section" || size === "hero" ? "text-lg" : "text-base") +
-  " transition-all duration-700 ease-out group-hover:tracking-[0.02em]";
+  size === "section" ? "text-lg" : size === "hero" ? "text-base" : "text-base";
+
+// The HTML for the dark volumetric background and the shine effect
+const darkVolumetricEffect = `
+  <div class="absolute inset-0 z-0 bg-black"></div>
+  
+  <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_0%_0%,var(--color-primary),transparent_75%)] opacity-90 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"></div>
+  
+  <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_100%_100%,var(--color-accent),transparent_75%)] opacity-90 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"></div>
+  
+  <div class="absolute inset-0 z-10 -translate-x-[150%] skew-x-[-25deg] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-[150%]" aria-hidden="true"></div>
+`;
 ---
 
 {
   href ? (
-    <a href={href} class={classes}>
+    <a href={href} class={classes} target={target} rel={rel}>
+      <Fragment set:html={darkVolumetricEffect} />
+
       <span class={innerWrapClass}>
         <span class={textClass}>
           <slot />
@@ -65,17 +79,17 @@ const textClass =
         {showArrowResolved && (
           <ArrowRight
             class:list={[
-              arrowClass,
-              size === "widget" || size === "spotlight" ? "ml-2" : "",
-              "shrink-0 opacity-80 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-x-1.5",
+              arrowSizeClass,
+              "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5",
             ]}
           />
         )}
       </span>
-      <span class={innerGlowClass} aria-hidden="true" />
     </a>
   ) : (
     <button type={type} class={classes}>
+      <Fragment set:html={darkVolumetricEffect} />
+
       <span class={innerWrapClass}>
         <span class={textClass}>
           <slot />
@@ -83,14 +97,12 @@ const textClass =
         {showArrowResolved && (
           <ArrowRight
             class:list={[
-              arrowClass,
-              size === "widget" || size === "spotlight" ? "ml-2" : "",
-              "shrink-0 opacity-80 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-x-1.5",
+              arrowSizeClass,
+              "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5",
             ]}
           />
         )}
       </span>
-      <span class={innerGlowClass} aria-hidden="true" />
     </button>
   )
 }

@@ -1,111 +1,75 @@
 ---
-import { Github, Twitter, Linkedin, Mail } from "lucide-astro";
+import { MessageCircle } from "lucide-astro";
+import { HEDUL_WHATSAPP_URL } from "@/constants/contact";
 
 const currentYear = new Date().getFullYear();
 
-const footerLinks = {
-  Producto: [
-    { name: "Características", href: "#features" },
-    { name: "Precios", href: "#pricing" },
-    { name: "Plataforma Empresarial", href: "/products" },
-  ],
-  Empresa: [
-    { name: "Acerca de", href: "#about" },
-    { name: "Carreras", href: "#careers" },
-    { name: "Contacto", href: "#contact" },
-  ],
-  Recursos: [
-    { name: "Documentación", href: "#docs" },
-    { name: "Centro de Ayuda", href: "#help" },
-    { name: "Blog", href: "#blog" },
-  ],
-};
-
-const socialLinks = [
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Github, href: "#", label: "GitHub" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Mail, href: "#", label: "Email" },
+const footerLinks = [
+  { name: "Inicio", href: "#hero" },
+  { name: "Problema", href: "#pain-points" },
+  { name: "Funcionalidades", href: "#features" },
+  { name: "Empresa", href: "#company" },
+  { name: "Demo", href: "#cta" },
 ];
 ---
 
 <footer class="bg-card border-t border-border text-foreground">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-      {/* Brand */}
-      <div class="col-span-2 md:col-span-1">
-        <div class="flex items-center space-x-2 mb-4">
-          <div
-            class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center"
-          >
-            <span class="text-primary-foreground font-bold text-lg">H</span>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-10">
+      <!-- Brand -->
+      <div>
+        <div class="flex items-center space-x-2 mb-3">
+          <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <span class="text-primary-foreground font-bold text-sm tracking-tight">L</span>
           </div>
-          <span class="text-xl font-bold">Liiot</span>
+          <div>
+            <span class="text-lg font-bold text-foreground">Liiot</span>
+            <span class="text-xs text-muted-foreground ml-1.5 font-medium">/ Hedul</span>
+          </div>
         </div>
-        <p class="text-muted-foreground text-sm mb-6">
-          Construyendo soluciones de software innovadoras para empresas
-          modernas.
+        <p class="text-sm text-muted-foreground font-medium max-w-xs">
+          Soluciones de alto impacto para erradicar lo tedioso y potenciar el bienestar humano.
         </p>
-        <div class="flex space-x-4">
-          {
-            socialLinks.map((social) => {
-              // Renombrado de variable para mayor claridad
-              const Icon = social.icon;
-              return (
-                <a
-                  href={social.href}
-                  aria-label={social.label}
-                  class="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Icon size={20} />
-                </a>
-              );
-            })
-          }
-        </div>
       </div>
 
-      {/* Link Columns */}
-      {
-        Object.entries(footerLinks).map(([category, links]) => (
-          <div>
-            <h3 class="font-semibold text-foreground mb-4">{category}</h3>
-            <ul class="space-y-3">
-              {links.map((link) => (
-                <li>
-                  <a
-                    href={link.href}
-                    class="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
+      <!-- Links -->
+      <div class="flex flex-wrap gap-x-6 gap-y-2 md:justify-center">
+        {footerLinks.map((link) => (
+          <a
+            href={link.href}
+            class="text-sm text-muted-foreground hover:text-primary transition-all duration-500 ease-out font-medium"
+          >
+            {link.name}
+          </a>
+        ))}
+      </div>
+
+      <!-- WhatsApp CTA -->
+      <div class="md:text-right">
+        <a
+          href={HEDUL_WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-all duration-500 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+        >
+          <MessageCircle class="size-4 mr-2 shrink-0" />
+          Hablar con un experto
+        </a>
+      </div>
     </div>
 
-    <div class="pt-8 border-t border-border">
-      <div
-        class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
-      >
-        <p class="text-sm text-muted-foreground">
-          © {currentYear} SoftwareCo. Todos los derechos reservados.
+    <!-- Bottom bar -->
+    <div class="pt-6 border-t border-border">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p class="text-xs text-muted-foreground">
+          &copy; {currentYear} Liiot. Todos los derechos reservados.
         </p>
-        <div class="flex space-x-6">
-          <a
-            href="#privacy"
-            class="text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            Política de Privacidad
+        <div class="flex gap-6">
+          <a href="#hero" class="text-xs text-muted-foreground hover:text-primary transition-all duration-500 ease-out">
+            Inicio
           </a>
-          <a
-            href="#terms"
-            class="text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            Términos de Servicio
+          <a href="#cta" class="text-xs text-muted-foreground hover:text-primary transition-all duration-500 ease-out">
+            Demo
           </a>
         </div>
       </div>

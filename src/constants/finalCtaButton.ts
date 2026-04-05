@@ -1,27 +1,32 @@
 /**
- * Shared styles for the button CTA.
- * Keep in sync with `FinalCTAButton.astro`.
+ * Primary CTA — Luxury structure for dark, volumetric styling.
  */
 
-// 1. Fluid Background: We use a gradient that is 300% wide. On hover, we pan it from left to right.
-// 2. Micro-scale: Reduced to a barely-there 1.01 scale so it feels sturdy, not bouncy.
-// 3. Inner Glass Ring: `ring-1 ring-inset` creates a sharp, premium edge.
 export const finalCtaButtonBase =
-  "relative overflow-hidden group transition-all duration-700 ease-out hover:scale-[1.01] active:scale-[0.99] text-[var(--primary-foreground)] " +
-  "bg-gradient-to-r from-[color-mix(in_oklch,var(--accent)_90%,black)] via-[color-mix(in_oklch,var(--accent)_70%,black)] to-[color-mix(in_oklch,var(--accent)_90%,black)] " +
-  "bg-[length:300%_100%] bg-left hover:bg-right " +
-  "ring-1 ring-inset ring-white/5 hover:ring-white/20";
-
-// Shadows are completely minimized to a tiny ambient blur, letting the button's internal light do the work.
-const ambientShadow = "shadow-[0_2px_10px_-2px_rgba(0,0,0,0.2)]";
+  "group relative inline-flex items-center justify-center overflow-hidden whitespace-nowrap " +
+  "font-semibold tracking-wide text-white rounded-xl outline-none " +
+  // Crisp glass-like inner ring to catch the "light"
+  "ring-1 ring-inset ring-white/20 " +
+  // Deep resting shadow + subtle white inner top-highlight
+  "shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_20px_-8px_rgba(0,0,0,0.6)] " +
+  // Smooth unified transition for the button structure
+  "transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] " +
+  // Hover: Lift slightly and bloom the drop shadow with the primary color
+  "hover:-translate-y-0.5 hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_16px_32px_-12px_color-mix(in_oklab,var(--color-primary)_60%,transparent)] " +
+  // Active: Snappy micro-press
+  "active:scale-[0.98] active:translate-y-0 " +
+  "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 " +
+  "focus-visible:ring-offset-background dark:focus-visible:ring-offset-background";
 
 export const finalCtaButtonSizeClasses = {
-  section: `px-14 py-8 text-xl font-semibold rounded-xl ${ambientShadow}`,
-  hero: `px-12 py-7 text-lg font-semibold rounded-xl ${ambientShadow}`,
-  form: `w-full px-8 py-6 text-lg font-semibold rounded-xl ${ambientShadow}`,
-  widget: `w-full py-5 text-base font-semibold rounded-md ${ambientShadow} inline-flex items-center justify-center gap-2`,
-  spotlight: `px-6 py-3 text-base font-semibold rounded-md ${ambientShadow} w-full sm:w-auto inline-flex items-center justify-center gap-2`,
-  compact: `inline-flex items-center justify-center px-8 h-12 text-lg font-bold rounded-lg ${ambientShadow}`,
+  section: "px-12 py-6 text-lg rounded-xl",
+  hero: "px-10 py-5 text-base rounded-xl",
+  form: "w-full px-8 py-4 text-base rounded-xl",
+  widget:
+    "w-full py-4 text-sm rounded-xl inline-flex items-center justify-center gap-2",
+  spotlight:
+    "px-6 py-3 text-sm rounded-xl w-full sm:w-auto inline-flex items-center justify-center gap-2",
+  compact: "inline-flex items-center justify-center px-6 h-11 text-sm rounded-lg",
 } as const;
 
 export type FinalCtaButtonSize = keyof typeof finalCtaButtonSizeClasses;

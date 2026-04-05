@@ -1,21 +1,25 @@
 ---
-import FinalCTA from "@/components/FinalCTA.astro";
-import HeroSection from "@/components/HeroSection.astro";
 import Layout from "@/components/layouts/Layout.astro";
-import ProductSpotlight from "@/components/ProductSpotlight.astro";
+import ScrollProgress from "@/components/ScrollProgress.astro";
+import Navbar from "@/components/Navbar.astro";
+import Hero from "@/components/Hero.astro";
+import Features from "@/components/Features.astro";
+import ProblemForWho from "@/components/ProblemForWho.astro";
 import WhyChooseUs from "@/components/WhyChooseUs.astro";
+import ScrollQuote from "@/components/ScrollQuote.astro";
+import FinalCTA from "@/components/FinalCTA.astro";
 import Footer from "@/components/Footer.astro";
-import ScrollFollowWidget from "@/components/ScrollFollowWidget.astro";
-import Navigation from "@/components/Navigation.astro";
 ---
 
 <Layout>
-  <Navigation />
-  <!-- <ScrollFollowWidget /> -->
-  <main id="hero" class="bg-background min-h-screen">
-    <HeroSection />
-    <ProductSpotlight />
+  <ScrollProgress />
+  <Navbar />
+  <main class="bg-background">
+    <Hero />
+    <Features />
+    <ProblemForWho />
     <WhyChooseUs />
+    <ScrollQuote />
     <FinalCTA />
   </main>
   <Footer />
