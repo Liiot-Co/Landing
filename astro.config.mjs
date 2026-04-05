@@ -14,13 +14,13 @@ export default defineConfig({
         binaryInterval: 300,
       },
       hmr: {
-        clientPort: process.env.SERVER_PORT, // Force the browser to connect to this port on localhost
+        clientPort: process.env.SERVER_PORT ? Number(process.env.SERVER_PORT) : undefined,
       }
     },
   },
   server: {
     host: true,
-    port: process.env.SERVER_PORT,
+    port: process.env.SERVER_PORT ? Number(process.env.SERVER_PORT) : undefined,
     allowedHosts: true,
   }
 });
