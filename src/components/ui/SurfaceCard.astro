@@ -1,0 +1,35 @@
+---
+interface Props {
+  id?: string;
+  class?: string;
+  tone?: "brand" | "dark";
+  hover?: boolean;
+}
+
+const {
+  class: className = "",
+  tone = "brand",
+  hover = true,
+  ...rest
+} = Astro.props as Props;
+
+const base =
+  "landing-card relative overflow-hidden rounded-2xl border backdrop-blur-md";
+
+const toneClasses =
+  tone === "dark"
+    ? "border-primary/35 bg-linear-to-br from-slate-950/95 via-slate-900/90 to-slate-950/95"
+    : "border-primary/22 bg-linear-to-br from-slate-950/78 via-slate-900/72 to-slate-950/76";
+
+const hoverClasses = hover
+  ? "transition-all duration-300 ease-out hover:border-primary/35"
+  : "";
+
+const classes = [base, toneClasses, hoverClasses, className]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class={classes} {...rest}>
+  <slot />
+</div>

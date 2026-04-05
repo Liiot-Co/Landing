@@ -1,0 +1,20 @@
+---
+/**
+ * Shared section background: matching corner blurs (primary / accent).
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<div
+  class:list={["absolute inset-0 pointer-events-none overflow-hidden", className]}
+  aria-hidden="true"
+>
+  <div class="absolute -top-32 -right-32 h-72 w-72 rounded-full bg-primary/6 blur-3xl"
+  ></div>
+  <div class="absolute -bottom-32 -left-32 h-72 w-72 rounded-full bg-accent/6 blur-3xl"
+  ></div>
+</div>
