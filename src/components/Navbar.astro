@@ -1,6 +1,6 @@
 ---
-import { Menu, X } from "lucide-astro";
-import { cn } from "@/lib/utils";
+import LiiotMark from "@/components/ui/LiiotMark.astro";
+import { LIIOT_CALENDLY_URL } from "@/constants/contact";
 
 interface NavLink {
   name: string;
@@ -8,161 +8,110 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { name: "Inicio", path: "#hero" },
-  { name: "Problema", path: "#pain-points" },
-  { name: "Producto", path: "#features" },
-  { name: "Empresa", path: "#company" },
-  { name: "Demo", path: "#cta" },
+  { name: "Por qué existimos", path: "#por-que-existimos" },
+  { name: "Cómo trabajamos", path: "#como-trabajamos" },
+  { name: "Proyectos", path: "#proyectos" },
+  { name: "Equipo", path: "#equipo" },
+  { name: "Agendar", path: "#agendar" },
 ];
 ---
 
 <nav
   id="site-nav"
-  class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent"
+  class="fixed top-0 left-0 right-0 z-50 mix-blend-difference"
   role="navigation"
   aria-label="Navegación principal"
 >
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16 sm:h-20">
+    <div class="flex h-20 items-center justify-between sm:h-24">
       {/* Brand */}
-      <a
-        href="/"
-        class="flex items-center space-x-2 group"
-        aria-label="Liiot — Inicio"
-      >
-        <div
-          class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center transition-transform group-hover:scale-110"
-        >
-          <span class="text-primary-foreground font-bold text-sm tracking-tight"
-            >aT</span
-          >
-        </div>
-        <div class="flex flex-col leading-none">
-          <span class="text-lg font-bold text-foreground">Liiot</span>
-          <span
-            class="text-xs text-accent font-medium tracking-widest uppercase"
-            >Hedul</span
-          >
-        </div>
+      <a href="#hero" class="group flex items-center gap-2.5" aria-label="Liiot — Inicio">
+        <LiiotMark class="size-7 sm:size-8" color="white" />
+        <span class="text-lg font-bold tracking-tight text-white">Liiot</span>
       </a>
 
-      {/* Desktop links */}
-      <div class="hidden md:flex items-center gap-8">
-        {
-          navLinks.map((link) => (
-            <a
-              href={link.path}
-              class={cn(
-                "text-sm font-medium transition-colors relative py-2 text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {link.name}
-            </a>
-          ))
-        }
-
-        <a
-          href="#cta"
-          class="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-primary via-accent/90 to-primary bg-size-[165%_165%] bg-position-[18%_50%] px-5 py-2.5 text-sm font-semibold text-primary-foreground ring-1 ring-white/15 transition-all duration-300 ease-out hover:bg-position-[85%_50%] hover:brightness-110 hover:ring-white/25"
-        >
-          Solicitar demo
-        </a>
-      </div>
-
-      {/* Mobile toggle */}
+      {/* Hamburger — única entrada de navegación visible */}
       <button
         id="nav-toggle"
-        class="md:hidden p-2 text-foreground"
+        class="relative flex size-11 flex-col items-center justify-center gap-[7px]"
         aria-label="Abrir menú"
         aria-expanded="false"
         aria-controls="nav-drawer"
       >
-        <Menu id="nav-icon-open" class="w-6 h-6" aria-hidden="true" />
-        <X id="nav-icon-close" class="w-6 h-6 hidden" aria-hidden="true" />
+        <span
+          id="nav-line-1"
+          class="block h-[1.5px] w-6 origin-center bg-white transition-transform duration-300 ease-out"
+        ></span>
+        <span
+          id="nav-line-2"
+          class="block h-[1.5px] w-6 origin-center bg-white transition-transform duration-300 ease-out"
+        ></span>
       </button>
-    </div>
-
-    {/* Mobile drawer */}
-    <div
-      id="nav-drawer"
-      class="md:hidden py-4 border-t border-border hidden"
-      role="menu"
-    >
-      <div class="flex flex-col space-y-1">
-        {
-          navLinks.map((link) => (
-            <a
-              href={link.path}
-              class={cn(
-                "text-sm font-medium transition-colors px-2 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50",
-              )}
-              data-nav-item
-              role="menuitem"
-            >
-              {link.name}
-            </a>
-          ))
-        }
-        <a
-          href="#cta"
-          class="mt-2 inline-flex items-center justify-center rounded-xl bg-linear-to-r from-primary via-accent/90 to-primary bg-size-[165%_165%] bg-position-[18%_50%] px-5 py-3 text-sm font-semibold text-primary-foreground ring-1 ring-white/15 transition-all duration-300 ease-out hover:bg-position-[85%_50%] hover:brightness-110 hover:ring-white/25"
-          data-nav-item
-          role="menuitem"
-        >
-          Solicitar demo
-        </a>
-      </div>
     </div>
   </div>
 </nav>
 
+{/* Overlay drawer — fondo sólido propio (fuera del blend-difference del nav) */}
+<div
+  id="nav-drawer"
+  class="fixed inset-0 z-40 flex translate-y-[-8px] flex-col justify-center bg-background opacity-0 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+  role="menu"
+  aria-hidden="true"
+>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <ul class="flex flex-col gap-2">
+      {
+        navLinks.map((link, i) => (
+          <li>
+            <a
+              href={link.path}
+              data-nav-item
+              role="menuitem"
+              class="drawer-link block py-2 text-[12vw] font-bold leading-[1.05] tracking-tight text-foreground transition-colors duration-300 hover:text-accent sm:text-6xl lg:text-7xl"
+              style={`transition-delay:${i * 40}ms`}
+            >
+              {link.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a
+      href={LIIOT_CALENDLY_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-nav-item
+      role="menuitem"
+      class="mt-12 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-accent"
+    >
+      Agendar consultoría
+      <span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</div>
+
 <script>
-  // ── Selectors ──────────────────────────────────────────────────────────────
-  const nav = document.getElementById("site-nav")!;
   const toggle = document.getElementById("nav-toggle")!;
   const drawer = document.getElementById("nav-drawer")!;
-  const iconOpen = document.getElementById("nav-icon-open")!;
-  const iconClose = document.getElementById("nav-icon-close")!;
-  const navItems = drawer.querySelectorAll("[data-nav-item]");
+  const line1 = document.getElementById("nav-line-1")!;
+  const line2 = document.getElementById("nav-line-2")!;
+  const navItems = drawer.querySelectorAll<HTMLElement>("[data-nav-item]");
 
-  // ── Config ─────────────────────────────────────────────────────────────────
-  const GLASS = [
-    "bg-background/85",
-    "backdrop-blur-xl",
-    "border-b",
-    "border-border/60",
-    "shadow-sm",
-  ];
-  const SCROLL_THRESHOLD = 20;
+  let open = false;
 
-  // ── State ──────────────────────────────────────────────────────────────────
-  let scrolled = false;
-  let drawerOpen = false;
-
-  // ── Scroll → glass effect ──────────────────────────────────────────────────
-  function onScroll() {
-    const isScrolled = window.scrollY > SCROLL_THRESHOLD;
-    if (isScrolled === scrolled) return;
-    scrolled = isScrolled;
-    nav.classList.toggle("bg-transparent", !scrolled);
-    GLASS.forEach((c) => nav.classList.toggle(c, scrolled));
-  }
-
-  // ── Drawer toggle ──────────────────────────────────────────────────────────
-  function setDrawer(open: boolean) {
-    drawerOpen = open;
+  function setDrawer(next: boolean) {
+    open = next;
     toggle.setAttribute("aria-expanded", String(open));
-    drawer.classList.toggle("hidden", !open);
-    iconOpen.classList.toggle("hidden", open);
-    iconClose.classList.toggle("hidden", !open);
+    drawer.setAttribute("aria-hidden", String(!open));
+    drawer.classList.toggle("opacity-0", !open);
+    drawer.classList.toggle("pointer-events-none", !open);
+    drawer.classList.toggle("translate-y-[-8px]", !open);
+    line1.style.transform = open ? "translateY(4px) rotate(45deg)" : "none";
+    line2.style.transform = open ? "translateY(-4px) rotate(-45deg)" : "none";
+    document.body.style.overflow = open ? "hidden" : "";
   }
 
-  // ── Listeners ──────────────────────────────────────────────────────────────
-  window.addEventListener("scroll", onScroll, { passive: true });
-  toggle.addEventListener("click", () => setDrawer(!drawerOpen));
-  navItems.forEach((el) =>
-    el.addEventListener("click", () => setDrawer(false)),
-  );
-
-  onScroll(); // init
+  toggle.addEventListener("click", () => setDrawer(!open));
+  navItems.forEach((el) => el.addEventListener("click", () => setDrawer(false)));
 </script>

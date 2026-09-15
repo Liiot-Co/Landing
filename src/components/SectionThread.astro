@@ -1,0 +1,102 @@
+---
+/**
+ * Hilo de navegación — reemplaza los eyebrows estáticos. Un hilo vertical
+ * fijo con un nodo por capítulo del viaje del héroe; el nodo activo y su
+ * etiqueta se revelan por scroll-trigger (IntersectionObserver) en vez de
+ * texto fijo sobre cada headline. mix-blend-difference (igual que el
+ * Navbar) mantiene el contraste sobre cualquier fondo de la página.
+ */
+const chapters = [
+  { id: "hero", label: "Inicio" },
+  { id: "el-reto", label: "El reto" },
+  { id: "por-que-existimos", label: "El porqué" },
+  { id: "como-trabajamos", label: "El plan" },
+  { id: "proyectos", label: "La prueba" },
+  { id: "equipo", label: "El equipo" },
+  { id: "agendar", label: "El regreso" },
+];
+---
+
+<nav
+  id="section-thread"
+  class="pointer-events-none fixed left-6 top-1/2 z-40 hidden -translate-y-1/2 mix-blend-difference lg:flex xl:left-10"
+  aria-label="Progreso de la página"
+>
+  <ol class="pointer-events-auto flex flex-col items-center">
+    {
+      chapters.map((c, i) => (
+        <li class="flex flex-col items-center">
+          <a
+            href={`#${c.id}`}
+            data-thread-link={c.id}
+            class="group relative flex items-center py-2.5"
+            aria-label={c.label}
+          >
+            <span
+              data-thread-dot={c.id}
+              class="thread-dot block size-[5px] rounded-full bg-white/35"
+            />
+            <span
+              data-thread-label={c.id}
+              class="thread-label pointer-events-none absolute left-5 -translate-x-1 whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.15em] text-white opacity-0"
+            >
+              {String(i + 1).padStart(2, "0")} — {c.label}
+            </span>
+          </a>
+          {i < chapters.length - 1 && <span class="block h-6 w-px bg-white/20" />}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .thread-dot {
+    transition: all 450ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .thread-dot.is-active {
+    width: 8px;
+    height: 8px;
+    background: white;
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.45);
+  }
+
+  .thread-label {
+    transition:
+      opacity 400ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .thread-label.is-active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+</style>
+
+<script>
+  const dots = document.querySelectorAll<HTMLElement>("[data-thread-dot]");
+  const labels = document.querySelectorAll<HTMLElement>("[data-thread-label]");
+
+  const setActive = (id: string, active: boolean) => {
+    dots.forEach((dot) => {
+      if (dot.dataset.threadDot === id) dot.classList.toggle("is-active", active);
+    });
+    labels.forEach((label) => {
+      if (label.dataset.threadLabel === id) label.classList.toggle("is-active", active);
+    });
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => setActive(entry.target.id, entry.isIntersecting));
+    },
+    { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+  );
+
+  document.querySelectorAll<HTMLElement>("[data-thread-link]").forEach((link) => {
+    const id = link.dataset.threadLink!;
+    const target = document.getElementById(id);
+    if (target) observer.observe(target);
+  });
+</script>

@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 html,
@@ -17,129 +17,127 @@ body {
 }
 
 :root {
-  /* --- LIGHT MODE: ETHEREAL DAYLIGHT --- */
+  /* --- LIGHT MODE: Documentos / impresión (Brandbook §Color, modo claro) --- */
+  --background: #FBF9F6;
+  --foreground: #0B0710;
 
-  /* Background: A very soft "Porcelain" purple-white. Not clinical white, but warm and airy. */
-  --background: oklch(0.985 0.003 292);
-  --foreground: oklch(0.20 0.04 292);
-  /* Softer Charcoal-Violet for easier reading than pure black */
+  --card: #FFFFFF;
+  --card-foreground: #0B0710;
 
-  /* Surfaces: Pure White to make content "pop" against the soft background */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.20 0.04 292);
+  --popover: #FFFFFF;
+  --popover-foreground: #0B0710;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0.04 292);
+  /* BRAND: Violeta — tecnología, precisión, estructura */
+  --primary: #5A228B;
+  --primary-high: #8B45CC;
+  --primary-foreground: #FFFFFF;
 
-  /* BRAND: Smooth Lavender */
-  --primary: oklch(0.64 0.11 292);
-  --primary-foreground: oklch(1 0 0);
+  /* ACCENT: Naranja — humanidad, energía, calidez */
+  --accent: #FF6A33;
+  --accent-light: #FF8A5C;
+  --accent-foreground: #0B0710;
 
-  /* ACCENT: Sunset Orange (High Vibrancy) 
-     Adjusted slightly lighter (L=0.72) for a friendlier look on light mode */
-  --accent: oklch(0.72 0.16 50);
-  --accent-foreground: oklch(0.14 0.02 292);
+  /* Acentos decorativos — brandbook §Color: amarillo (informativo), rosa (emocional) */
+  --brand-yellow: #FFC300;
+  --brand-pink: #FF4D6D;
 
-  /* Secondary: Very light, barely-there gray-purple for hover states/buttons */
-  --secondary: oklch(0.97 0.01 292);
-  --secondary-foreground: oklch(0.35 0.04 292);
+  --secondary: #F0EDE8;
+  --secondary-foreground: #0B0710;
 
-  /* Muted: Subtle dividers or background text — higher contrast for body copy */
-  --muted: oklch(0.97 0.01 292);
-  --muted-foreground: oklch(0.42 0.04 292);
+  --muted: #F0EDE8;
+  --muted-foreground: rgba(11, 7, 16, 0.55);
 
-  --destructive: oklch(0.59 0.20 20);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive: #FF4D6D;
+  --destructive-foreground: #FFFFFF;
 
-  /* Borders: Extremely light (L=0.94). 
-     This makes the UI look "cleaner" by removing heavy grid lines. */
-  --border: oklch(0.94 0.01 292);
-  --input: oklch(0.94 0.01 292);
-  --ring: oklch(0.64 0.11 292);
+  --border: rgba(11, 7, 16, 0.08);
+  --input: rgba(11, 7, 16, 0.08);
+  --ring: #5A228B;
 
-  /* Data Viz - Pastel Adjusted */
-  --chart-1: oklch(0.64 0.11 292);
-  --chart-2: oklch(0.72 0.16 50);
-  --chart-3: oklch(0.85 0.10 320);
-  --chart-4: oklch(0.60 0.12 250);
-  --chart-5: oklch(0.78 0.14 150);
+  --chart-1: #5A228B;
+  --chart-2: #FF6A33;
+  --chart-3: #FFC300;
+  --chart-4: #FF4D6D;
+  --chart-5: #8B45CC;
 
-  /* Sidebar: Distinct from background, but very bright */
-  --sidebar: oklch(0.97 0.005 292);
-  --sidebar-foreground: oklch(0.30 0.04 292);
-  --sidebar-primary: oklch(0.64 0.11 292);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.94 0.01 292);
-  --sidebar-accent-foreground: oklch(0.20 0.03 292);
-  --sidebar-border: oklch(0.92 0.01 292);
-  --sidebar-ring: oklch(0.64 0.11 292);
+  --sidebar: #F0EDE8;
+  --sidebar-foreground: #0B0710;
+  --sidebar-primary: #5A228B;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FFFFFF;
+  --sidebar-accent-foreground: #0B0710;
+  --sidebar-border: rgba(11, 7, 16, 0.08);
+  --sidebar-ring: #5A228B;
 
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 
-  /* Brand marketing gradient (lavender → sunset) — matches #7C3AED → #EA580C feel in OKLch */
-  --gradient-brand: linear-gradient(135deg, oklch(0.52 0.22 292) 0%, oklch(0.58 0.2 50) 100%);
-  --gradient-brand-soft: linear-gradient(135deg, oklch(0.64 0.11 292 / 0.12) 0%, oklch(0.7 0.16 50 / 0.1) 100%);
+  --gradient-brand: linear-gradient(135deg, #5A228B 0%, #FF6A33 100%);
+  --gradient-brand-soft: linear-gradient(135deg, rgba(90, 34, 139, 0.12) 0%, rgba(255, 106, 51, 0.1) 100%);
 
-  /* Shadows: TINTED PURPLE. 
-     Instead of grey shadows, we use low-opacity purple. 
-     This makes the white interface look "glowing" and high-end. */
-  --shadow-sm: 0 1px 2px 0 oklch(0.20 0.06 292 / 0.05);
-  --shadow: 0 1px 3px 0 oklch(0.20 0.06 292 / 0.08), 0 1px 2px -1px oklch(0.20 0.06 292 / 0.08);
-  --shadow-md: 0 4px 6px -1px oklch(0.20 0.06 292 / 0.08), 0 2px 4px -2px oklch(0.20 0.06 292 / 0.08);
-  --shadow-lg: 0 10px 15px -3px oklch(0.20 0.06 292 / 0.08), 0 4px 6px -4px oklch(0.20 0.06 292 / 0.08);
+  --shadow-sm: 0 1px 2px 0 rgba(11, 7, 16, 0.05);
+  --shadow: 0 1px 3px 0 rgba(11, 7, 16, 0.08), 0 1px 2px -1px rgba(11, 7, 16, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(11, 7, 16, 0.08), 0 2px 4px -2px rgba(11, 7, 16, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(11, 7, 16, 0.08), 0 4px 6px -4px rgba(11, 7, 16, 0.08);
 }
 
 .dark {
-  /* --- DARK MODE: DEEP COSMIC OBSIDIAN (Unchanged structure, updated Accent) --- */
+  /* --- DARK MODE: Deep Cosmic Obsidian — dominante (Brandbook §Color) --- */
+  --background: #07040F;
+  --foreground: #FFFFFF;
 
-  --background: oklch(0.14 0.02 292);
-  --foreground: oklch(0.98 0.005 292);
+  --card: #1D1530;
+  --card-foreground: #FFFFFF;
 
-  --card: oklch(0.17 0.025 292);
-  --card-foreground: oklch(0.98 0.005 292);
+  --popover: #1D1530;
+  --popover-foreground: #FFFFFF;
 
-  --popover: oklch(0.17 0.025 292);
-  --popover-foreground: oklch(0.98 0.005 292);
+  --primary: #5A228B;
+  --primary-high: #8B45CC;
+  --primary-foreground: #FFFFFF;
 
-  --primary: oklch(0.64 0.11 292);
-  --primary-foreground: oklch(1 0 0);
+  --accent: #FF6A33;
+  --accent-light: #FF8A5C;
+  --accent-foreground: #07040F;
 
-  /* Accent: Neon Sunset */
-  --accent: oklch(0.70 0.18 50);
-  --accent-foreground: oklch(0.14 0.02 292);
+  --brand-yellow: #FFC300;
+  --brand-pink: #FF4D6D;
 
-  --secondary: oklch(0.22 0.03 292);
-  --secondary-foreground: oklch(0.98 0 0);
+  --secondary: #241C38;
+  --secondary-foreground: #FFFFFF;
 
-  --muted: oklch(0.22 0.03 292);
-  --muted-foreground: oklch(0.78 0.03 292);
+  --muted: #241C38;
+  --muted-foreground: rgba(255, 255, 255, 0.55);
 
-  --destructive: oklch(0.60 0.18 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive: #FF4D6D;
+  --destructive-foreground: #FFFFFF;
 
-  --border: oklch(0.25 0.03 292);
-  --input: oklch(0.25 0.03 292);
-  --ring: oklch(0.64 0.11 292);
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #8B45CC;
 
-  --chart-1: oklch(0.64 0.11 292);
-  --chart-2: oklch(0.70 0.18 50);
-  --chart-3: oklch(0.75 0.12 320);
-  --chart-4: oklch(0.50 0.14 250);
-  --chart-5: oklch(0.70 0.15 150);
+  --chart-1: #8B45CC;
+  --chart-2: #FF6A33;
+  --chart-3: #FFC300;
+  --chart-4: #FF4D6D;
+  --chart-5: #5A228B;
 
-  --sidebar: oklch(0.12 0.02 292);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.64 0.11 292);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.22 0.03 292);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.25 0.03 292);
-  --sidebar-ring: oklch(0.64 0.11 292);
+  --sidebar: #0F0A1A;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #8B45CC;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #241C38;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #8B45CC;
 
-  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.4);
-  --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.4), 0 1px 2px -1px oklch(0 0 0 / 0.4);
-  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.4), 0 2px 4px -1px oklch(0 0 0 / 0.4);
-  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.4), 0 4px 6px -4px oklch(0 0 0 / 0.4);
+  /* Surfaces intermedios (Brandbook: surface-primary/secondary/elevated) */
+  --surface-secondary: #0F0A1A;
+  --surface-elevated: #1D1530;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
 }
 
 @theme inline {
@@ -150,13 +148,17 @@ body {
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-high: var(--primary-high);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
   --color-accent-foreground: var(--accent-foreground);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-pink: var(--brand-pink);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -175,6 +177,8 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-surface-secondary: var(--surface-secondary, var(--background));
+  --color-surface-elevated: var(--surface-elevated, var(--card));
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -245,25 +249,9 @@ body {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Glass panels — consistent radius + blur sitewide (no drop shadow) */
-  .glass-panel {
-    @apply rounded-2xl bg-card/75 backdrop-blur-xl border border-border/50;
-  }
-
-  /* Legacy elevated card — prefer .landing-card for marketing surfaces */
-  .card-elevated {
-    @apply relative isolate rounded-2xl border border-border/50 bg-card/90 backdrop-blur-xl;
-    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms ease;
-  }
-
-  .card-elevated:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in oklab, var(--color-primary) 15%, var(--color-border));
-  }
-
   /* Section labels — typography only, no pill/chip */
   .section-eyebrow {
-    @apply text-xs font-semibold tracking-[0.2em] uppercase text-accent;
+    @apply text-xs font-bold tracking-[0.2em] uppercase text-accent;
   }
 
   /* Subtle brand wash for section backgrounds */
@@ -271,119 +259,147 @@ body {
     background-image: var(--gradient-brand-soft);
   }
 
-  /* Text gradient — purple → orange */
+  /* Text gradient — violeta → naranja. Uso único por vista (Brandbook §16: no-universal-text-gradient) */
   .text-gradient {
-    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    background: linear-gradient(90deg, var(--primary-high) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  /* Editorial headline — massive & tight */
+  /* Editorial headline — massive & tight, peso máximo del sistema (700) */
   .headline-editorial {
-    @apply font-black tracking-tighter leading-none;
+    @apply font-bold tracking-tighter leading-[0.95];
   }
 
-  /* Marketing cards — glass surface + radial border follows pointer (see mouse-border.ts) */
-  .landing-card {
-    --mx: 50%;
-    --my: 50%;
-    @apply relative isolate rounded-2xl border border-transparent backdrop-blur-sm;
+  /* Botón físico — degradado vertical sutil + luz interior arriba / sombra abajo,
+     como un botón con volumen real. Reemplaza el barrido diagonal brillante. */
+  .btn-physical {
+    @apply relative isolate font-bold border-0;
     transition:
-      border-color 300ms ease,
-      filter 0.2s ease;
+      transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
+      filter 200ms ease;
   }
 
-  .landing-card > * {
-    position: relative;
-    z-index: 2;
+  .btn-physical:hover {
+    filter: brightness(1.06);
   }
 
-  .landing-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: radial-gradient(
-      420px circle at var(--mx, 50%) var(--my, 50%),
-      color-mix(in oklab, var(--color-primary) 55%, transparent),
-      color-mix(in oklab, var(--color-accent) 50%, transparent),
-      transparent 52%
-    );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 1;
-    transition: opacity 0.2s ease;
+  .btn-physical:active {
+    transform: translateY(1px) scale(0.99);
   }
 
-  .landing-card:hover::before {
-    opacity: 1;
-  }
-
-  /* Primary CTA — linear luxury gradient + subtle sheen */
-  .btn-brand-gradient {
+  .btn-physical--violet {
+    color: white;
     background-image: linear-gradient(
-      110deg,
-      color-mix(in oklab, var(--color-primary) 88%, black) 0%,
-      color-mix(in oklab, var(--color-accent) 82%, black) 48%,
-      color-mix(in oklab, var(--color-primary) 88%, black) 100%
+      180deg,
+      color-mix(in oklab, var(--color-primary-high) 88%, white 12%) 0%,
+      var(--color-primary) 55%,
+      color-mix(in oklab, var(--color-primary) 80%, black) 100%
     );
-    background-size: 170% 170%;
-    background-position: 16% 50%;
-    @apply relative isolate text-white font-semibold border-0 overflow-hidden;
-    transition:
-      transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
-      filter 300ms ease,
-      background-position 400ms ease;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+      0 10px 24px -12px color-mix(in oklab, var(--color-primary) 65%, transparent);
   }
 
-  .btn-brand-gradient::before {
+  .btn-physical--violet:active {
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.35),
+      0 4px 10px -6px color-mix(in oklab, var(--color-primary) 55%, transparent);
+  }
+
+  .btn-physical--dark {
+    color: white;
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in oklab, #07040f 78%, white 10%) 0%,
+      #07040f 55%,
+      black 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+      0 12px 26px -14px rgba(0, 0, 0, 0.65);
+  }
+
+  .btn-physical--dark:active {
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.5),
+      0 4px 10px -6px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Imagen de marca — desatura la foto y le pasa un velo violeta→naranja en blend "color".
+     Unifica cualquier placeholder con la identidad Liiot sin depender de fotografía monocroma real. */
+  .media-duotone {
+    @apply relative isolate overflow-hidden;
+  }
+
+  .media-duotone img,
+  .media-duotone video {
+    filter: grayscale(0.85) contrast(1.08) brightness(0.82);
+    transition: filter 500ms cubic-bezier(0.4, 0, 0.2, 1), transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .media-duotone::after {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: inherit;
-    padding: 1.5px;
     background: linear-gradient(
-      120deg,
-      transparent 0%,
-      color-mix(in oklab, white 24%, transparent) 50%,
-      transparent 100%
+      160deg,
+      color-mix(in oklab, var(--color-primary-high) 65%, transparent) 0%,
+      transparent 55%,
+      color-mix(in oklab, var(--color-accent) 55%, transparent) 100%
     );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+    mix-blend-mode: color;
     pointer-events: none;
-    opacity: 0;
-    z-index: 1;
-    transition: opacity 0.2s ease;
   }
 
-  .btn-brand-gradient:hover {
-    @apply scale-[1.03];
-    filter: brightness(1.08);
-    background-position: 88% 50%;
+  /* Hover: la foto recupera color y contraste — usado en Portafolio y Equipo */
+  .media-duotone-reveal:hover img,
+  .media-duotone-reveal:focus-within img {
+    filter: grayscale(0.1) contrast(1.05) brightness(0.95);
   }
 
-  .btn-brand-gradient:hover::before {
-    opacity: 1;
+  /* Morph gradients — nubes de color en movimiento lento, mesh-style
+     (Brandbook §design-tokens.core.morphGradient). Ver ui/MorphGradient.astro. */
+  .morph-gradient {
+    filter: blur(48px);
   }
 
-  .btn-brand-gradient:active {
-    @apply scale-[0.98];
+  .morph-blob {
+    position: absolute;
+    top: var(--mb-y);
+    left: var(--mb-x);
+    width: var(--mb-size);
+    height: var(--mb-size);
+    border-radius: 9999px;
+    background: var(--mb-color);
+    transform: translate(-50%, -50%);
+    animation-name: morph-drift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    will-change: transform;
+  }
+
+  @keyframes morph-drift {
+    0% {
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+    50% {
+      transform: translate(-42%, -56%) scale(1.15) rotate(8deg);
+    }
+    100% {
+      transform: translate(-56%, -46%) scale(0.92) rotate(-6deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .morph-blob {
+      animation: none;
+    }
   }
 
   /* Noise texture overlay — apply to ::after of a container */

@@ -1,0 +1,107 @@
+---
+/**
+ * "Cómo trabajamos" — grid asimétrico interactivo. Hover en cada paso
+ * cambia la imagen del panel derecho (crossfade). Fuente: vault §4.
+ */
+const steps = [
+  {
+    n: "01",
+    title: "Entendemos tu visión",
+    body: "No llegamos con respuestas, llegamos con preguntas. Queremos entender qué quieres lograr con tu comunidad o tu equipo.",
+    image:
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1600&auto=format&fit=crop",
+  },
+  {
+    n: "02",
+    title: "Construimos juntos",
+    body: "Iteraciones cortas, comunicación constante. Cada versión se siente más tuya — el mejor software es el que se siente propio.",
+    image:
+      "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop",
+  },
+  {
+    n: "03",
+    title: "Crecemos juntos",
+    body: "La entrega no es el final. Medimos, ajustamos, evolucionamos. La tecnología que crea comunidad nunca deja de crecer.",
+    image:
+      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1600&auto=format&fit=crop",
+  },
+];
+---
+
+<section id="como-trabajamos" class="relative overflow-hidden bg-surface-secondary py-28 lg:py-36">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div id="how-header" class="mb-16 max-w-2xl translate-y-6 opacity-0 lg:mb-24">
+      <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+        Trabajamos contigo,<br />no para ti
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 gap-12 lg:grid-cols-[40%_1fr] lg:gap-8" id="how-grid">
+      {/* Izquierda — pasos numerados, disparan el crossfade */}
+      <div class="flex flex-col divide-y divide-border">
+        {
+          steps.map((step, i) => (
+            <button
+              type="button"
+              class="js-how-step group flex w-full flex-col gap-3 py-8 text-left first:pt-0 last:pb-0"
+              data-step={i + 1}
+              aria-label={`Ver: ${step.title}`}
+            >
+              <span class="flex items-baseline gap-4">
+                <span class="js-how-number text-2xl font-bold tabular-nums text-primary-high transition-colors duration-300 group-hover:text-accent">
+                  {step.n}
+                </span>
+                <span class="text-xl font-bold tracking-tight text-foreground transition-colors duration-300 sm:text-2xl">
+                  {step.title}
+                </span>
+              </span>
+              <p class="max-w-md pl-11 text-sm leading-relaxed text-muted-foreground">
+                {step.body}
+              </p>
+            </button>
+          ))
+        }
+      </div>
+
+      {/* Derecha — panel de media, crossfade entre las 3 imágenes */}
+      <div class="media-duotone relative aspect-[4/5] w-full overflow-hidden rounded-2xl lg:aspect-auto lg:h-full lg:min-h-[520px]">
+        {
+          steps.map((step, i) => (
+            <img
+              src={step.image}
+              alt=""
+              aria-hidden="true"
+              data-step-image={i + 1}
+              class:list={[
+                "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out",
+                i === 0 ? "opacity-100" : "opacity-0",
+              ]}
+              loading="lazy"
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const grid = document.getElementById("how-grid");
+  if (grid) {
+    const steps = grid.querySelectorAll<HTMLElement>(".js-how-step");
+    const images = grid.querySelectorAll<HTMLImageElement>("[data-step-image]");
+
+    const setActive = (n: string) => {
+      images.forEach((img) => {
+        img.classList.toggle("opacity-100", img.dataset.stepImage === n);
+        img.classList.toggle("opacity-0", img.dataset.stepImage !== n);
+      });
+    };
+
+    steps.forEach((step) => {
+      const n = step.dataset.step!;
+      step.addEventListener("pointerenter", () => setActive(n));
+      step.addEventListener("focus", () => setActive(n));
+    });
+  }
+</script>

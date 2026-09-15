@@ -2,11 +2,13 @@
 import Layout from "@/components/layouts/Layout.astro";
 import ScrollProgress from "@/components/ScrollProgress.astro";
 import Navbar from "@/components/Navbar.astro";
+import SectionThread from "@/components/SectionThread.astro";
 import Hero from "@/components/Hero.astro";
-import Features from "@/components/Features.astro";
-import ProblemForWho from "@/components/ProblemForWho.astro";
-import WhyChooseUs from "@/components/WhyChooseUs.astro";
-import ScrollQuote from "@/components/ScrollQuote.astro";
+import Villain from "@/components/Villain.astro";
+import Philosophy from "@/components/Philosophy.astro";
+import HowWeWork from "@/components/HowWeWork.astro";
+import Portfolio from "@/components/Portfolio.astro";
+import Team from "@/components/Team.astro";
 import FinalCTA from "@/components/FinalCTA.astro";
 import Footer from "@/components/Footer.astro";
 ---
@@ -14,12 +16,14 @@ import Footer from "@/components/Footer.astro";
 <Layout>
   <ScrollProgress />
   <Navbar />
+  <SectionThread />
   <main class="bg-background">
     <Hero />
-    <Features />
-    <ProblemForWho />
-    <WhyChooseUs />
-    <ScrollQuote />
+    <Villain />
+    <Philosophy />
+    <HowWeWork />
+    <Portfolio />
+    <Team />
     <FinalCTA />
   </main>
   <Footer />

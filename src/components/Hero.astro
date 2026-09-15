@@ -1,297 +1,107 @@
 ---
-import SectionAmbience from "@/components/ui/SectionAmbience.astro";
-import SurfaceCard from "@/components/ui/SurfaceCard.astro";
-import HeroCanvas from "@/components/HeroCanvas.astro";
-import FinalCTAButton from "@/components/FinalCTAButton.astro";
-import { HEDUL_WHATSAPP_URL } from "@/constants/contact";
+/**
+ * Hero — abre con el llamado a la aventura del visitante (viaje del héroe,
+ * etapa 1: "El Héroe"), no con la marca. Imagen a pantalla completa, con
+ * aire suficiente para leer y solo una viñeta local detrás del texto.
+ */
+import MorphGradient from "@/components/ui/MorphGradient.astro";
+import { LIIOT_CALENDLY_URL } from "@/constants/contact";
+
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=2400&auto=format&fit=crop";
 ---
 
 <section
   id="hero"
-  class="relative min-h-screen flex items-end lg:items-center overflow-hidden pt-20 pb-12 lg:pb-0"
+  class="relative flex h-screen min-h-[680px] items-end overflow-hidden bg-background"
 >
-  <HeroCanvas />
-  <SectionAmbience />
-
-  <div
-    class="absolute inset-0 pointer-events-none opacity-40 dark:opacity-25 bg-gradient-brand-soft"
-    aria-hidden="true"
-  >
+  {/* Fondo — la foto se ve completa; solo una viñeta local sostiene el texto */}
+  <div id="hero-bg" class="absolute inset-0 opacity-0">
+    <img
+      src={HERO_IMAGE}
+      alt=""
+      aria-hidden="true"
+      class="hero-bg-img h-full w-full object-cover"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div
+      class="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-background via-background/38 to-transparent"
+      aria-hidden="true"
+    >
+    </div>
+    <MorphGradient recipe="hybrid" blend="soft-light" opacity={0.32} />
   </div>
 
-  <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-    <div
-      class="grid grid-cols-1 items-end gap-12 lg:grid-cols-12 lg:items-center lg:gap-10"
+  <div class="container relative z-10 mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
+    <h1
+      id="hero-title"
+      class="headline-editorial max-w-5xl translate-y-8 text-[13vw] text-foreground opacity-0 sm:text-[9vw] lg:text-[7.5vw]"
     >
-      <div class="flex flex-col lg:col-span-6">
-        <h1
-          id="hero-title"
-          class="mb-6 translate-y-6 text-4xl font-extrabold tracking-tight opacity-0 md:text-5xl"
-        >
-          <span class="text-foreground">Erradicamos el caos.</span><br />
-          <span class="text-gradient">Optimizamos tu operación.</span>
-        </h1>
+      Construimos tu<br />futuro contigo
+    </h1>
 
-        <p
-          id="hero-body"
-          class="mb-8 max-w-xl translate-y-4 text-lg font-medium leading-relaxed text-muted-foreground opacity-0 sm:text-xl"
-        >
-          Hedul automatiza turnos, ausencias y coberturas de última hora para
-          que operés con más claridad y menos fricción.
-        </p>
+    <p
+      id="hero-body"
+      class="mt-9 max-w-md translate-y-4 text-sm font-medium leading-relaxed text-muted-foreground opacity-0 sm:text-base"
+    >
+      Construimos tecnología que une personas, crea confianza y hace que las
+      cosas funcionen mejor. Startup colombiana, seria y joven.
+    </p>
 
-        <div id="hero-cta" class="translate-y-4 opacity-0">
-          <FinalCTAButton href={HEDUL_WHATSAPP_URL} size="hero" target="_blank">
-            Solicitar demo en WhatsApp
-          </FinalCTAButton>
-        </div>
-      </div>
-
-      <div id="hero-illustration" class="translate-y-6 opacity-0 lg:col-span-6">
-        <SurfaceCard
-          id="hero-calendar-wrap"
-          class="group isolate p-6"
-          tone="brand"
-        >
-          <div class="relative z-[2]">
-            <div class="mb-5 flex items-center gap-2">
-              <span class="size-2.5 rounded-full bg-destructive/60"></span>
-              <span class="size-2.5 rounded-full bg-accent/60"></span>
-              <span class="size-2.5 rounded-full bg-chart-5/60"></span>
-              <span
-                class="ml-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60"
-              >
-                Hedul — Cobertura de turnos
-              </span>
-            </div>
-
-            <div class="mb-3 grid grid-cols-[100px_1fr] gap-3 px-1">
-              <span
-                class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50"
-              >
-                Empleado
-              </span>
-              <div class="grid grid-cols-7 gap-1">
-                {
-                  ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => (
-                    <span class="text-center text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/40">
-                      {d}
-                    </span>
-                  ))
-                }
-              </div>
-            </div>
-
-            <!-- Row 1 -->
-            <div
-              class="mb-2.5 grid grid-cols-[100px_1fr] items-center gap-3 px-1"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="flex size-6 items-center justify-center rounded-full border border-border/50 bg-primary/25 text-[9px] font-bold text-primary"
-                >
-                  AM
-                </span>
-                <span class="truncate text-xs font-medium text-foreground/80"
-                  >A. Martínez</span
-                >
-              </div>
-              <div class="grid grid-cols-7 gap-1">
-                <div
-                  class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div class="group/pill relative">
-                    <div
-                      class="h-7 rounded-lg border-2 border-primary/35 bg-primary/30 shadow-sm transition-[transform,box-shadow] duration-300 ease-out will-change-transform group-hover/pill:z-20 group-hover/pill:scale-110 group-hover/pill:shadow-[0_6px_20px_-4px_color-mix(in_oklab,var(--color-primary)_45%,transparent)]"
-                    >
-                    </div>
-                    <div
-                      class="pointer-events-none absolute bottom-full left-1/2 z-30 mb-1.5 -translate-x-1/2 opacity-0 transition-all duration-200 ease-out group-hover/pill:translate-y-0 group-hover/pill:opacity-100"
-                      role="tooltip"
-                    >
-                      <span
-                        class="block whitespace-nowrap rounded-lg border border-border/60 bg-card/95 px-2.5 py-1 text-[10px] font-semibold text-foreground shadow-lg backdrop-blur-md"
-                      >
-                        Turno: Enfermería · 100% cubierto
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                {
-                  [0, 1, 2, 3].map(() => (
-                    <div class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]">
-                      <div class="h-7 rounded-lg border border-primary/25 bg-primary/20 transition-transform duration-300 ease-out group-hover:scale-105" />
-                    </div>
-                  ))
-                }
-                <div
-                  class="js-hero-slot col-span-2 opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div
-                    class="h-7 rounded-lg border border-border/35 bg-muted/35 transition-transform duration-300 ease-out group-hover:scale-[1.02]"
-                  >
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Row 2 gap row -->
-            <div
-              class="mb-2.5 grid grid-cols-[100px_1fr] items-center gap-3 px-1"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="flex size-6 items-center justify-center rounded-full border border-border/50 bg-accent/25 text-[9px] font-bold text-accent"
-                >
-                  CR
-                </span>
-                <span class="truncate text-xs font-medium text-foreground/80"
-                  >C. Ramírez</span
-                >
-              </div>
-              <div class="grid grid-cols-7 gap-1">
-                <div
-                  class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div class="group/pill relative">
-                    <div
-                      class="h-7 rounded-lg border border-accent/30 bg-accent/20 transition-transform duration-300 ease-out group-hover/pill:z-20 group-hover/pill:scale-110"
-                    >
-                    </div>
-                    <div
-                      class="pointer-events-none absolute bottom-full left-1/2 z-30 mb-1.5 -translate-x-1/2 opacity-0 transition-all duration-200 ease-out group-hover/pill:opacity-100"
-                      role="tooltip"
-                    >
-                      <span
-                        class="block whitespace-nowrap rounded-lg border border-border/60 bg-card/95 px-2.5 py-1 text-[10px] font-semibold text-foreground shadow-lg backdrop-blur-md"
-                      >
-                        Turno: UCI · Asignado
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div
-                    class="h-7 rounded-lg border border-accent/25 bg-accent/18 transition-transform duration-300 ease-out group-hover:scale-105"
-                  >
-                  </div>
-                </div>
-                <div
-                  class="hero-shift-gap js-hero-slot relative col-span-3 h-7 overflow-hidden rounded-lg border-2 border-dashed border-destructive/45 bg-destructive/8 opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div
-                    class="absolute inset-0 origin-left scale-x-0 rounded-lg bg-linear-to-r from-primary to-accent opacity-0 transition-all duration-700 ease-out group-hover:scale-x-100 group-hover:opacity-100"
-                  >
-                  </div>
-                </div>
-                {
-                  [0, 1].map(() => (
-                    <div class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]">
-                      <div class="h-7 rounded-lg border border-accent/25 bg-accent/18 transition-transform duration-300 ease-out group-hover:scale-105" />
-                    </div>
-                  ))
-                }
-              </div>
-            </div>
-
-            <!-- Row 3 -->
-            <div
-              class="mb-4 grid grid-cols-[100px_1fr] items-center gap-3 px-1"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="flex size-6 items-center justify-center rounded-full border border-border/50 bg-chart-5/25 text-[9px] font-bold text-chart-5"
-                >
-                  LV
-                </span>
-                <span class="truncate text-xs font-medium text-foreground/80"
-                  >L. Valencia</span
-                >
-              </div>
-              <div class="grid grid-cols-7 gap-1">
-                <div
-                  class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div
-                    class="h-7 rounded-lg border border-border/35 bg-muted/35 transition-transform duration-300 ease-out group-hover:scale-105"
-                  >
-                  </div>
-                </div>
-                {
-                  [0, 1, 2].map(() => (
-                    <div class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]">
-                      <div class="h-7 rounded-lg border border-chart-5/35 bg-chart-5/25 transition-transform duration-300 ease-out group-hover:scale-105" />
-                    </div>
-                  ))
-                }
-                <div
-                  class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div class="group/pill relative">
-                    <div
-                      class="h-7 rounded-lg border-2 border-chart-5/40 bg-chart-5/30 transition-transform duration-300 ease-out group-hover/pill:z-20 group-hover/pill:scale-110"
-                    >
-                    </div>
-                    <div
-                      class="pointer-events-none absolute bottom-full left-1/2 z-30 mb-1.5 -translate-x-1/2 opacity-0 transition-all duration-200 ease-out group-hover/pill:opacity-100"
-                      role="tooltip"
-                    >
-                      <span
-                        class="block whitespace-nowrap rounded-lg border border-border/60 bg-card/95 px-2.5 py-1 text-[10px] font-semibold text-foreground shadow-lg backdrop-blur-md"
-                      >
-                        Turno: Guardia · 100% cubierto
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div
-                    class="h-7 rounded-lg border border-chart-5/30 bg-chart-5/20 transition-transform duration-300 ease-out group-hover:scale-105"
-                  >
-                  </div>
-                </div>
-                <div
-                  class="js-hero-slot opacity-0 [transform:translateY(-10px)_scale(0.94)]"
-                >
-                  <div
-                    class="h-7 rounded-lg border border-border/35 bg-muted/35 transition-transform duration-300 ease-out group-hover:scale-105"
-                  >
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="hero-toast absolute bottom-4 right-4 z-20 flex translate-y-2 scale-95 items-center gap-2 rounded-xl border border-border/50 bg-card/95 px-3 py-2 opacity-0 shadow-lg backdrop-blur-sm transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
-              style="transition-delay: 0.35s;"
-            >
-              <span
-                class="flex size-5 items-center justify-center rounded-full bg-chart-5/25"
-              >
-                <svg
-                  class="size-3 text-chart-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="3"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 13l4 4L19 7"></path>
-                </svg>
-              </span>
-              <span class="text-xs font-semibold text-foreground"
-                >Reemplazo asignado</span
-              >
-            </div>
-          </div>
-        </SurfaceCard>
-      </div>
+    <div id="hero-cta" class="mt-12 flex translate-y-4 flex-wrap items-center gap-x-8 gap-y-5 opacity-0">
+      <a
+        href={LIIOT_CALENDLY_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-physical btn-physical--violet inline-flex items-center justify-center rounded-xl px-8 py-4 text-sm uppercase tracking-[0.1em]"
+      >
+        Agendar consultoría
+      </a>
+      <a
+        href="#el-reto"
+        class="text-sm font-bold uppercase tracking-[0.1em] text-foreground underline decoration-accent decoration-2 underline-offset-4 transition-opacity hover:opacity-70"
+      >
+        Conoce nuestra filosofía
+      </a>
     </div>
   </div>
+
+  {/* Indicador de scroll — círculo sutil */}
+  <a
+    href="#el-reto"
+    aria-label="Desplazarse a la siguiente sección"
+    class="group absolute bottom-8 right-4 z-10 flex size-12 items-center justify-center rounded-full border border-foreground/25 text-foreground/70 transition-colors hover:border-foreground/50 hover:text-foreground sm:right-6 lg:right-8"
+  >
+    <svg
+      class="size-4 animate-bounce"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m0 0l-6-6m6 6l6-6" />
+    </svg>
+  </a>
 </section>
+
+<style>
+  .hero-bg-img {
+    animation: hero-slow-scale 20s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  }
+
+  @keyframes hero-slow-scale {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg-img {
+      animation: none;
+    }
+  }
+</style>

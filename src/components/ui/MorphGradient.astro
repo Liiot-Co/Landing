@@ -1,0 +1,67 @@
+---
+/**
+ * Morph gradient — 4-5 radiales apiladas, blureadas, en deriva lenta
+ * (Brandbook design-tokens.json → core.morphGradient). Nubes de color en
+ * movimiento, no un barrido lineal de 2 tonos. Máximo un morph gradient
+ * visible por vista (Brandbook §16).
+ */
+interface Props {
+  recipe?: "tech" | "human" | "hybrid" | "aurora";
+  class?: string;
+  opacity?: number;
+  blend?: "screen" | "soft-light" | "overlay" | "color";
+}
+
+const {
+  recipe = "aurora",
+  class: className = "",
+  opacity = 0.45,
+  blend = "screen",
+} = Astro.props as Props;
+
+const recipes: Record<
+  string,
+  { color: string; x: number; y: number; size: number }[]
+> = {
+  tech: [
+    { color: "var(--color-primary-high)", x: 20, y: 25, size: 46 },
+    { color: "var(--color-primary)", x: 78, y: 20, size: 42 },
+    { color: "var(--color-brand-pink)", x: 65, y: 78, size: 30 },
+    { color: "var(--color-primary-high)", x: 22, y: 80, size: 38 },
+  ],
+  human: [
+    { color: "var(--color-accent)", x: 25, y: 30, size: 44 },
+    { color: "var(--color-accent-light)", x: 78, y: 25, size: 40 },
+    { color: "var(--color-brand-yellow)", x: 70, y: 78, size: 32 },
+    { color: "var(--color-accent)", x: 22, y: 78, size: 38 },
+  ],
+  hybrid: [
+    { color: "var(--color-primary-high)", x: 15, y: 20, size: 42 },
+    { color: "var(--color-accent)", x: 82, y: 15, size: 42 },
+    { color: "var(--color-brand-yellow)", x: 78, y: 82, size: 30 },
+    { color: "var(--color-brand-pink)", x: 18, y: 82, size: 28 },
+    { color: "var(--color-primary)", x: 50, y: 50, size: 46 },
+  ],
+  aurora: [
+    { color: "var(--color-primary-high)", x: 30, y: 30, size: 42 },
+    { color: "var(--color-accent)", x: 72, y: 68, size: 42 },
+  ],
+};
+
+const blobs = recipes[recipe];
+---
+
+<div
+  class:list={["morph-gradient pointer-events-none absolute inset-0 overflow-hidden", className]}
+  style={`opacity:${opacity}; mix-blend-mode:${blend};`}
+  aria-hidden="true"
+>
+  {
+    blobs.map((b, i) => (
+      <span
+        class="morph-blob"
+        style={`--mb-color:${b.color}; --mb-x:${b.x}%; --mb-y:${b.y}%; --mb-size:${b.size}vw; animation-duration:${16 + i * 1.4}s; animation-delay:${i * -2.3}s;`}
+      />
+    ))
+  }
+</div>

@@ -1,0 +1,34 @@
+---
+/**
+ * Isotipo oficial Liiot — 4 piezas geométricas, un solo color por uso.
+ * Nunca combina violeta y naranja (Brandbook §06 — Logo). Default: violeta.
+ */
+interface Props {
+  class?: string;
+  color?: "violet" | "white" | "black";
+}
+
+const { class: className = "size-8", color = "violet" } = Astro.props as Props;
+
+const fill =
+  color === "white" ? "#FFFFFF" : color === "black" ? "#0B0710" : "#8B45CC";
+---
+
+<svg class={className} viewBox="0 0 48 48" aria-hidden="true">
+  <path
+    fill={fill}
+    d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+  ></path>
+  <path
+    fill={fill}
+    d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
+  ></path>
+  <path
+    fill={fill}
+    d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
+  ></path>
+  <path
+    fill={fill}
+    d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
+  ></path>
+</svg>

@@ -1,0 +1,59 @@
+---
+/**
+ * "¿Por qué existimos?" — Liiot se presenta como guía, no como protagonista
+ * (viaje del héroe, etapa 2: "El Mentor"). Cinematic focus pull y revelado
+ * palabra a palabra.
+ * Fuente: vault §3.
+ */
+import MorphGradient from "@/components/ui/MorphGradient.astro";
+import { PHILOSOPHY_TEXT } from "@/lib/philosophy";
+
+const words = PHILOSOPHY_TEXT.split(" ");
+---
+
+<section
+  id="por-que-existimos"
+  class="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-background py-28 lg:py-36"
+>
+  <div id="phil-glow" class="opacity-0 transition-opacity duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]">
+    <MorphGradient recipe="tech" blend="screen" opacity={0.4} />
+  </div>
+
+  <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-4xl text-center">
+      <h2
+        id="phil-quote"
+        class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl"
+      >
+        {
+          words.map((word) => (
+            <span class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0 blur-[12px] will-change-[transform,filter,opacity]">
+              {word}
+            </span>
+          ))
+        }
+      </h2>
+
+      <p class="mx-auto mt-8 max-w-xl text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
+        No solo resolver problemas técnicos. Por eso existimos: para construir
+        software que tenga un propósito más grande que funcionar.
+      </p>
+
+      <div class="mx-auto mt-12 flex justify-center">
+        <div
+          id="phil-divider"
+          class="h-[2px] w-0 bg-gradient-to-r from-transparent via-accent to-transparent opacity-0"
+          aria-hidden="true"
+        >
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Ensure Safari handles the blur animations smoothly */
+  .js-phil-word {
+    -webkit-font-smoothing: antialiased;
+  }
+</style>

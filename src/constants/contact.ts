@@ -1,3 +1,8 @@
-/** Primary WhatsApp entry point for sales / demo (placeholder number — replace in one place). */
-export const HEDUL_WHATSAPP_URL =
-  "https://wa.me/573000000000?text=Hola,%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20Hedul" as const;
+/**
+ * Enlaces de contacto y agenda de Liiot.
+ * ⚠️ Placeholders — reemplazar por los enlaces reales antes de publicar.
+ */
+export const LIIOT_CALENDLY_URL = "https://calendly.com/liiot/consultoria" as const;
+export const LIIOT_EMAIL = "hola@liiot.dev" as const;
+export const LIIOT_LINKEDIN_URL = "https://www.linkedin.com/company/liiot" as const;
+export const LIIOT_INSTAGRAM_URL = "https://www.instagram.com/liiot" as const;

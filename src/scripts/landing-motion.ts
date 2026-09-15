@@ -1,75 +1,77 @@
 /**
  * Single entry for all landing scroll / entrance motion (one Motion import graph).
- * Prefer `prefers-reduced-motion`: skip animations and reveal content immediately.
+ * Every section reveal shares the same easing curve (`flowEasing`) so scrolling
+ * through the page reads as one continuous motion language, not a different
+ * "feel" per section. Prefer `prefers-reduced-motion`: skip animations and
+ * reveal content immediately.
  */
 import { animate, inView, stagger } from "motion";
 import {
-  fadeUpReveal,
+  flowEasing,
   inViewMargin,
-  springSnappy,
-  springSoft,
+  motionEnter,
+  motionEnterFast,
   staggerFromStart,
 } from "@/lib/motion/landing";
 
 const INIT_ATTR = "data-landing-motion-init";
 
+/**
+ * Motion's typings reject array/`"none"` keyframe values on a plain string
+ * selector even though the runtime supports them. One loose cast, reused
+ * wherever we animate by id/class with a keyframe array.
+ */
+const looseAnimate = animate as unknown as (
+  selector: string | NodeListOf<Element>,
+  keyframes: Record<string, unknown>,
+  options: Record<string, unknown>,
+) => void;
+
+/** Standard "fade up" reveal — the one entrance pattern used sitewide. */
+function reveal(selector: string, delay = 0, fast = false) {
+  const preset = fast ? motionEnterFast : motionEnter;
+  looseAnimate(
+    selector,
+    { opacity: 1, transform: "translateY(0px)" },
+    { duration: preset.duration, delay, easing: preset.easing },
+  );
+}
+
+function revealGroup(elements: NodeListOf<Element>, staggerInterval = 0.1) {
+  looseAnimate(
+    elements,
+    { opacity: 1, transform: "translateY(0px)" },
+    { duration: motionEnter.duration, delay: staggerFromStart(staggerInterval), easing: motionEnter.easing },
+  );
+}
+
 function applyReducedMotionStates() {
-  const setBulk = (
-    selector: string,
-    styles: Record<string, string>,
-  ) => {
+  const setBulk = (selector: string, styles: Record<string, string>) => {
     document.querySelectorAll<HTMLElement>(selector).forEach((el) => {
       Object.assign(el.style, styles);
     });
   };
 
   setBulk(
-    "#hero-title, #hero-body, #hero-cta, #hero-illustration",
+    "#hero-title, #hero-body, #hero-cta, #hero-bg",
     { opacity: "1", transform: "none" },
   );
-  setBulk(".js-hero-slot", {
-    opacity: "1",
-    transform: "translateY(0px) scale(1)",
-  });
 
-  setBulk("#features-header", { opacity: "1", transform: "translateY(0px)" });
-  setBulk(".js-feature-card", { opacity: "1", transform: "translateY(0px)" });
-  setBulk(".js-feat-slot", {
-    opacity: "1",
-    transform: "translateY(0px) scale(1)",
-  });
-
-  setBulk("#problem-forwho-header", {
+  setBulk(
+    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark",
+    { opacity: "1", transform: "translateY(0px)" },
+  );
+  setBulk(".js-portfolio-item, .js-team-card", {
     opacity: "1",
     transform: "translateY(0px)",
   });
-  setBulk(".js-problem-card", { opacity: "1", transform: "translateY(0px)" });
-
-  for (const sel of [
-    "#company-eyebrow",
-    "#company-headline",
-    "#company-p1",
-    "#company-p2",
-    "#company-p3",
-  ] as const) {
-    setBulk(sel, { opacity: "1", transform: "translateY(0px)" });
-  }
 
   const cta = document.getElementById("final-cta-card");
-  if (cta) {
-    Object.assign(cta.style, { opacity: "1", transform: "none" });
-  }
+  if (cta) Object.assign(cta.style, { opacity: "1", transform: "none" });
 
   const glow = document.getElementById("phil-glow");
-  if (glow) {
-    glow.style.opacity = "1";
-    glow.style.transform = "scale(1)";
-  }
-  const eyeb = document.getElementById("phil-eyebrow");
-  if (eyeb) {
-    eyeb.style.opacity = "1";
-    eyeb.style.letterSpacing = "0.3em";
-  }
+  if (glow) glow.style.opacity = "1";
+
   document.querySelectorAll<HTMLElement>(".js-phil-word").forEach((el) => {
     el.style.opacity = "1";
     el.style.filter = "blur(0px)";
@@ -83,184 +85,87 @@ function applyReducedMotionStates() {
 }
 
 function setupHero() {
-  type HeroKeyframe = { opacity: number; transform: string };
-  type HeroOpts = { duration: number; delay: number; ease: string };
-  const heroAnimate = animate as unknown as (
-    selector: string,
-    keyframes: HeroKeyframe,
-    options: HeroOpts,
-  ) => void;
-
-  const heroEase = "ease-out";
-  const fadeUp: HeroKeyframe = { opacity: 1, transform: "none" };
-
-  heroAnimate("#hero-title", fadeUp, {
-    duration: 0.5,
-    delay: 0.3,
-    ease: heroEase,
-  });
-  heroAnimate("#hero-body", fadeUp, {
-    duration: 0.5,
-    delay: 0.5,
-    ease: heroEase,
-  });
-  heroAnimate("#hero-cta", fadeUp, {
-    duration: 0.5,
-    delay: 0.65,
-    ease: heroEase,
-  });
-  heroAnimate("#hero-illustration", fadeUp, {
-    duration: 0.55,
-    delay: 0.45,
-    ease: heroEase,
-  });
-
-  let slotsAnimated = false;
-  inView(
-    "#hero-illustration",
-    () => {
-      if (slotsAnimated) return;
-      slotsAnimated = true;
-      const slots = document.querySelectorAll<HTMLElement>(".js-hero-slot");
-      slots.forEach((el, i) => {
-        animate(
-          el,
-          { opacity: 1, transform: "translateY(0px) scale(1)" },
-          { ...springSnappy, delay: i * 0.042 },
-        );
-      });
-    },
-    { margin: "-12% 0px -12% 0px" },
-  );
+  reveal("#hero-bg", 0);
+  reveal("#hero-title", 0.28);
+  reveal("#hero-body", 0.46, true);
+  reveal("#hero-cta", 0.58, true);
 }
 
-function setupFeatures() {
+function setupVillain() {
   inView(
-    "#features",
+    "#el-reto",
     (element) => {
-      animate(
-        "#features-header",
-        { opacity: 1, transform: "translateY(0px)" },
-        { ...springSnappy },
-      );
-
-      animate(
-        element.querySelectorAll(".js-feature-card"),
-        { opacity: 1, transform: "translateY(0px)" },
-        { ...springSnappy, delay: staggerFromStart(0.1) },
-      );
-
-      const slots = element.querySelectorAll(".js-feat-slot");
-      slots.forEach((el, i) => {
-        const node = el as HTMLElement;
-        node.style.opacity = "0";
-        node.style.transform = "translateY(8px) scale(0.95)";
-
-        animate(
-          el,
-          { opacity: 1, transform: "translateY(0px) scale(1)" },
-          { ...springSnappy, delay: 0.3 + i * 0.03 },
-        );
-      });
+      reveal("#villain-header");
+      revealGroup(element.querySelectorAll(".js-villain-item"), 0.1);
+      reveal("#villain-pivot", 0.3, true);
     },
     { margin: inViewMargin.section },
   );
 }
 
-function setupProblemForWho() {
+function setupPhilosophy() {
   inView(
-    "#pain-points",
+    "#por-que-existimos",
+    () => {
+      const glow = document.getElementById("phil-glow");
+      if (glow) glow.style.opacity = "1";
+
+      looseAnimate(
+        ".js-phil-word",
+        {
+          opacity: 1,
+          filter: ["blur(12px)", "blur(0px)"],
+          transform: ["translateY(32px) scale(0.95)", "translateY(0px) scale(1)"],
+        },
+        {
+          duration: 0.9,
+          delay: stagger(0.06, { startDelay: 0.2 }),
+          easing: flowEasing,
+        },
+      );
+
+      looseAnimate(
+        "#phil-divider",
+        { opacity: 0.8, width: ["0%", "160px"] },
+        { duration: 1.2, delay: 0.8, easing: flowEasing },
+      );
+    },
+    { margin: "-25% 0px -25% 0px" },
+  );
+}
+
+function setupHowWeWork() {
+  inView("#como-trabajamos", () => reveal("#how-header"), { margin: inViewMargin.section });
+}
+
+function setupPortfolio() {
+  inView(
+    "#proyectos",
     (element) => {
-      animate(
-        "#problem-forwho-header",
-        { opacity: 1, transform: "translateY(0px)" },
-        { ...springSoft },
-      );
-      animate(
-        element.querySelectorAll(".js-problem-card"),
-        { opacity: 1, transform: "translateY(0px)" },
-        { ...springSoft, delay: staggerFromStart(0.1) },
-      );
+      reveal("#portfolio-header");
+      revealGroup(element.querySelectorAll(".js-portfolio-item"), 0.15);
     },
     { margin: inViewMargin.section },
   );
 }
 
-function setupCompany() {
-  const companyRevealSelectors = [
-    "#company-eyebrow",
-    "#company-headline",
-    "#company-p1",
-    "#company-p2",
-    "#company-p3",
-  ] as const;
-
+function setupTeam() {
   inView(
-    "#company",
-    () => {
-      companyRevealSelectors.forEach((sel, i) => {
-        animate(
-          sel,
-          { opacity: 1, transform: "translateY(0px)" },
-          { ...springSoft, delay: i * 0.07 },
-        );
-      });
+    "#equipo",
+    (element) => {
+      reveal("#team-header");
+      revealGroup(element.querySelectorAll(".js-team-card"), 0.1);
     },
     { margin: inViewMargin.section },
   );
 }
 
 function setupFinalCta() {
-  inView(
-    "#cta",
-    () => {
-      animate("#final-cta-card", fadeUpReveal(), { ...springSoft });
-    },
-    { margin: inViewMargin.section },
-  );
+  inView("#agendar", () => reveal("#final-cta-card"), { margin: inViewMargin.section });
 }
 
-function setupPhilosophyQuote() {
-  inView(
-    "#philosophy-statement",
-    () => {
-      const glow = document.getElementById("phil-glow");
-      if (glow) {
-        glow.style.opacity = "1";
-        glow.style.transform = "scale(1)";
-      }
-
-      animate(
-        "#phil-eyebrow",
-        { opacity: 1, letterSpacing: ["0.1em", "0.3em"] },
-        { duration: 1, easing: [0.22, 1, 0.36, 1] },
-      );
-
-      animate(
-        ".js-phil-word",
-        {
-          opacity: 1,
-          filter: ["blur(12px)", "blur(0px)"],
-          transform: [
-            "translateY(32px) scale(0.95)",
-            "translateY(0px) scale(1)",
-          ],
-        },
-        {
-          duration: 0.9,
-          delay: stagger(0.06, { start: 0.2 }),
-          easing: [0.22, 1, 0.36, 1],
-        },
-      );
-
-      animate(
-        "#phil-divider",
-        { opacity: 0.8, width: ["0%", "160px"] },
-        { duration: 1.2, delay: 0.8, easing: [0.22, 1, 0.36, 1] },
-      );
-    },
-    { margin: "-25% 0px -25% 0px" },
-  );
+function setupFooter() {
+  inView("#footer-mark", () => reveal("#footer-mark"), { margin: "-10% 0px -10% 0px" });
 }
 
 function init() {
@@ -273,11 +178,13 @@ function init() {
   }
 
   setupHero();
-  setupFeatures();
-  setupProblemForWho();
-  setupCompany();
+  setupVillain();
+  setupPhilosophy();
+  setupHowWeWork();
+  setupPortfolio();
+  setupTeam();
   setupFinalCta();
-  setupPhilosophyQuote();
+  setupFooter();
 }
 
 document.addEventListener("astro:page-load", init);
