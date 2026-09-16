@@ -32,7 +32,7 @@ const steps = [
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div id="how-header" class="mb-16 max-w-2xl translate-y-6 opacity-0 lg:mb-24">
       <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-        Trabajamos contigo,<br />no para ti
+        Trabajamos <span data-annotate="como-trabajamos">contigo</span>,<br />no para ti
       </h2>
     </div>
 
@@ -73,7 +73,7 @@ const steps = [
               aria-hidden="true"
               data-step-image={i + 1}
               class:list={[
-                "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out",
+                "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
                 i === 0 ? "opacity-100" : "opacity-0",
               ]}
               loading="lazy"

@@ -1,8 +1,7 @@
 ---
 import Layout from "@/components/layouts/Layout.astro";
-import ScrollProgress from "@/components/ScrollProgress.astro";
 import Navbar from "@/components/Navbar.astro";
-import SectionThread from "@/components/SectionThread.astro";
+import StoryPath from "@/components/StoryPath.astro";
 import Hero from "@/components/Hero.astro";
 import Villain from "@/components/Villain.astro";
 import Philosophy from "@/components/Philosophy.astro";
@@ -14,10 +13,9 @@ import Footer from "@/components/Footer.astro";
 ---
 
 <Layout>
-  <ScrollProgress />
   <Navbar />
-  <SectionThread />
-  <main class="bg-background">
+  <main class="relative bg-background">
+    <StoryPath />
     <Hero />
     <Villain />
     <Philosophy />

@@ -26,7 +26,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     quote: "Profesionales jóvenes que se apoyan, comparten y construyen el futuro.",
     description:
       "Nuestra propia comunidad. Un espacio donde el talento joven de Colombia construye el futuro del software junto.",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1800&auto=format&fit=crop",
     imageAlt: "Comunidad de profesionales jóvenes colaborando",
   },
 ];

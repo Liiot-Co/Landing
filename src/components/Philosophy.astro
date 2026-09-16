@@ -2,7 +2,9 @@
 /**
  * "¿Por qué existimos?" — Liiot se presenta como guía, no como protagonista
  * (viaje del héroe, etapa 2: "El Mentor"). Cinematic focus pull y revelado
- * palabra a palabra.
+ * palabra a palabra. Fondo elevado (--dt-surface-elevated) para separarla de
+ * Hero/Villain (--dt-surface-primary) y aurora reservada a este hito
+ * (Brandbook §Motion: "Aurora solo en hitos").
  * Fuente: vault §3.
  */
 import MorphGradient from "@/components/ui/MorphGradient.astro";
@@ -13,10 +15,13 @@ const words = PHILOSOPHY_TEXT.split(" ");
 
 <section
   id="por-que-existimos"
-  class="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-background py-28 lg:py-36"
+  class="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-surface-elevated py-28 lg:py-36"
 >
-  <div id="phil-glow" class="opacity-0 transition-opacity duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]">
-    <MorphGradient recipe="tech" blend="screen" opacity={0.4} />
+  <div
+    id="phil-glow"
+    class="opacity-0 transition-opacity duration-[600ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+  >
+    <MorphGradient recipe="aurora" blend="screen" opacity={0.45} />
   </div>
 
   <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,7 +32,10 @@ const words = PHILOSOPHY_TEXT.split(" ");
       >
         {
           words.map((word) => (
-            <span class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0 blur-[12px] will-change-[transform,filter,opacity]">
+            <span
+              class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0 blur-[12px] will-change-[transform,filter,opacity]"
+              data-annotate={word === "problema" ? "por-que-existimos" : undefined}
+            >
               {word}
             </span>
           ))
@@ -35,8 +43,9 @@ const words = PHILOSOPHY_TEXT.split(" ");
       </h2>
 
       <p class="mx-auto mt-8 max-w-xl text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
-        No solo resolver problemas técnicos. Por eso existimos: para construir
-        software que tenga un propósito más grande que funcionar.
+        Por eso pasa lo que ya viste: horas facturadas sin compromiso, código
+        que nadie entiende, productos que no se sienten propios. Existimos
+        para construir distinto — con las personas, no solo para el contrato.
       </p>
 
       <div class="mx-auto mt-12 flex justify-center">

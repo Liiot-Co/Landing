@@ -1,0 +1,326 @@
+---
+/**
+ * "Lápiz" narrativo — un trazo a mano alzada (grosor variable, como
+ * pincel/pluma) que circula la palabra clave de cada capítulo del viaje del
+ * héroe (`[data-annotate]` en Hero, Villain, Philosophy, HowWeWork,
+ * Portfolio, Team, FinalCTA). El conector entre dos palabras NUNCA cruza
+ * texto ni imágenes: baja por un carril pegado al borde izquierdo (siempre
+ * vacío) con una leve ondulación, y solo se desvía hacia la palabra por
+ * ENCIMA de su título — en el padding superior de la sección, donde nunca
+ * hay contenido — antes de bajar en línea recta sobre la propia palabra.
+ * Se dibuja progresivamente con el scroll (no de golpe) y, una vez dibujado,
+ * queda marcado — como la tinta de un editor sobre el texto. Naranja puro
+ * (--accent) con halo oscuro (drop-shadow) para leerse sobre cualquier fondo.
+ */
+---
+
+<div
+  id="story-path"
+  class="pointer-events-none absolute inset-0 z-30 hidden lg:block"
+  aria-hidden="true"
+>
+  <svg id="story-path-svg" class="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+    <defs></defs>
+    <g id="story-annotations"></g>
+  </svg>
+</div>
+
+<style>
+  .story-circle {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.85);
+    filter: drop-shadow(0 0 2.5px rgba(7, 4, 15, 0.65)) drop-shadow(0 0 1px rgba(7, 4, 15, 0.5));
+    /* --dt-easing-human · rol "Warm": el trazo aparece como si acabara de dibujarse */
+    transition:
+      opacity 500ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .story-circle.is-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .story-connector {
+    filter: drop-shadow(0 0 2px rgba(7, 4, 15, 0.6));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story-circle {
+      transition: none;
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
+
+<script>
+  type Circle = { id: string; cx: number; cy: number; rx: number; ry: number };
+  type Segment = { fromId: string; toId: string; top: number; bottom: number; rect: SVGRectElement };
+
+  const container = document.getElementById("story-path");
+  const svg = document.getElementById("story-path-svg");
+  const group = document.getElementById("story-annotations");
+  const defs = svg?.querySelector("defs");
+
+  const ACCENT = "var(--accent)";
+  const ACCENT_LIGHT = "var(--accent-light)";
+  const LANE_X = 14; // carril pegado al borde izquierdo — siempre vacío
+
+  let circles: Circle[] = [];
+  let segments: Segment[] = [];
+  const maxProgress = new Map<string, number>();
+
+  function hashRandom(seed: number) {
+    const x = Math.sin(seed * 12.9898) * 43758.5453;
+    return (x - Math.floor(x)) * 2 - 1;
+  }
+
+  /** Bucle cerrado suave (Catmull-Rom → bezier) a través de puntos con jitter — un círculo "a mano". */
+  function roughEllipsePath(cx: number, cy: number, rx: number, ry: number, seed: number) {
+    const count = 12;
+    const pts: [number, number][] = [];
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const jitter = 1 + hashRandom(seed + i * 7.3) * 0.08;
+      pts.push([cx + Math.cos(angle) * rx * jitter, cy + Math.sin(angle) * ry * jitter]);
+    }
+    const n = pts.length;
+    const at = (i: number) => pts[(i + n) % n];
+    let d = `M ${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)}`;
+    for (let i = 0; i < n; i++) {
+      const p0 = at(i - 1);
+      const p1 = at(i);
+      const p2 = at(i + 1);
+      const p3 = at(i + 2);
+      const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+      const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+      const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+      const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+      d += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
+    }
+    return `${d} Z`;
+  }
+
+  /** Curva abierta suave (Catmull-Rom → bezier) a través de un polilínea de waypoints. */
+  function smoothOpenPath(pts: [number, number][]) {
+    const n = pts.length;
+    const at = (i: number) => pts[Math.min(n - 1, Math.max(0, i))];
+    const out: [number, number][] = [pts[0]];
+    for (let i = 0; i < n - 1; i++) {
+      const p0 = at(i - 1);
+      const p1 = at(i);
+      const p2 = at(i + 1);
+      const p3 = at(i + 2);
+      const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+      const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+      const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+      const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+      // Muestrea la bezier cúbica para poder afinar el ancho punto a punto.
+      const steps = 10;
+      for (let s = 1; s <= steps; s++) {
+        const t = s / steps;
+        const x =
+          (1 - t) ** 3 * p1[0] + 3 * (1 - t) ** 2 * t * c1x + 3 * (1 - t) * t ** 2 * c2x + t ** 3 * p2[0];
+        const y =
+          (1 - t) ** 3 * p1[1] + 3 * (1 - t) ** 2 * t * c1y + 3 * (1 - t) * t ** 2 * c2y + t ** 3 * p2[1];
+        out.push([x, y]);
+      }
+    }
+    return out;
+  }
+
+  /** Cinta rellena que se afina en los dos extremos y engrosa al centro — trazo de pincel real. */
+  function ribbonFromPoints(points: [number, number][], maxHalfWidth: number) {
+    const n = points.length;
+    const left: [number, number][] = [];
+    const right: [number, number][] = [];
+    for (let i = 0; i < n; i++) {
+      const [x, y] = points[i];
+      const [px, py] = points[Math.max(0, i - 1)];
+      const [nx, ny] = points[Math.min(n - 1, i + 1)];
+      let tx = nx - px;
+      let ty = ny - py;
+      const tl = Math.hypot(tx, ty) || 1;
+      tx /= tl;
+      ty /= tl;
+      const nxp = -ty;
+      const nyp = tx;
+      const w = maxHalfWidth * Math.sin(Math.PI * (i / (n - 1)));
+      left.push([x + nxp * w, y + nyp * w]);
+      right.push([x - nxp * w, y - nyp * w]);
+    }
+    let d = `M ${left[0][0].toFixed(2)} ${left[0][1].toFixed(2)}`;
+    for (let i = 1; i < n; i++) d += ` L ${left[i][0].toFixed(2)} ${left[i][1].toFixed(2)}`;
+    for (let i = n - 1; i >= 0; i--) d += ` L ${right[i][0].toFixed(2)} ${right[i][1].toFixed(2)}`;
+    return `${d} Z`;
+  }
+
+  /** Waypoints que rodean el contenido en vez de cruzarlo: baja por el carril
+   * izquierdo (vacío en toda la página) y solo entra hacia la palabra por
+   * ENCIMA de su título, en el padding de sección donde nunca hay texto. */
+  function routeWaypoints(a: Circle, b: Circle, waveSeed: number): [number, number][] {
+    const exitY = a.cy + a.ry * 0.6;
+    const approachY = b.cy - b.ry - 44;
+
+    if (approachY - exitY < 60) {
+      // Circulos muy cercanos verticalmente: curva directa corta, sin carril.
+      return [
+        [a.cx, a.cy + a.ry * 0.9],
+        [(a.cx + b.cx) / 2, (a.cy + b.cy) / 2],
+        [b.cx, b.cy - b.ry * 0.9],
+      ];
+    }
+
+    const waypoints: [number, number][] = [[a.cx - a.rx * 0.2, a.cy + a.ry * 0.85]];
+    const laneSteps = 3;
+    for (let i = 1; i <= laneSteps; i++) {
+      const t = i / (laneSteps + 1);
+      const y = exitY + (approachY - exitY) * t;
+      const wave = hashRandom(waveSeed + i * 4.2) * 9;
+      waypoints.push([LANE_X + wave, y]);
+    }
+    waypoints.push([LANE_X, approachY]);
+    waypoints.push([b.cx, approachY]);
+    waypoints.push([b.cx, b.cy - b.ry * 0.9]);
+    return waypoints;
+  }
+
+  function svgEl<K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, string>) {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    return el;
+  }
+
+  function layoutPath() {
+    if (!container || !svg || !group || !defs) return;
+
+    const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-annotate]"));
+    if (targets.length === 0) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const svgWidth = containerRect.width;
+    svg.setAttribute("viewBox", `0 0 ${svgWidth} ${containerRect.height}`);
+
+    circles = targets.map((el) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        id: el.dataset.annotate!,
+        cx: rect.left - containerRect.left + rect.width / 2,
+        cy: rect.top - containerRect.top + rect.height / 2,
+        rx: rect.width / 2 + 16,
+        ry: rect.height / 2 + 12,
+      };
+    });
+
+    group.replaceChildren();
+    defs.querySelectorAll("[data-generated-clip]").forEach((el) => el.remove());
+    segments = [];
+
+    circles.forEach((circle, i) => {
+      if (i > 0) {
+        const prev = circles[i - 1];
+        const waypoints = routeWaypoints(prev, circle, i * 5.7);
+        const centerline = smoothOpenPath(waypoints);
+
+        const clipId = `story-clip-${circle.id}`;
+        const rect = svgEl("rect", { x: "0", y: `${centerline[0][1]}`, width: `${svgWidth}`, height: "0" });
+        const clipPath = svgEl("clipPath", { id: clipId, clipPathUnits: "userSpaceOnUse" });
+        clipPath.setAttribute("data-generated-clip", "1");
+        clipPath.appendChild(rect);
+        defs.appendChild(clipPath);
+
+        const connector = svgEl("g", { class: "story-connector", "clip-path": `url(#${clipId})` });
+        connector.append(
+          svgEl("path", { d: ribbonFromPoints(centerline, 5), fill: ACCENT_LIGHT, "fill-opacity": "0.5" }),
+          svgEl("path", { d: ribbonFromPoints(centerline, 2.4), fill: ACCENT }),
+        );
+        group.appendChild(connector);
+
+        segments.push({
+          fromId: prev.id,
+          toId: circle.id,
+          top: Math.min(...centerline.map((p) => p[1])),
+          bottom: Math.max(...centerline.map((p) => p[1])),
+          rect: rect as SVGRectElement,
+        });
+      }
+
+      const g = svgEl("g", { class: "story-circle", "data-annotate-id": circle.id });
+      g.append(
+        svgEl("path", {
+          d: roughEllipsePath(circle.cx, circle.cy, circle.rx, circle.ry, i * 3.1),
+          fill: "none",
+          stroke: ACCENT_LIGHT,
+          "stroke-opacity": "0.55",
+          "stroke-width": "5",
+          "stroke-linecap": "round",
+          "vector-effect": "non-scaling-stroke",
+        }),
+        svgEl("path", {
+          d: roughEllipsePath(circle.cx, circle.cy, circle.rx, circle.ry, i * 3.1 + 1.7),
+          fill: "none",
+          stroke: ACCENT,
+          "stroke-width": "2.5",
+          "stroke-linecap": "round",
+          "vector-effect": "non-scaling-stroke",
+        }),
+      );
+      group.appendChild(g);
+    });
+
+    updateDraw();
+  }
+
+  /** La "línea de dibujo" es un punto por debajo del centro del viewport — el
+   * trazo se completa un poco antes de que el lector llegue a la palabra. */
+  function drawLineY() {
+    return window.scrollY + window.innerHeight * 0.68;
+  }
+
+  function updateDraw() {
+    const line = drawLineY();
+
+    segments.forEach((seg) => {
+      const span = seg.bottom - seg.top || 1;
+      const raw = (line - seg.top) / span;
+      const clamped = Math.min(Math.max(raw, 0), 1);
+      const prevMax = maxProgress.get(seg.toId) ?? 0;
+      const progress = Math.max(prevMax, clamped);
+      maxProgress.set(seg.toId, progress);
+      seg.rect.setAttribute("y", `${seg.top}`);
+      seg.rect.setAttribute("height", `${span * progress}`);
+    });
+
+    circles.forEach((circle) => {
+      const revealY = circle.cy - circle.ry;
+      const wasVisible = (maxProgress.get(`circle:${circle.id}`) ?? 0) > 0;
+      if (wasVisible || line >= revealY) {
+        maxProgress.set(`circle:${circle.id}`, 1);
+        group?.querySelector(`[data-annotate-id="${circle.id}"]`)?.classList.add("is-visible");
+      }
+    });
+  }
+
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      updateDraw();
+      ticking = false;
+    });
+  }
+
+  let resizeTimer: ReturnType<typeof setTimeout>;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(layoutPath, 150);
+  });
+  window.addEventListener("load", layoutPath);
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  layoutPath();
+</script>

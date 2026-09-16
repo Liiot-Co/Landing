@@ -279,7 +279,7 @@ body {
     transition:
       transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
-      filter 200ms ease;
+      filter 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-physical:hover {
@@ -292,12 +292,7 @@ body {
 
   .btn-physical--violet {
     color: white;
-    background-image: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-primary-high) 88%, white 12%) 0%,
-      var(--color-primary) 55%,
-      color-mix(in oklab, var(--color-primary) 80%, black) 100%
-    );
+    background-image: linear-gradient(180deg, color-mix(in oklab, var(--color-primary-high) 90%, white 5%) 0%, var(--color-primary) 30%, color-mix(in oklab, var(--color-primary) 83%, black) 100% );
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.32),
       inset 0 -2px 4px rgba(0, 0, 0, 0.3),
