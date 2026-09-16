@@ -3,16 +3,30 @@
  * "Lápiz" narrativo — un trazo a mano alzada (grosor variable, como
  * pincel/pluma) que circula la palabra clave de cada capítulo del viaje del
  * héroe (`[data-annotate]` en Hero, Villain, Philosophy, HowWeWork,
- * Portfolio, Team, FinalCTA). El conector entre dos palabras NUNCA cruza
- * texto ni imágenes: baja por un carril pegado al borde izquierdo (siempre
- * vacío) con una leve ondulación, y solo se desvía hacia la palabra por
- * ENCIMA de su título — en el padding superior de la sección, donde nunca
- * hay contenido — antes de bajar en línea recta sobre la propia palabra.
- * Se dibuja progresivamente con el scroll (no de golpe) y, una vez dibujado,
- * queda marcado — como la tinta de un editor sobre el texto. Naranja puro
- * (--accent) con halo oscuro (drop-shadow) para leerse sobre cualquier fondo.
+ * Portfolio y Team — el trazo termina ahí, al presentar al equipo). El
+ * conector entre dos palabras NUNCA cruza texto ni imágenes: baja por un
+ * carril vacío pegado al borde del viewport —izquierdo o derecho, alternando
+ * segmento a segmento para usar el aire de ambos lados— con una leve
+ * ondulación, y solo se desvía hacia la palabra por ENCIMA de su título — en
+ * el padding superior de la sección, donde nunca hay contenido — antes de
+ * bajar en línea recta sobre la propia palabra. Si en algún punto ningún
+ * carril tiene aire suficiente, ese tramo se dibuja por detrás del contenido
+ * en vez de forzar un cruce. Se dibuja progresivamente con el scroll (no de
+ * golpe) y, una vez dibujado, queda marcado — como la tinta de un editor
+ * sobre el texto. Naranja puro (--accent) con halo oscuro (drop-shadow) para
+ * leerse sobre cualquier fondo.
  */
 ---
+
+<div
+  id="story-path-behind"
+  class="pointer-events-none absolute inset-0 hidden lg:block"
+  aria-hidden="true"
+>
+  <svg id="story-path-behind-svg" class="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+    <g id="story-connectors-behind"></g>
+  </svg>
+</div>
 
 <div
   id="story-path"
@@ -64,10 +78,12 @@
   const svg = document.getElementById("story-path-svg");
   const group = document.getElementById("story-annotations");
   const defs = svg?.querySelector("defs");
+  const behindGroup = document.getElementById("story-connectors-behind");
 
   const ACCENT = "var(--accent)";
   const ACCENT_LIGHT = "var(--accent-light)";
-  const LANE_X = 14; // carril pegado al borde izquierdo — siempre vacío
+  const LANE_INSET = 14; // distancia del carril al borde del viewport
+  const MIN_LANE_MARGIN = LANE_INSET + 14; // aire mínimo para que el carril no roce el contenido
 
   let circles: Circle[] = [];
   let segments: Segment[] = [];
@@ -158,10 +174,11 @@
     return `${d} Z`;
   }
 
-  /** Waypoints que rodean el contenido en vez de cruzarlo: baja por el carril
-   * izquierdo (vacío en toda la página) y solo entra hacia la palabra por
-   * ENCIMA de su título, en el padding de sección donde nunca hay texto. */
-  function routeWaypoints(a: Circle, b: Circle, waveSeed: number): [number, number][] {
+  /** Waypoints que rodean el contenido en vez de cruzarlo: baja por un
+   * carril lateral (vacío en toda la página, izquierdo o derecho según
+   * `laneX`) y solo entra hacia la palabra por ENCIMA de su título, en el
+   * padding de sección donde nunca hay texto. */
+  function routeWaypoints(a: Circle, b: Circle, waveSeed: number, laneX: number): [number, number][] {
     const exitY = a.cy + a.ry * 0.6;
     const approachY = b.cy - b.ry - 44;
 
@@ -180,9 +197,9 @@
       const t = i / (laneSteps + 1);
       const y = exitY + (approachY - exitY) * t;
       const wave = hashRandom(waveSeed + i * 4.2) * 9;
-      waypoints.push([LANE_X + wave, y]);
+      waypoints.push([laneX + wave, y]);
     }
-    waypoints.push([LANE_X, approachY]);
+    waypoints.push([laneX, approachY]);
     waypoints.push([b.cx, approachY]);
     waypoints.push([b.cx, b.cy - b.ry * 0.9]);
     return waypoints;
@@ -195,7 +212,7 @@
   }
 
   function layoutPath() {
-    if (!container || !svg || !group || !defs) return;
+    if (!container || !svg || !group || !defs || !behindGroup) return;
 
     const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-annotate]"));
     if (targets.length === 0) return;
@@ -203,6 +220,19 @@
     const containerRect = container.getBoundingClientRect();
     const svgWidth = containerRect.width;
     svg.setAttribute("viewBox", `0 0 ${svgWidth} ${containerRect.height}`);
+    document
+      .getElementById("story-path-behind-svg")
+      ?.setAttribute("viewBox", `0 0 ${svgWidth} ${containerRect.height}`);
+
+    // Mide el aire real a cada lado del contenido centrado (`.container`) para
+    // saber si el carril de ese lado está libre de verdad, en vez de asumir
+    // un margen fijo — el mismo cálculo sirve para toda la página porque
+    // todas las secciones comparten el mismo `.container` centrado.
+    const sampleRect = document.querySelector<HTMLElement>(".container")?.getBoundingClientRect();
+    const leftMargin = sampleRect ? sampleRect.left - containerRect.left : LANE_INSET;
+    const rightMargin = sampleRect ? containerRect.right - sampleRect.right : LANE_INSET;
+    const canUseLeft = leftMargin >= MIN_LANE_MARGIN;
+    const canUseRight = rightMargin >= MIN_LANE_MARGIN;
 
     circles = targets.map((el) => {
       const rect = el.getBoundingClientRect();
@@ -216,13 +246,32 @@
     });
 
     group.replaceChildren();
+    behindGroup.replaceChildren();
     defs.querySelectorAll("[data-generated-clip]").forEach((el) => el.remove());
     segments = [];
 
     circles.forEach((circle, i) => {
       if (i > 0) {
         const prev = circles[i - 1];
-        const waypoints = routeWaypoints(prev, circle, i * 5.7);
+
+        // Alterna el carril entre izquierda y derecha segmento a segmento —
+        // usa el aire de ambos lados en vez de pegarse siempre al mismo
+        // borde — y si el lado preferido no tiene espacio, cae al otro; si
+        // ninguno lo tiene, el tramo se dibuja detrás del contenido.
+        const preferRight = i % 2 === 1;
+        const side: "left" | "right" | "behind" =
+          preferRight && canUseRight
+            ? "right"
+            : !preferRight && canUseLeft
+              ? "left"
+              : canUseRight
+                ? "right"
+                : canUseLeft
+                  ? "left"
+                  : "behind";
+        const laneX = side === "right" ? svgWidth - LANE_INSET : LANE_INSET;
+
+        const waypoints = routeWaypoints(prev, circle, i * 5.7, laneX);
         const centerline = smoothOpenPath(waypoints);
 
         const clipId = `story-clip-${circle.id}`;
@@ -234,10 +283,10 @@
 
         const connector = svgEl("g", { class: "story-connector", "clip-path": `url(#${clipId})` });
         connector.append(
-          svgEl("path", { d: ribbonFromPoints(centerline, 5), fill: ACCENT_LIGHT, "fill-opacity": "0.5" }),
-          svgEl("path", { d: ribbonFromPoints(centerline, 2.4), fill: ACCENT }),
+          svgEl("path", { d: ribbonFromPoints(centerline, 4), fill: ACCENT_LIGHT, "fill-opacity": "0.5" }),
+          svgEl("path", { d: ribbonFromPoints(centerline, 1.4), fill: ACCENT }),
         );
-        group.appendChild(connector);
+        (side === "behind" ? behindGroup : group).appendChild(connector);
 
         segments.push({
           fromId: prev.id,
