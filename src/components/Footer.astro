@@ -4,7 +4,7 @@
  * Fuente: vault §8.
  */
 import { Linkedin, Instagram } from "lucide-astro";
-import LiiotMark from "@/components/ui/LiiotMark.astro";
+import LiiotMark from "@/components/ui/LiiotMarkAnimated.astro";
 import MorphGradient from "@/components/ui/MorphGradient.astro";
 import { LIIOT_EMAIL, LIIOT_INSTAGRAM_URL, LIIOT_LINKEDIN_URL } from "@/constants/contact";
 
@@ -23,7 +23,7 @@ const currentYear = new Date().getFullYear();
 
       <div class="flex flex-col gap-8 sm:flex-row sm:gap-16">
         <div class="flex flex-col gap-2">
-          <p class="section-eyebrow mb-1">Contacto</p>
+          <p class="text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground mb-1">Contacto</p>
           <a
             href={`mailto:${LIIOT_EMAIL}`}
             class="text-sm font-medium text-foreground transition-colors hover:text-accent"
@@ -33,7 +33,7 @@ const currentYear = new Date().getFullYear();
         </div>
 
         <div class="flex flex-col gap-2">
-          <p class="section-eyebrow mb-1">Redes</p>
+          <p class="text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground mb-1">Redes</p>
           <div class="flex items-center gap-4">
             <a
               href={LIIOT_LINKEDIN_URL}
@@ -57,7 +57,7 @@ const currentYear = new Date().getFullYear();
         </div>
 
         <div class="flex flex-col gap-2">
-          <p class="section-eyebrow mb-1">Legal</p>
+          <p class="text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground mb-1">Legal</p>
           <a href="#" class="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
             Privacidad
           </a>

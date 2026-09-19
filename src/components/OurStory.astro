@@ -1,0 +1,419 @@
+---
+/**
+ * "El Villano → Nuestra filosofía" — wipe cinematográfico (viaje del héroe,
+ * etapas 2-3), maquetado como una doble página de revista: kicker + folio de
+ * página, tipografía editorial grande y un collage fotográfico interactivo
+ * en vez de un simple bloque de texto sobre un fondo animado.
+ *
+ * EL RETO (01, frío, violeta) — notas tachadas como recortes de prensa
+ * (`obstacles`) + una foto desaturada de un escritorio genérico ("así no").
+ * LA FILOSOFÍA (02, cálida, vívida) responde `obstacles` uno a uno con
+ * `resolutions`, mismo número (01↔01, 02↔02, 03↔03) — la relación "esto
+ * combatimos → así lo resolvemos" queda explícita por el emparejamiento, no
+ * solo implícita en el tono. La filosofía lleva además dos fotos
+ * superpuestas del equipo real trabajando, con un sticker de caption, como
+ * una página de "quiénes somos" de revista. Las fotos crecen un poco al
+ * hover (misma curva `--dt-easing-human` que ya usan las cards de
+ * HowWeWork.astro) — el collage responde, no es estático. Sin rotaciones:
+ * ni fotos ni texto se inclinan, todo alineado en grilla.
+ *
+ * El fondo de la filosofía es un mesh gradient: color base sólido +
+ * múltiples `radial-gradient()` apiladas en `background-image`, cada una
+ * anclada en un punto distinto y apagándose a transparent al 50% (sin
+ * blur). Usa las posiciones de la receta `hybrid` de `design-tokens.json`
+ * (→ core.morphGradient.hybrid: "firma narrativa completa, toda la paleta
+ * a partes iguales — máxima libertad artística", reservada para "hero de
+ * marketing y portadas narrativas") con los colores de marca. El scrim
+ * radial detrás del texto evita que tanto color le quite legibilidad al
+ * quote — ya no depende de un divisor decorativo para cerrar la sección.
+ *
+ * Desktop (≥1024px, motion permitido): `landing-motion.ts` fija la sección
+ * en pantalla (`ScrollTrigger` `pin`) y el scroll mueve un corte diagonal
+ * (`clip-path: polygon(...)`, variables `--wipe-top`/`--wipe-bottom`) que
+ * "abre" la filosofía sobre el reto — el villano nunca se desplaza, es la
+ * cortina la que revela lo que hay detrás. Aplica la regla del brandbook
+ * "Tech inicia en violeta, Human resuelve en naranja" (§Motion) llevada a su
+ * máxima expresión: el wipe ES la narrativa.
+ *
+ * Mobile / `prefers-reduced-motion`: sin pin ni clip-path — los dos paneles
+ * caen a flujo normal, apilados verticalmente (collage debajo del texto),
+ * con los mismos reveals en cascada de antes (ver `applyReducedMotionStates`
+ * y el bloque `mobileStory` en landing-motion.ts).
+ *
+ * Copy base: vault §1 "Qué no es Liiot" y vault §3 "Por qué existimos",
+ * reescrita con voz narrativa/emocional en segunda persona en vez de
+ * fragmentos clínicos.
+ */
+import { PHILOSOPHY_TEXT } from "@/lib/philosophy";
+
+/*
+ * Sujeto = el lector ("pagaste", "te entregaron", "recibiste"), nunca
+ * "nosotros" ni una frase sin sujeto — con solo el eyebrow "El reto" arriba,
+ * una lista de frases negativas sin dueño explícito se lee, al escanear,
+ * como una descripción de Liiot (el tema que la sección acaba de presentar),
+ * no de la industria genérica que Liiot vino a cambiar.
+ */
+const obstacles = [
+  { n: "01", text: "Pagaste por horas. Nunca por confianza." },
+  { n: "02", text: "Te entregaron código que nadie vuelve a mirar." },
+  { n: "03", text: "Recibiste un producto que nunca aprendiste a querer." },
+];
+
+/*
+ * Responde a `obstacles` uno a uno, mismo número — la relación "esto
+ * combatimos → así lo resolvemos" queda explícita por el emparejamiento
+ * 01↔01, 02↔02, 03↔03, no solo implícita en el tono general del párrafo.
+ */
+const resolutions = [
+  { n: "01", text: "Aquí facturamos compromiso, no horas." },
+  { n: "02", text: "Aquí el código se queda — lo seguimos entendiendo." },
+  { n: "03", text: "Aquí no paramos hasta que lo sientas tuyo." },
+];
+
+const words = PHILOSOPHY_TEXT.split(" ");
+---
+
+<section id="el-reto" class="relative bg-background">
+  <div id="story-stage" class="story-stage relative">
+    {/* PANEL 1 — El reto: la fricción que el visitante ya conoce */}
+    <div
+      id="story-reto"
+      class="story-layer story-layer--reto relative z-[1] flex items-center overflow-hidden bg-background py-24 lg:py-16"
+    >
+      <span class="story-folio absolute right-4 top-4 lg:right-8 lg:top-8" aria-hidden="true">01</span>
+
+      <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
+          <div>
+            <div id="villain-header" class="flex items-start gap-4 sm:gap-6 max-w-3xl translate-y-6 opacity-0">
+              {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
+              <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
+                <span class="size-2 rounded-full bg-brand-pink mb-3"></span>
+                <span class="section-eyebrow-vertical">
+                  El reto
+                </span>
+                <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
+              </div>
+
+              <div>
+                <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+                  No somos una<br /><span class="text-brand-pink" data-annotate="el-reto">fábrica de código</span>
+                </h2>
+                {/* Nombra la pelea ANTES de la lista — sin esto, una lista de frases
+                    negativas se lee, al escanear, como una descripción de Liiot */}
+                <p class="mt-4 text-base font-bold text-muted-foreground sm:text-lg">
+                  Esto es lo que combatimos, todos los días:
+                </p>
+              </div>
+            </div>
+
+            <ul class="mt-8 flex flex-col gap-4 lg:mt-10">
+              {
+                obstacles.map((o) => (
+                  <li class="js-villain-item note-card note-card-reto flex items-baseline gap-3 translate-y-6 opacity-0">
+                    <span class="text-sm font-bold tabular-nums text-brand-pink/70">{o.n}</span>
+                    <p class="text-lg font-bold leading-snug text-foreground/60 line-through decoration-2 decoration-brand-pink/60 sm:text-xl">
+                      {o.text}
+                    </p>
+                  </li>
+                ))
+              }
+            </ul>
+
+            <p
+              id="villain-pivot"
+              class="mt-10 translate-y-6 text-xl font-bold text-muted-foreground opacity-0 sm:text-2xl lg:mt-12"
+            >
+              No tiene que ser así.
+            </p>
+
+            {/* PUENTE — pregunta en tono de guía/mentor, no de confesión: evita
+                "nosotros" para no sonar a Liiot admitiendo ser el villano. */}
+            <p
+              id="story-bridge"
+              class="mt-4 translate-y-4 text-lg font-bold text-accent opacity-0 sm:text-xl"
+            >
+              ¿Y si existiera otra forma?
+            </p>
+          </div>
+
+          {/* Collage — una sola foto desaturada: el escritorio genérico de cualquier agencia */}
+          <div class="story-collage relative mx-auto mt-4 aspect-[4/5] w-full max-w-[220px] lg:mx-0 lg:mt-0 lg:max-w-none">
+            <figure class="story-photo story-photo--cold absolute inset-3 overflow-hidden rounded-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=700&auto=format&fit=crop"
+                alt="Un escritorio vacío y genérico, sin nadie detrás"
+                class="h-full w-full object-cover grayscale"
+                loading="lazy"
+              />
+            </figure>
+            <span class="story-tag absolute -right-2 top-8 lg:top-10">así no</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* PANEL 2 — La filosofía: Liiot responde como guía, no como protagonista.
+        Recortada con un clip-path diagonal que el scroll abre sobre el panel 1. */}
+    <div
+      id="por-que-existimos"
+      class="story-layer story-layer--filosofia relative z-[2] flex items-center overflow-hidden bg-surface-elevated py-24 lg:py-16"
+    >
+      <div id="story-mesh" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
+      <div id="story-mesh-scrim" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+      <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+        <span class="story-folio absolute right-4 top-4 lg:right-8 lg:top-8" aria-hidden="true">02</span>
+
+        <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+          <div class="flex items-start gap-4 sm:gap-6">
+            {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
+            <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
+              <span class="size-2 rounded-full bg-accent mb-3"></span>
+              <span class="section-eyebrow-vertical">
+                Filosofía
+              </span>
+              <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
+            </div>
+
+            <div>
+              <h3
+                id="phil-quote"
+                class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl"
+              >
+                {
+                  words.map((word) => (
+                    <span
+                      class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0 blur-[12px] will-change-[transform,filter,opacity]"
+                      data-annotate={word === "problema" ? "por-que-existimos" : undefined}
+                    >
+                      {word}
+                    </span>
+                  ))
+                }
+              </h3>
+
+              <p class="mt-8 text-base font-bold text-foreground/80 sm:text-lg">
+                Por eso, aquí es distinto:
+              </p>
+
+              <ul class="mt-4 flex max-w-xl flex-col gap-3">
+                {
+                  resolutions.map((r) => (
+                    <li class="flex items-center gap-3">
+                      <span class="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-full bg-foreground/15 text-xs font-bold tabular-nums text-foreground">
+                        {r.n}
+                      </span>
+                      <p class="text-sm font-bold leading-snug text-foreground sm:text-base">
+                        {r.text}
+                      </p>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+
+          {/* Collage — dos fotos superpuestas del equipo real, tech + human en un mismo cuadro */}
+          <div class="story-collage relative mx-auto mt-4 aspect-[4/5] w-full max-w-[260px] lg:mx-0 lg:mt-0 lg:max-w-none">
+            <figure class="story-photo story-photo--a absolute left-0 top-0 w-[72%] overflow-hidden rounded-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop"
+                alt="El equipo de Liiot revisando código juntos, señalando la pantalla"
+                class="h-full w-full object-cover"
+                loading="lazy"
+              />
+            </figure>
+            <figure class="story-photo story-photo--b absolute bottom-0 right-0 w-[58%] overflow-hidden rounded-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop"
+                alt="Personas del equipo riendo mientras trabajan juntas"
+                class="h-full w-full object-cover"
+                loading="lazy"
+              />
+            </figure>
+            <span class="story-sticker absolute -left-2 bottom-[26%] lg:bottom-[30%]">Así construimos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Ensure Safari handles the blur animations smoothly */
+  .js-phil-word {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /*
+   * Estado por defecto (mobile / prefers-reduced-motion / antes de que el JS
+   * active el modo cine): flujo normal, sin pin ni corte — dos paneles
+   * apilados, cada uno legible por sí solo.
+   */
+  .story-layer {
+    min-height: 0;
+  }
+
+  /*
+   * Modo cine (`landing-motion.ts` añade esta clase solo en desktop con
+   * motion permitido, justo antes de crear el ScrollTrigger con pin — así
+   * `end: "+=140%"` se calcula sobre el 100vh real, no sobre el alto
+   * apilado). Los paneles pasan a superponerse a pantalla completa.
+   */
+  .story-stage.is-cinematic {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .story-stage.is-cinematic .story-layer {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .story-stage.is-cinematic .story-layer--filosofia {
+    --wipe-top: 100%;
+    --wipe-bottom: 100%;
+    clip-path: polygon(
+      var(--wipe-top) 0%,
+      100% 0%,
+      100% 100%,
+      var(--wipe-bottom) 100%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story-stage.is-cinematic,
+    .story-stage.is-cinematic .story-layer {
+      position: static;
+      height: auto;
+      clip-path: none;
+    }
+  }
+
+  /*
+   * Mesh gradient — color base sólido + 7 radiales apiladas ancladas en
+   * distintos puntos, cada una apagándose a transparent al 50%. Colores de
+   * marca (violeta, violeta alto, naranja, naranja claro, amarillo, rosa)
+   * en vez de tonos genéricos.
+   */
+  #story-mesh {
+    background-color: var(--primary);
+    background-image:
+      radial-gradient(at 85% 82%, var(--accent) 0px, transparent 50%),
+      radial-gradient(at 92% 8%, var(--brand-pink) 0px, transparent 50%),
+      radial-gradient(at 96% 5%, var(--primary-high) 0px, transparent 50%),
+      radial-gradient(at 88% 24%, var(--brand-yellow) 0px, transparent 50%),
+      radial-gradient(at 61% 51%, var(--accent-light) 0px, transparent 50%),
+      radial-gradient(at 90% 96%, var(--primary-high) 0px, transparent 50%),
+      radial-gradient(at 1% 78%, var(--primary) 0px, transparent 50%);
+    background-repeat: no-repeat;
+    animation: story-mesh-drift 18s ease-in-out infinite alternate;
+  }
+
+  /* Cada capa deriva un poco distinto — "nubes de color" independientes, no un barrido único */
+  @keyframes story-mesh-drift {
+    0% {
+      background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+    }
+    100% {
+      background-position: 4% 6%, -4% 4%, 3% -5%, -3% -4%, -5% 3%, 5% -3%, -3% 5%;
+    }
+  }
+
+  /* Oscurece el centro (donde vive el texto) sin apagar el color en los bordes */
+  #story-mesh-scrim {
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(7, 4, 15, 0.55) 0%,
+      rgba(7, 4, 15, 0.15) 45%,
+      transparent 75%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #story-mesh {
+      animation: none;
+    }
+  }
+
+  /* Folio de página — detalle editorial, como el número de página de una revista */
+  .story-folio {
+    z-index: 3;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    color: var(--muted-foreground);
+    opacity: 0.55;
+  }
+
+  /* Notas — cada obstáculo se lee como un recorte de prensa, no una fila de lista */
+  .note-card {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--foreground) 3%, transparent);
+  }
+
+  /* Collage fotográfico — fotos superpuestas que se acomodan un poco más al pasar el cursor */
+  .story-collage {
+    isolation: isolate;
+  }
+
+  .story-photo {
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .story-photo--a {
+    aspect-ratio: 3 / 4;
+    z-index: 1;
+  }
+
+  .story-photo--b {
+    aspect-ratio: 4 / 3;
+    z-index: 2;
+  }
+
+  .story-photo--cold {
+    aspect-ratio: 3 / 4;
+  }
+
+  .story-collage:hover .story-photo--a,
+  .story-collage:hover .story-photo--b,
+  .story-collage:hover .story-photo--cold {
+    transform: scale(1.015);
+  }
+
+  /* Sticker de caption sobre el collage — el detalle "de revista", plano, sin sombra ni borde */
+  .story-sticker,
+  .story-tag {
+    z-index: 3;
+    border-radius: 9999px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .story-sticker {
+    background: var(--accent);
+    color: white;
+  }
+
+  .story-tag {
+    background: var(--card);
+    color: var(--muted-foreground);
+    text-transform: lowercase;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story-photo {
+      transition: none;
+    }
+  }
+</style>

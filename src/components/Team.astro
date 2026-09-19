@@ -8,14 +8,25 @@ import { TEAM_MEMBERS } from "@/constants/team";
 
 <section id="equipo" class="relative overflow-hidden bg-surface-secondary py-28 lg:py-36">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div id="team-header" class="mb-16 max-w-2xl translate-y-6 opacity-0 lg:mb-20">
-      <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-        Somos <span data-annotate="equipo">tres</span>
-      </h2>
-      <p class="mt-6 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
-        Un equipo pequeño que se conoce, se apoya y construye juntas. Eso se
-        nota en el trabajo.
-      </p>
+    <div id="team-header" class="mb-16 flex items-start gap-4 sm:gap-6 max-w-2xl translate-y-6 opacity-0 lg:mb-20">
+      {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
+      <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
+        <span class="size-2 rounded-full bg-primary-high mb-3"></span>
+        <span class="section-eyebrow-vertical">
+          El equipo
+        </span>
+        <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
+      </div>
+
+      <div>
+        <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+          Somos <span data-annotate="equipo">tres</span>
+        </h2>
+        <p class="mt-6 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
+          Un equipo pequeño que se conoce, se apoya y construye juntas. Eso se
+          nota en el trabajo.
+        </p>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-3">
@@ -63,41 +74,29 @@ import { TEAM_MEMBERS } from "@/constants/team";
 </section>
 
 <style>
-  /* .media-duotone img (global.css) también transiciona `transform` (700ms) —
-     eso compite con la animación de abajo: el navegador salta de golpe al
-     primer keyframe en vez de dejar que la animación entre en juego, y el
-     hover se siente tosco. Acotamos la transición propia a `filter` (la
-     reduce a la única propiedad, reutilizando su misma duración/easing por
-     posición) y dejamos que la animación sea la única dueña de `transform`. */
+  .team-photo {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: box-shadow 450ms cubic-bezier(0.4, 0, 0.2, 1), border-color 450ms ease;
+  }
+
   .team-photo-img {
-    transition-property: filter;
-    /* Encuadre fijo, ligeramente ampliado para tener margen de paneo sin
-       dejar huecos — no es el efecto de hover, es el recorte base. */
-    transform: scale(1.08);
+    filter: grayscale(0.55) contrast(1.1) brightness(0.9);
+    transition: filter 450ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: none !important;
   }
 
-  /* "Live photo" — paneo lento en loop al hacer hover, simula movimiento sin
-     zoom: solo traslada dentro del margen ya dado por el encuadre base.
-     Arranca exactamente en el reposo (scale(1.08) translate(0,0)) para que
-     la entrada sea continua, no un salto — --dt-easing-flow, rol ambient. */
-  .team-photo:hover .team-photo-img,
-  .team-photo:focus-within .team-photo-img {
-    animation: team-live-pan 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  /* Chroma Pop & Neon Glow en hover (sin zoom ni translate) */
+  .js-team-card:hover .team-photo,
+  .js-team-card:focus-within .team-photo {
+    border-color: rgba(255, 255, 255, 0.45);
+    box-shadow:
+      0 0 34px -4px rgba(139, 69, 204, 0.65),
+      0 0 16px rgba(255, 106, 51, 0.5),
+      0 14px 28px -8px rgba(0, 0, 0, 0.5);
   }
 
-  @keyframes team-live-pan {
-    from {
-      transform: scale(1.08) translate(0, 0);
-    }
-    to {
-      transform: scale(1.08) translate(-3%, 3%);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .team-photo:hover .team-photo-img,
-    .team-photo:focus-within .team-photo-img {
-      animation: none;
-    }
+  .js-team-card:hover .team-photo-img,
+  .js-team-card:focus-within .team-photo-img {
+    filter: grayscale(0) saturate(1.45) contrast(1.18) brightness(1.04);
   }
 </style>

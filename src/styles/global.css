@@ -249,9 +249,22 @@ body {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Section labels — typography only, no pill/chip */
+  /* Section labels — typography */
   .section-eyebrow {
-    @apply text-xs font-bold tracking-[0.2em] uppercase text-accent;
+    @apply text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground;
+  }
+
+  /* Section eyebrow vertical (editorial lateral, de arriba hacia abajo) */
+  .section-eyebrow-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    line-height: 1;
+    color: var(--muted-foreground);
+    user-select: none;
   }
 
   /* Subtle brand wash for section backgrounds */
@@ -412,5 +425,14 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 256px 256px;
+  }
+
+  /* Squircle for cards and media (continuous curvature without oval distortion) */
+  .squircle {
+    --squircle-radius: 44px;
+    border-radius: var(--squircle-radius, 44px);
+    corner-shape: squircle;
+    -webkit-corner-smoothing: 60%;
+    corner-smoothing: 60%;
   }
 }

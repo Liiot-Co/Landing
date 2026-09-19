@@ -1,5 +1,5 @@
 ---
-import LiiotMark from "@/components/ui/LiiotMark.astro";
+import LiiotMark from "@/components/ui/LiiotMarkAnimated.astro";
 import { LIIOT_CALENDLY_URL } from "@/constants/contact";
 
 interface NavLink {
@@ -16,48 +16,49 @@ const navLinks: NavLink[] = [
 ];
 ---
 
-<nav
-  id="site-nav"
-  class="fixed top-0 left-0 right-0 z-50"
-  role="navigation"
-  aria-label="Navegación principal"
+<header
+  id="site-header"
+  class="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none px-3 pt-3 transition-all duration-300 sm:px-6 sm:pt-4"
 >
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex h-20 items-center justify-between sm:h-24">
-      {/* Brand — colores reales de marca; un halo (drop-shadow) sostiene el
-         contraste sobre el fondo claro del Hero sin invertir el tono
-         (mix-blend-difference desviaba el violeta/blanco hacia verde/cian). */}
-      <a
-        href="#hero"
-        class="group flex items-center gap-2.5 drop-shadow-[0_1px_6px_rgba(7,4,15,0.55)]"
-        aria-label="Liiot — Inicio"
-      >
-        <LiiotMark class="size-7 sm:size-8" color="violet" />
-        <span class="text-lg font-bold tracking-tight text-white">Liiot</span>
-      </a>
+  <nav
+    id="site-nav"
+    class="nav-pill pointer-events-auto flex w-full max-w-7xl items-center justify-between px-4 py-3.5 transition-all duration-300 sm:px-6 sm:py-4"
+    role="navigation"
+    aria-label="Navegación principal"
+  >
+    {/* Brand */}
+    <a
+      href="#hero"
+      class="group flex items-center gap-2.5 transition-transform duration-200 hover:scale-105"
+      aria-label="Liiot — Inicio"
+    >
+      <LiiotMark class="size-7 sm:size-8" color="violet" />
+      <span class="text-lg font-bold tracking-tight text-white">Liiot</span>
+    </a>
 
-      {/* Hamburger — única entrada de navegación visible */}
-      <button
-        id="nav-toggle"
-        class="relative flex size-11 flex-col items-center justify-center gap-[7px] drop-shadow-[0_1px_4px_rgba(7,4,15,0.55)]"
-        aria-label="Abrir menú"
-        aria-expanded="false"
-        aria-controls="nav-drawer"
-      >
+    {/* Hamburger Toggle */}
+    <button
+      id="nav-toggle"
+      class="nav-toggle-btn relative flex size-10 items-center justify-center rounded-full transition-all duration-200 hover:bg-white/10 active:scale-95"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      aria-controls="nav-drawer"
+    >
+      <div class="flex flex-col items-center justify-center gap-[6px]">
         <span
           id="nav-line-1"
-          class="block h-[1.5px] w-6 origin-center bg-white transition-transform duration-300 ease-out"
+          class="block h-[1.5px] w-5 origin-center bg-white transition-transform duration-300 ease-out"
         ></span>
         <span
           id="nav-line-2"
-          class="block h-[1.5px] w-6 origin-center bg-white transition-transform duration-300 ease-out"
+          class="block h-[1.5px] w-5 origin-center bg-white transition-transform duration-300 ease-out"
         ></span>
-      </button>
-    </div>
-  </div>
-</nav>
+      </div>
+    </button>
+  </nav>
+</header>
 
-{/* Overlay drawer — fondo sólido propio (fuera del blend-difference del nav) */}
+{/* Overlay drawer — menú pantalla completa */}
 <div
   id="nav-drawer"
   class="fixed inset-0 z-40 flex translate-y-[-8px] flex-col justify-center bg-background opacity-0 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
@@ -97,6 +98,50 @@ const navLinks: NavLink[] = [
   </div>
 </div>
 
+<style>
+  .nav-pill {
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background: transparent;
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     ESTADO GLASSMORPHIC PILL AL HACER SCROLL (DEGRADE SUTIL LIIOT DARK)
+     ════════════════════════════════════════════════════════════════════ */
+  .nav-pill.is-scrolled {
+    max-width: 36rem;
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(
+      135deg,
+      rgba(90, 34, 139, 0.42) 0%,
+      rgba(15, 10, 26, 0.86) 48%,
+      rgba(255, 106, 51, 0.24) 100%
+    );
+    background-color: rgba(7, 4, 15, 0.8);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow:
+      0 16px 36px -10px rgba(0, 0, 0, 0.7),
+      0 0 24px -6px rgba(90, 34, 139, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+
+  @media (min-width: 640px) {
+    .nav-pill.is-scrolled {
+      max-width: 40rem;
+      padding: 0.625rem 1.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .nav-pill.is-scrolled {
+      max-width: 44rem;
+      padding: 0.625rem 2rem;
+    }
+  }
+</style>
+
 <script>
   const toggle = document.getElementById("nav-toggle")!;
   const drawer = document.getElementById("nav-drawer")!;
@@ -113,11 +158,32 @@ const navLinks: NavLink[] = [
     drawer.classList.toggle("opacity-0", !open);
     drawer.classList.toggle("pointer-events-none", !open);
     drawer.classList.toggle("translate-y-[-8px]", !open);
-    line1.style.transform = open ? "translateY(4px) rotate(45deg)" : "none";
-    line2.style.transform = open ? "translateY(-4px) rotate(-45deg)" : "none";
+    line1.style.transform = open ? "translateY(3px) rotate(45deg)" : "none";
+    line2.style.transform = open ? "translateY(-3px) rotate(-45deg)" : "none";
     document.body.style.overflow = open ? "hidden" : "";
   }
 
   toggle.addEventListener("click", () => setDrawer(!open));
   navItems.forEach((el) => el.addEventListener("click", () => setDrawer(false)));
+
+  // Glassmorphic pill al hacer scroll
+  function initNavScroll() {
+    const nav = document.getElementById("site-nav");
+    if (!nav) return;
+
+    const onScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      nav.classList.toggle("is-scrolled", isScrolled);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initNavScroll();
+  } else {
+    document.addEventListener("DOMContentLoaded", initNavScroll);
+  }
+  document.addEventListener("astro:page-load", initNavScroll);
 </script>

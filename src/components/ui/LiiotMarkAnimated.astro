@@ -1,0 +1,73 @@
+---
+/**
+ * Isotipo Liiot — variante animada.
+ * Cada pieza geométrica se "deconstruye" al hover y se reensambla.
+ * transform-box: fill-box asegura que transform-origin use el centro
+ * de cada path individual, no del viewBox completo.
+ */
+interface Props {
+  class?: string;
+  color?: "violet" | "white" | "black";
+}
+
+const { class: className = "size-8", color = "violet" } = Astro.props as Props;
+
+const fill =
+  color === "white" ? "#FFFFFF" : color === "black" ? "#0B0710" : "#8B45CC";
+---
+
+<svg class:list={["liiot-mark", className]} viewBox="0 0 48 48" aria-hidden="true">
+  <path
+    class="liiot-path liiot-path--1"
+    fill={fill}
+    d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+  ></path>
+  <path
+    class="liiot-path liiot-path--2"
+    fill={fill}
+    d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
+  ></path>
+  <path
+    class="liiot-path liiot-path--3"
+    fill={fill}
+    d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
+  ></path>
+  <path
+    class="liiot-path liiot-path--4"
+    fill={fill}
+    d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
+  ></path>
+</svg>
+
+<style>
+  .liiot-mark path {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .liiot-mark:hover .liiot-path--1 {
+    transform: translate(-18%, -12%) rotate(-5deg);
+  }
+  .liiot-mark:hover .liiot-path--2 {
+    transform: translate(18%, 12%) rotate(5deg);
+  }
+  .liiot-mark:hover .liiot-path--3 {
+    transform: translate(0, 15%) scale(0.9);
+  }
+  .liiot-mark:hover .liiot-path--4 {
+    transform: translate(0, -15%) scale(0.9);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liiot-mark path {
+      transition: none;
+    }
+    .liiot-mark:hover .liiot-path--1,
+    .liiot-mark:hover .liiot-path--2,
+    .liiot-mark:hover .liiot-path--3,
+    .liiot-mark:hover .liiot-path--4 {
+      transform: none;
+    }
+  }
+</style>

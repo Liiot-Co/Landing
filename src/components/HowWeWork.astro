@@ -1,107 +1,382 @@
 ---
 /**
- * "Cómo trabajamos" — grid asimétrico interactivo. Hover en cada paso
- * cambia la imagen del panel derecho (crossfade). Fuente: vault §4.
+ * "Cómo trabajamos" — Tarjetas Apiladas (Sticky Card Stack).
+ *
+ * Enfoque emocional y juvenil:
+ * - Menos texto, copy directo y humano que conecta desde la emoción.
+ * - Imágenes juveniles, frescas y espontáneas de equipos creativos / makers.
+ * - Colores FLAT vivos del Design System (`var(--primary)`, `var(--accent)`, `var(--brand-pink)`).
+ * - Sin texturas ni degradés (superficies sólidas, sin bordes).
+ * - Iconos esenciales para destacar los valores clave.
+ * - Hover con rotación sutil sin zoom.
+ * - Compatible con animación GSAP (`#how-header`).
  */
+
+import {
+  HeartHandshake,
+  Sparkles,
+  Zap,
+  Users,
+  TrendingUp,
+  Sprout,
+} from "lucide-astro";
+
 const steps = [
   {
-    n: "01",
     title: "Entendemos tu visión",
-    body: "No llegamos con respuestas, llegamos con preguntas. Queremos entender qué quieres lograr con tu comunidad o tu equipo.",
+    emotion:
+      "Menos supuestos, más empatía. Nos sentamos contigo a entender qué enciende de verdad el corazón de tu comunidad.",
     image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop",
+    theme: "violet",
+    textColor: "light",
+    rotation: "-2deg",
+    points: [
+      {
+        icon: HeartHandshake,
+        text: "Escucha honesta, cero tecnicismos vacíos",
+      },
+      {
+        icon: Sparkles,
+        text: "Tecnología que nace del propósito humano",
+      },
+    ],
   },
   {
-    n: "02",
     title: "Construimos juntos",
-    body: "Iteraciones cortas, comunicación constante. Cada versión se siente más tuya — el mejor software es el que se siente propio.",
+    emotion:
+      "Cero burocracia, pura química. Cada avance se siente tuyo porque lo soñamos, probamos y pulimos hombro a hombro.",
     image:
-      "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=1200&auto=format&fit=crop",
+    theme: "orange",
+    textColor: "dark",
+    rotation: "2deg",
+    points: [
+      {
+        icon: Zap,
+        text: "Sprints vivos con avances cada semana",
+      },
+      {
+        icon: Users,
+        text: "Equipo directo y cercano, sin intermediarios",
+      },
+    ],
   },
   {
-    n: "03",
     title: "Crecemos juntos",
-    body: "La entrega no es el final. Medimos, ajustamos, evolucionamos. La tecnología que crea comunidad nunca deja de crecer.",
+    emotion:
+      "El lanzamiento es solo el inicio del viaje. Aprendemos de tu gente para que el software nunca deje de latir ni de sumar valor.",
     image:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
+    theme: "pink",
+    textColor: "light",
+    rotation: "-2deg",
+    points: [
+      {
+        icon: TrendingUp,
+        text: "Impacto y conexión en personas reales",
+      },
+      {
+        icon: Sprout,
+        text: "Una alianza que sigue viva en el tiempo",
+      },
+    ],
   },
 ];
 ---
 
-<section id="como-trabajamos" class="relative overflow-hidden bg-surface-secondary py-28 lg:py-36">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div id="how-header" class="mb-16 max-w-2xl translate-y-6 opacity-0 lg:mb-24">
-      <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-        Trabajamos <span data-annotate="como-trabajamos">contigo</span>,<br />no para ti
-      </h2>
+<section id="como-trabajamos" class="relative bg-surface-secondary py-24 lg:py-32">
+  <div class="container relative mx-auto px-4 sm:px-6 lg:px-8">
+    {/* Encabezado editorial con eyebrow vertical lateral */}
+    <div id="how-header" class="mb-12 flex items-start gap-4 sm:gap-6 translate-y-6 opacity-0 lg:mb-16">
+      {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
+      <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
+        <span class="size-2 rounded-full bg-accent mb-3"></span>
+        <span class="section-eyebrow-vertical">
+          Nuestro método
+        </span>
+        <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
+      </div>
+
+      <div class="max-w-2xl">
+        <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+          Trabajamos contigo,<br />no para ti
+        </h2>
+        <p class="mt-4 max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
+          Una alianza cercana donde cada iteración suma. Software diseñado a escala humana, construido con la energía de crear juntos.
+        </p>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-12 lg:grid-cols-[40%_1fr] lg:gap-8" id="how-grid">
-      {/* Izquierda — pasos numerados, disparan el crossfade */}
-      <div class="flex flex-col divide-y divide-border">
-        {
-          steps.map((step, i) => (
-            <button
-              type="button"
-              class="js-how-step group flex w-full flex-col gap-3 py-8 text-left first:pt-0 last:pb-0"
-              data-step={i + 1}
-              aria-label={`Ver: ${step.title}`}
+    {/* Contenedor de Tarjetas Apiladas (Sticky Stack) */}
+    <div class="how-cards-stack relative flex flex-col gap-6 pb-12 sm:gap-10 lg:gap-14 lg:pb-20">
+      {
+        steps.map((step, index) => {
+          const isDarkText = step.textColor === "dark";
+          return (
+            <article
+              class={`how-card how-card--${step.theme} squircle group relative w-full overflow-hidden p-6 transition-all duration-300 sm:p-9 lg:p-12 ${isDarkText ? "text-[#07040F]" : "text-white"}`}
+              style={`--stack-index: ${index}; --hover-rotation: ${step.rotation};`}
+              data-step-card={index + 1}
             >
-              <span class="flex items-baseline gap-4">
-                <span class="js-how-number text-2xl font-bold tabular-nums text-primary-high transition-colors duration-300 group-hover:text-accent">
-                  {step.n}
-                </span>
-                <span class="text-xl font-bold tracking-tight text-foreground transition-colors duration-300 sm:text-2xl">
-                  {step.title}
-                </span>
-              </span>
-              <p class="max-w-md pl-11 text-sm leading-relaxed text-muted-foreground">
-                {step.body}
-              </p>
-            </button>
-          ))
-        }
-      </div>
+              {/* Contenido Editorial con retícula equilibrada */}
+              <div class="relative z-10 grid grid-cols-1 items-center gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
+                {/* Columna Izquierda: Información emocional y concisa */}
+                <div class="flex flex-col justify-center">
+                  {/* Titular limpio sin números */}
+                  <h3 class={`text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl ${isDarkText ? "text-[#07040F]" : "text-white"}`}>
+                    {step.title}
+                  </h3>
 
-      {/* Derecha — panel de media, crossfade entre las 3 imágenes */}
-      <div class="media-duotone relative aspect-[4/5] w-full overflow-hidden rounded-2xl lg:aspect-auto lg:h-full lg:min-h-[520px]">
-        {
-          steps.map((step, i) => (
-            <img
-              src={step.image}
-              alt=""
-              aria-hidden="true"
-              data-step-image={i + 1}
-              class:list={[
-                "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
-                i === 0 ? "opacity-100" : "opacity-0",
-              ]}
-              loading="lazy"
-            />
-          ))
-        }
-      </div>
+                  {/* Frase emocional protagonista */}
+                  <p class={`mt-4 text-base font-medium leading-relaxed sm:text-lg lg:text-xl ${isDarkText ? "text-[#07040F]/90" : "text-white/95"}`}>
+                    {step.emotion}
+                  </p>
+
+                  {/* Puntos clave emocionales con iconos */}
+                  <div class="mt-6 flex flex-col gap-3 sm:mt-7">
+                    {step.points.map((pt) => {
+                      const IconComponent = pt.icon;
+                      return (
+                        <div class="flex items-center gap-3">
+                          <div class={`flex size-7 flex-shrink-0 items-center justify-center rounded-lg ${isDarkText ? "bg-[#07040F]/12 text-[#07040F]" : "bg-white/20 text-white"}`}>
+                            <IconComponent class="size-3.5" />
+                          </div>
+                          <span class={`text-sm font-semibold tracking-tight sm:text-base ${isDarkText ? "text-[#07040F]/90" : "text-white/90"}`}>
+                            {pt.text}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Columna Derecha: Imagen juvenil con efecto Chroma Pop en hover (cero zoom/translate) */}
+                <div class="relative w-full">
+                  <div class="media-frame squircle relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/11] lg:aspect-[4/3]">
+                    <div class="chroma-media h-full w-full">
+                      <img
+                        src={step.image}
+                        alt={`Liiot · ${step.title}`}
+                        class="how-card-img h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                      <div class="chroma-veil" aria-hidden="true"></div>
+                      <div class="chroma-sheen" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })
+      }
     </div>
   </div>
 </section>
 
-<script>
-  const grid = document.getElementById("how-grid");
-  if (grid) {
-    const steps = grid.querySelectorAll<HTMLElement>(".js-how-step");
-    const images = grid.querySelectorAll<HTMLImageElement>("[data-step-image]");
+<style>
+  /* ════════════════════════════════════════════════════════════════════
+     STACKING CARDS (STICKY APILADO)
+     ════════════════════════════════════════════════════════════════════ */
+  .how-cards-stack {
+    position: relative;
+  }
 
-    const setActive = (n: string) => {
-      images.forEach((img) => {
-        img.classList.toggle("opacity-100", img.dataset.stepImage === n);
-        img.classList.toggle("opacity-0", img.dataset.stepImage !== n);
+  .how-card {
+    position: sticky;
+    top: calc(5.5rem + var(--stack-index) * 1.5rem);
+    z-index: calc(10 + var(--stack-index));
+    will-change: clip-path, transform;
+    border: none;
+    border-radius: 44px;
+    corner-smoothing: 60%;
+    -webkit-corner-smoothing: 60%;
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65), 0 2px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  @media (min-width: 640px) {
+    .how-card {
+      top: calc(6.5rem + var(--stack-index) * 2rem);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .how-card {
+      top: calc(7rem + var(--stack-index) * 2.25rem);
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     COLORES FLAT VIVOS (VARIABLES DEL DESIGN SYSTEM)
+     ════════════════════════════════════════════════════════════════════ */
+  .how-card--violet {
+    background-color: var(--primary);
+  }
+
+  .how-card--orange {
+    background-color: var(--accent);
+  }
+
+  .how-card--pink {
+    background-color: var(--brand-pink);
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     HOVER DE IMAGEN: CHROMA POP & NEON GLOW (CERO ZOOM / CERO TRANSLATE)
+     ════════════════════════════════════════════════════════════════════ */
+  .media-frame {
+    border-radius: 26px;
+    corner-smoothing: 60%;
+    -webkit-corner-smoothing: 60%;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.45);
+    transition: box-shadow 450ms cubic-bezier(0.4, 0, 0.2, 1), border-color 450ms ease;
+  }
+
+  .chroma-media {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .how-card-img {
+    filter: grayscale(0.55) contrast(1.1) brightness(0.88);
+    transition: filter 450ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: none !important;
+  }
+
+  /* Velo de color base */
+  .chroma-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      140deg,
+      rgba(90, 34, 139, 0.35) 0%,
+      transparent 55%,
+      rgba(255, 106, 51, 0.3) 100%
+    );
+    mix-blend-mode: color;
+    opacity: 0.85;
+    transition: opacity 450ms ease;
+    pointer-events: none;
+  }
+
+  /* Destello holográfico y color Pop en hover */
+  .chroma-sheen {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 75% 25%,
+      rgba(255, 77, 109, 0.45) 0%,
+      rgba(255, 195, 0, 0.3) 40%,
+      transparent 75%
+    );
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  /* ── ESTADOS AL HACER HOVER EN LA TARJETA ── */
+  .how-card:hover .how-card-img,
+  .how-card:focus-within .how-card-img {
+    filter: grayscale(0) saturate(1.5) contrast(1.18) brightness(1.04);
+  }
+
+  .how-card:hover .chroma-veil,
+  .how-card:focus-within .chroma-veil {
+    opacity: 0.2;
+  }
+
+  .how-card:hover .chroma-sheen,
+  .how-card:focus-within .chroma-sheen {
+    opacity: 1;
+  }
+
+  /* Resplandores Neón vivos por tema de tarjeta */
+  .how-card--violet:hover .media-frame {
+    border-color: rgba(255, 255, 255, 0.45);
+    box-shadow:
+      0 0 36px -4px rgba(255, 77, 109, 0.7),
+      0 0 16px rgba(139, 69, 204, 0.55),
+      0 16px 36px -8px rgba(0, 0, 0, 0.6);
+  }
+
+  .how-card--orange:hover .media-frame {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow:
+      0 0 36px -4px rgba(255, 195, 0, 0.75),
+      0 0 16px rgba(255, 106, 51, 0.65),
+      0 16px 36px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .how-card--pink:hover .media-frame {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow:
+      0 0 36px -4px rgba(255, 106, 51, 0.75),
+      0 0 16px rgba(255, 77, 109, 0.65),
+      0 16px 36px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Prefers reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .how-card {
+      position: static;
+      box-shadow: none;
+    }
+    .how-card-img {
+      transition: none;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Micro-interacción de profundidad al hacer scroll:
+   * Atenúa suavemente la escala de la tarjeta que queda debajo.
+   */
+  function initCardStackMotion() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const cards = document.querySelectorAll<HTMLElement>(".how-card");
+    if (cards.length < 2) return;
+
+    const onScroll = () => {
+      cards.forEach((card, i) => {
+        if (i === cards.length - 1) return;
+        const nextCard = cards[i + 1];
+        if (!nextCard) return;
+
+        const cardRect = card.getBoundingClientRect();
+        const nextRect = nextCard.getBoundingClientRect();
+
+        if (nextRect.top <= cardRect.bottom && nextRect.top > cardRect.top) {
+          const overlap = (cardRect.bottom - nextRect.top) / cardRect.height;
+          const clamped = Math.min(Math.max(overlap, 0), 1);
+          const scale = 1 - clamped * 0.04;
+          const brightness = 1 - clamped * 0.12;
+          card.style.transform = `scale(${scale})`;
+          card.style.filter = `brightness(${brightness})`;
+        } else if (nextRect.top <= cardRect.top) {
+          card.style.transform = "scale(0.96)";
+          card.style.filter = "brightness(0.88)";
+        } else {
+          card.style.transform = "scale(1)";
+          card.style.filter = "brightness(1)";
+        }
       });
     };
 
-    steps.forEach((step) => {
-      const n = step.dataset.step!;
-      step.addEventListener("pointerenter", () => setActive(n));
-      step.addEventListener("focus", () => setActive(n));
-    });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
   }
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initCardStackMotion();
+  } else {
+    document.addEventListener("DOMContentLoaded", initCardStackMotion);
+  }
+  document.addEventListener("astro:page-load", initCardStackMotion);
 </script>

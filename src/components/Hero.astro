@@ -3,12 +3,17 @@
  * Hero — abre con el llamado a la aventura del visitante (viaje del héroe,
  * etapa 1: "El Héroe"), no con la marca. Imagen a pantalla completa, con
  * aire suficiente para leer y solo una viñeta local detrás del texto.
+ *
+ * Interacciones:
+ * - Palabras interactivas: click para alternar palabras con animación Josh W. Comeau Squash and Stretch.
+ * - UX de edición viva: cursor parpadeante (blink caret) en lugar de botones o bordes dashed.
+ * - Transformación ultra-suave del font-weight con Satoshi Variable (550 -> 900).
  */
 import MorphGradient from "@/components/ui/MorphGradient.astro";
 import { LIIOT_CALENDLY_URL } from "@/constants/contact";
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1800&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1545285446-ff15b9e9b9b9?q=80&w=1170&auto=format&fit=crop";
 ---
 
 <section
@@ -25,6 +30,12 @@ const HERO_IMAGE =
       loading="eager"
       fetchpriority="high"
     />
+    {/* Radial gradient: de oscuro a claro desde la esquina superior derecha */}
+    <div
+      class="hero-radial-gradient absolute inset-0 pointer-events-none"
+      aria-hidden="true"
+    >
+    </div>
     <div
       class="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-background via-background/38 to-transparent"
       aria-hidden="true"
@@ -34,11 +45,45 @@ const HERO_IMAGE =
   </div>
 
   <div class="container relative z-10 mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
+    {/* Titular interactivo con tipografía cinética suave */}
     <h1
       id="hero-title"
-      class="headline-editorial max-w-5xl translate-y-8 text-[13vw] text-foreground opacity-0 sm:text-[9vw] lg:text-[7.5vw]"
+      class="headline-editorial hero-kinetic-title max-w-5xl translate-y-8 text-[12.5vw] text-foreground opacity-0 sm:text-[8.5vw] lg:text-[7vw]"
     >
-      Construimos tu<br /><span data-annotate="hero">futuro</span> contigo
+      <button
+        type="button"
+        id="swap-prefix"
+        class="kinetic-word-btn inline-block text-left"
+        aria-label="Alternar acción (click)"
+        title="Haz click para alternar"
+      >
+        <span id="prefix-text" class="kinetic-word">Construimos</span>
+      </button>{" "}
+      <span class="kinetic-word">tu</span>
+      <br />
+      <button
+        type="button"
+        id="hero-swap-btn"
+        class="interactive-word-btn inline-block text-left"
+        aria-label="Alternar palabra clave (click)"
+        title="Haz click para alternar palabra"
+      >
+        <span
+          id="hero-swap-word"
+          class="kinetic-word active-keyword inline-block"
+        >
+          futuro
+        </span>
+      </button>{" "}
+      <button
+        type="button"
+        id="swap-suffix"
+        class="kinetic-word-btn inline-block text-left"
+        aria-label="Alternar cierre (click)"
+        title="Haz click para alternar"
+      >
+        <span id="suffix-text" class="kinetic-word">contigo</span>
+      </button>
     </h1>
 
     <p
@@ -99,9 +144,215 @@ const HERO_IMAGE =
     }
   }
 
+  /* Radial gradient de oscuro a claro desde la esquina superior derecha */
+  .hero-radial-gradient {
+    background: radial-gradient(
+      circle farthest-corner at top right,
+      #07040f 0%,
+      rgba(15, 9, 28, 0.86) 28%,
+      rgba(42, 22, 68, 0.44) 58%,
+      rgba(255, 255, 255, 0.08) 82%,
+      rgba(255, 255, 255, 0.18) 100%
+    );
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     TIPOGRAFÍA CINÉTICA ULTRA-SMOOTH (WEIGHT 550 -> 900)
+     ════════════════════════════════════════════════════════════════════ */
+  .hero-kinetic-title {
+    user-select: none;
+    line-height: 0.98;
+  }
+
+  .kinetic-word-btn,
+  .interactive-word-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    vertical-align: baseline;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .interactive-word-btn {
+    position: relative;
+    transform-origin: bottom center;
+  }
+
+  .kinetic-word {
+    display: inline-block;
+    font-weight: 700;
+    will-change: font-weight, transform;
+    transform-origin: bottom center;
+    transition:
+      font-weight 380ms cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 300ms ease,
+      transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 300ms ease;
+    cursor: pointer;
+  }
+
+  /* Al pasar el cursor por el titular: las palabras no enfocadas se suavizan a 550 sin colapso */
+  .hero-kinetic-title:hover .kinetic-word {
+    font-weight: 550;
+    opacity: 0.85;
+  }
+
+  /* La palabra sobre la que está el cursor se expande a 900 con suavidad líquida */
+  .hero-kinetic-title .kinetic-word:hover,
+  .hero-kinetic-title .kinetic-word-btn:hover .kinetic-word,
+  .hero-kinetic-title .interactive-word-btn:hover .kinetic-word {
+    font-weight: 900 !important;
+    opacity: 1 !important;
+    transform: translateY(-2px);
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     PALABRA CLAVE: SIN DASHED, COLOR VIVO Y BLINK CURSOR
+     ════════════════════════════════════════════════════════════════════ */
+  .active-keyword {
+    color: var(--accent);
+    border: none !important;
+    padding: 0;
+    transform-origin: bottom center;
+  }
+
+
+
+  /* ════════════════════════════════════════════════════════════════════
+     JOSH W. COMEAU: SQUASH AND STRETCH ANIMATION (CRISP & SHARP)
+     ════════════════════════════════════════════════════════════════════ */
+  /* Mousedown / Active: Squash de anticipación (se aplasta y ensancha contra el suelo) */
+  .interactive-word-btn:active .active-keyword,
+  .kinetic-word-btn:active .kinetic-word {
+    transform: scale(1.14, 0.86) translateY(3px) !important;
+    transition: transform 70ms ease-out !important;
+  }
+
+  /* Clase Squash & Stretch al alternar palabra: 100% nítida, sin blur ni pérdidas de opacidad */
+  .is-squashing-and-stretching {
+    animation: jwc-squash-and-stretch 400ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    transform-origin: bottom center;
+    opacity: 1 !important;
+  }
+
+  @keyframes jwc-squash-and-stretch {
+    0% {
+      /* Anticipación / compresión elástica */
+      transform: scale(1.14, 0.86) translateY(3px);
+    }
+    30% {
+      /* STRETCH: rebota hacia arriba estirándose de forma nítida */
+      transform: scale(0.88, 1.14) translateY(-8px);
+    }
+    60% {
+      /* SQUASH DE IMPACTO: aterriza con compresión elástica */
+      transform: scale(1.06, 0.94) translateY(2px);
+    }
+    82% {
+      /* OVERSHOOT de micro-ajuste */
+      transform: scale(0.98, 1.02) translateY(-1px);
+    }
+    100% {
+      /* REPOSO PERFECTO */
+      transform: scale(1, 1) translateY(0);
+    }
+  }
+
+  /* Prefers reduced motion */
   @media (prefers-reduced-motion: reduce) {
+    .is-squashing-and-stretching,
     .hero-bg-img {
-      animation: none;
+      animation: none !important;
+      transition: none !important;
     }
   }
 </style>
+
+<script>
+  function initHeroWordInteraction() {
+    const swapBtn = document.getElementById("hero-swap-btn");
+    const swapWord = document.getElementById("hero-swap-word");
+    const prefixBtn = document.getElementById("swap-prefix");
+    const prefixText = document.getElementById("prefix-text");
+    const suffixBtn = document.getElementById("swap-suffix");
+    const suffixText = document.getElementById("suffix-text");
+
+    const keywords = [
+      { text: "futuro", color: "var(--accent)" },
+      { text: "software", color: "var(--primary-high)" },
+      { text: "producto", color: "var(--brand-pink)" },
+      { text: "impacto", color: "var(--brand-yellow)" },
+      { text: "comunidad", color: "var(--accent)" },
+      { text: "propósito", color: "var(--brand-pink)" },
+    ];
+
+    const prefixes = ["Construimos", "Diseñamos", "Creamos", "Impulsamos"];
+    const suffixes = ["contigo", "a tu lado", "en equipo", "de verdad"];
+
+    let kwIdx = 0;
+    let preIdx = 0;
+    let sufIdx = 0;
+    let isKwAnimating = false;
+
+    function triggerSquashStretch(el: HTMLElement | null, updateFn: () => void) {
+      if (!el) return;
+      // Actualizar el texto inmediatamente de forma nítida sin desfase visual
+      updateFn();
+
+      el.classList.remove("is-squashing-and-stretching");
+      void el.offsetWidth; // Force reflow
+      el.classList.add("is-squashing-and-stretching");
+
+      setTimeout(() => {
+        el.classList.remove("is-squashing-and-stretching");
+      }, 400);
+    }
+
+    swapBtn?.addEventListener("click", () => {
+      if (isKwAnimating) return;
+      isKwAnimating = true;
+
+      kwIdx = (kwIdx + 1) % keywords.length;
+      const next = keywords[kwIdx];
+
+      triggerSquashStretch(swapWord, () => {
+        if (swapWord) {
+          swapWord.textContent = next.text;
+          swapWord.style.color = next.color;
+        }
+      });
+
+      setTimeout(() => {
+        isKwAnimating = false;
+      }, 400);
+    });
+
+    prefixBtn?.addEventListener("click", () => {
+      preIdx = (preIdx + 1) % prefixes.length;
+      triggerSquashStretch(prefixText, () => {
+        if (prefixText) prefixText.textContent = prefixes[preIdx];
+      });
+    });
+
+    suffixBtn?.addEventListener("click", () => {
+      sufIdx = (sufIdx + 1) % suffixes.length;
+      triggerSquashStretch(suffixText, () => {
+        if (suffixText) suffixText.textContent = suffixes[sufIdx];
+      });
+    });
+  }
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initHeroWordInteraction();
+  } else {
+    document.addEventListener("DOMContentLoaded", initHeroWordInteraction);
+  }
+  document.addEventListener("astro:page-load", initHeroWordInteraction);
+</script>
