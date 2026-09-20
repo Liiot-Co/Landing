@@ -1,7 +1,12 @@
----
+﻿---
 /**
- * Isotipo Liiot — variante animada.
- * Cada pieza geométrica se "deconstruye" al hover y se reensambla.
+ * Isotipo Liiot - variante animada con morph por click.
+ *
+ * Hover:  cada pieza geometrica se "deconstruye" (scale + translate individual).
+ * Click:  el isotipo morph a una forma que representa un valor de marca,
+ *         interpolada con flubber. Cicla: logo -> futuro -> software ->
+ *         proposito -> impacto -> comunidad -> confianza -> logo.
+ *
  * transform-box: fill-box asegura que transform-origin use el centro
  * de cada path individual, no del viewBox completo.
  */
@@ -16,27 +21,48 @@ const fill =
   color === "white" ? "#FFFFFF" : color === "black" ? "#0B0710" : "#8B45CC";
 ---
 
-<svg class:list={["liiot-mark", className]} viewBox="0 0 48 48" aria-hidden="true">
-  <path
-    class="liiot-path liiot-path--1"
+<svg
+  class:list={["liiot-mark", className]}
+  viewBox="0 0 48 48"
+  role="button"
+  tabindex="0"
+  aria-label="Liiot - haz click para explorar nuestros valores"
+  data-fill={fill}
+>
+  <g class="liiot-original">
+    <path
+      class="liiot-path liiot-path--1"
+      fill={fill}
+      d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+    ></path>
+    <path
+      class="liiot-path liiot-path--2"
+      fill={fill}
+      d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
+    ></path>
+    <path
+      class="liiot-path liiot-path--3"
+      fill={fill}
+      d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
+    ></path>
+    <path
+      class="liiot-path liiot-path--4"
+      fill={fill}
+      d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
+    ></path>
+  </g>
+
+  <path class="liiot-morph-path" fill={fill} d="" style="opacity:0"></path>
+
+  <text
+    class="liiot-label"
+    x="24"
+    y="47"
+    text-anchor="middle"
     fill={fill}
-    d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
-  ></path>
-  <path
-    class="liiot-path liiot-path--2"
-    fill={fill}
-    d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
-  ></path>
-  <path
-    class="liiot-path liiot-path--3"
-    fill={fill}
-    d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
-  ></path>
-  <path
-    class="liiot-path liiot-path--4"
-    fill={fill}
-    d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
-  ></path>
+    font-size="0"
+    opacity="0"
+  ></text>
 </svg>
 
 <style>
@@ -59,9 +85,38 @@ const fill =
     transform: translate(0, -15%) scale(0.9);
   }
 
+  .liiot-morph-path {
+    transition: fill 0.4s ease;
+  }
+
+  .liiot-label {
+    font-family: 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .liiot-mark.is-morphing:hover .liiot-path--1,
+  .liiot-mark.is-morphing:hover .liiot-path--2,
+  .liiot-mark.is-morphing:hover .liiot-path--3,
+  .liiot-mark.is-morphing:hover .liiot-path--4 {
+    transform: none;
+  }
+
+  .liiot-mark.is-helixing:hover .liiot-path--1,
+  .liiot-mark.is-helixing:hover .liiot-path--2,
+  .liiot-mark.is-helixing:hover .liiot-path--3,
+  .liiot-mark.is-helixing:hover .liiot-path--4 {
+    transform: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .liiot-mark path {
       transition: none;
+    }
+    .liiot-morph-path {
+      transition: fill 0s;
     }
     .liiot-mark:hover .liiot-path--1,
     .liiot-mark:hover .liiot-path--2,
@@ -71,3 +126,7 @@ const fill =
     }
   }
 </style>
+
+<script>
+  import "@/scripts/liiot-morph";
+</script>

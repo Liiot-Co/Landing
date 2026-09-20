@@ -4,6 +4,9 @@
  */
 import { Linkedin } from "lucide-astro";
 import { TEAM_MEMBERS } from "@/constants/team";
+import { unsplashResize, unsplashSrcSet } from "@/lib/images";
+
+const PHOTO_WIDTHS = [400, 700];
 ---
 
 <section id="equipo" class="relative overflow-hidden bg-surface-secondary py-28 lg:py-36">
@@ -20,11 +23,11 @@ import { TEAM_MEMBERS } from "@/constants/team";
 
       <div>
         <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          Somos <span data-annotate="equipo">tres</span>
+          Nuestro <span data-annotate="equipo">equipo</span>
         </h2>
         <p class="mt-6 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
-          Un equipo pequeño que se conoce, se apoya y construye juntas. Eso se
-          nota en el trabajo.
+          Un equipo pequeño que se conoce, se apoya y construye junto, eso se
+          nota en cada proyecto.
         </p>
       </div>
     </div>
@@ -40,7 +43,9 @@ import { TEAM_MEMBERS } from "@/constants/team";
           >
             <div class="media-duotone media-duotone-reveal team-photo relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
               <img
-                src={member.photo}
+                src={unsplashResize(member.photo, 700, 70)}
+                srcset={unsplashSrcSet(member.photo, PHOTO_WIDTHS, 70)}
+                sizes="(min-width: 640px) 33vw, 90vw"
                 alt={member.photoAlt}
                 class="team-photo-img h-full w-full object-cover"
                 loading="lazy"

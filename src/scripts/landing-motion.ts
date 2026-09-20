@@ -7,6 +7,7 @@
  */
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import {
   motionEnter,
   motionEnterFast,
@@ -14,7 +15,11 @@ import {
   triggerStart,
 } from "@/lib/motion/landing";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+// Evita que el pin de setupStory() se re-mida cuando la barra de
+// direcciones del navegador móvil aparece/desaparece durante el scroll.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 const INIT_ATTR = "data-landing-motion-init";
 
@@ -72,6 +77,7 @@ function applyReducedMotionStates() {
     el.style.opacity = "1";
     el.style.filter = "blur(0px)";
     el.style.transform = "translateY(0px) scale(1)";
+    el.style.willChange = "auto";
   });
 }
 
@@ -85,18 +91,21 @@ function setupHero() {
 /**
  * "El reto" → "Nuestra filosofía" as a cinematic diagonal wipe.
  *
- * Desktop (≥1024px): the stage pins full-viewport and a diagonal clip-path
- * on the philosophy panel sweeps in from the right as the user scrolls,
- * uncovering it over the villain panel beneath. The wipe geometry is a
- * single `center` value (100 → -100, i.e. fully off-screen right → fully
- * covering) offset by a fixed `skew` on each edge, clamped with `Math.min`
- * so the philosophy panel starts at exactly zero width (no pre-scroll
- * peek). Villain content plays its entrance stagger once, right as the pin
- * engages; the philosophy word-reveal fires once the wipe has crossed
- * roughly its midpoint, so the words resolve just as they become legible.
+ * The stage pins full-viewport (all breakpoints — `ScrollTrigger.config({
+ * ignoreMobileResize: true })` at the top of this file keeps the pin from
+ * re-measuring when the mobile address bar hides/shows) and a diagonal
+ * clip-path on the philosophy panel sweeps in from the right as the user
+ * scrolls, uncovering it over the villain panel beneath. The wipe geometry
+ * is a single `center` value (100 → -100, i.e. fully off-screen right →
+ * fully covering) offset by a fixed `skew` on each edge, clamped with
+ * `Math.min` so the philosophy panel starts at exactly zero width (no
+ * pre-scroll peek). Villain content plays its entrance stagger once, right
+ * as the pin engages; the philosophy word-reveal fires once the wipe has
+ * crossed roughly its midpoint, so the words resolve just as they become
+ * legible.
  *
- * Mobile / reduced motion: no pin, no clip-path — same two panels in normal
- * document flow, each revealed with the sitewide cascade pattern.
+ * `prefers-reduced-motion`: `init()` never calls this function — the two
+ * panels stay in normal document flow via `applyReducedMotionStates()`.
  */
 function setupStory() {
   const stage = document.getElementById("story-stage");
@@ -104,35 +113,37 @@ function setupStory() {
   const filosofia = document.getElementById("por-que-existimos");
   if (!stage || !reto || !filosofia) return;
 
-  const desktopStory = () => {
-    stage.classList.add("is-cinematic");
+  stage.classList.add("is-cinematic");
 
-    const SKEW = 14; // total diagonal spread (percentage points) between the top and bottom edge
-    let philRevealed = false;
+  const SKEW = 14; // total diagonal spread (percentage points) between the top and bottom edge
+  let philRevealed = false;
 
-    const trigger = ScrollTrigger.create({
-      trigger: stage,
-      start: "top top",
-      end: "+=140%",
-      scrub: 0.4,
-      pin: true,
-      anticipatePin: 1,
-      onEnter: () => {
-        reveal("#villain-header");
-        revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
-        reveal("#villain-pivot", 0.3, true);
-        reveal("#story-bridge", 0.5, true);
-      },
-      onUpdate: (self) => {
-        const center = 100 + SKEW / 2 - self.progress * (200 + SKEW);
-        const top = Math.min(100, center + SKEW / 2);
-        const bottom = Math.min(100, center - SKEW / 2);
-        filosofia.style.setProperty("--wipe-top", `${top}%`);
-        filosofia.style.setProperty("--wipe-bottom", `${bottom}%`);
+  ScrollTrigger.create({
+    trigger: stage,
+    start: "top top",
+    end: "+=140%",
+    scrub: 0.4,
+    pin: true,
+    anticipatePin: 1,
+    onEnter: () => {
+      reveal("#villain-header");
+      revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
+      reveal("#villain-pivot", 0.3, true);
+      reveal("#story-bridge", 0.5, true);
+    },
+    onUpdate: (self) => {
+      const center = 100 + SKEW / 2 - self.progress * (200 + SKEW);
+      const top = Math.min(100, center + SKEW / 2);
+      const bottom = Math.min(100, center - SKEW / 2);
+      filosofia.style.setProperty("--wipe-top", `${top}%`);
+      filosofia.style.setProperty("--wipe-bottom", `${bottom}%`);
 
-        if (!philRevealed && self.progress > 0.52) {
-          philRevealed = true;
-          gsap.to(filosofia.querySelectorAll(".js-phil-word"), {
+      if (!philRevealed && self.progress > 0.52) {
+        philRevealed = true;
+        gsap.fromTo(
+          filosofia.querySelectorAll(".js-phil-word"),
+          { filter: "blur(12px)", willChange: "transform,filter,opacity" },
+          {
             opacity: 1,
             filter: "blur(0px)",
             y: 0,
@@ -140,39 +151,14 @@ function setupStory() {
             duration: 0.8,
             ease: motionEnter.ease,
             stagger: staggerFromStart(0.05),
-          });
-        }
-      },
-    });
-
-    return () => trigger.kill();
-  };
-
-  const mobileStory = () => {
-    onSectionEnter("#el-reto", triggerStart.section, () => {
-      reveal("#villain-header");
-      revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
-      reveal("#villain-pivot", 0.3, true);
-      reveal("#story-bridge", 0.5, true);
-    });
-
-    onSectionEnter("#por-que-existimos", triggerStart.philosophy, () => {
-      gsap.to(".js-phil-word", {
-        opacity: 1,
-        filter: "blur(0px)",
-        y: 0,
-        scale: 1,
-        duration: 0.9,
-        delay: 0.2,
-        ease: motionEnter.ease,
-        stagger: staggerFromStart(0.06),
-      });
-    });
-  };
-
-  const mm = gsap.matchMedia();
-  mm.add("(min-width: 1024px)", desktopStory);
-  mm.add("(max-width: 1023.98px)", mobileStory);
+            onComplete: function () {
+              gsap.set(filosofia.querySelectorAll(".js-phil-word"), { willChange: "auto" });
+            },
+          },
+        );
+      }
+    },
+  });
 }
 
 function setupHowWeWork() {
@@ -201,9 +187,43 @@ function setupFooter() {
   onSectionEnter("#footer-mark", triggerStart.footer, () => reveal("#footer-mark"));
 }
 
+/**
+ * Smooth-scrolls in-page `#anchor` links via GSAP's ScrollToPlugin instead
+ * of the native `scroll-behavior: smooth` (disabled in global.css — it
+ * fights ScrollTrigger's pin in setupStory(), producing a visible jump when
+ * entering the cinematic mode). ScrollToPlugin drives the same scroll
+ * position ScrollTrigger reads, so the two cooperate instead of racing.
+ * `offsetY` mirrors the site's `scroll-padding-top` (fixed nav clearance) by
+ * reading it straight from computed style, so both stay in sync.
+ */
+function setupSmoothAnchors() {
+  document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => {
+    const id = link.getAttribute("href")?.slice(1);
+    if (!id) return;
+
+    link.addEventListener("click", (event) => {
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      event.preventDefault();
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const offsetY = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+
+      gsap.to(window, {
+        duration: reduced ? 0 : 1,
+        scrollTo: { y: target, offsetY },
+        ease: "power2.inOut",
+      });
+      history.pushState(null, "", `#${id}`);
+    });
+  });
+}
+
 function init() {
   if (document.body.getAttribute(INIT_ATTR) === "1") return;
   document.body.setAttribute(INIT_ATTR, "1");
+
+  setupSmoothAnchors();
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     applyReducedMotionStates();

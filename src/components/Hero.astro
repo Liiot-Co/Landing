@@ -11,9 +11,8 @@
  */
 import MorphGradient from "@/components/ui/MorphGradient.astro";
 import { LIIOT_CALENDLY_URL } from "@/constants/contact";
-
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1545285446-ff15b9e9b9b9?q=80&w=1170&auto=format&fit=crop";
+import { HERO_IMAGE, HERO_IMAGE_WIDTHS } from "@/constants/hero";
+import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 ---
 
 <section
@@ -23,7 +22,9 @@ const HERO_IMAGE =
   {/* Fondo — la foto se ve completa; solo una viñeta local sostiene el texto */}
   <div id="hero-bg" class="absolute inset-0 opacity-0">
     <img
-      src={HERO_IMAGE}
+      src={unsplashResize(HERO_IMAGE, 1536, 65)}
+      srcset={unsplashSrcSet(HERO_IMAGE, HERO_IMAGE_WIDTHS, 65)}
+      sizes="100vw"
       alt=""
       aria-hidden="true"
       class="hero-bg-img h-full w-full object-cover"
@@ -45,53 +46,56 @@ const HERO_IMAGE =
   </div>
 
   <div class="container relative z-10 mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
-    {/* Titular interactivo con tipografía cinética suave */}
+    {/* Titular interactivo con tipografía cinética suave y líneas estables anti-shift */}
     <h1
       id="hero-title"
-      class="headline-editorial hero-kinetic-title max-w-5xl translate-y-8 text-[12.5vw] text-foreground opacity-0 sm:text-[8.5vw] lg:text-[7vw]"
+      class="headline-editorial hero-kinetic-title max-w-5xl translate-y-8 text-[clamp(2.1rem,9.6vw,6.4rem)] leading-[0.98] text-foreground opacity-0 sm:text-[clamp(3.2rem,8.2vw,6.5rem)] lg:text-[clamp(4rem,6.8vw,6.8rem)]"
     >
-      <button
-        type="button"
-        id="swap-prefix"
-        class="kinetic-word-btn inline-block text-left"
-        aria-label="Alternar acción (click)"
-        title="Haz click para alternar"
-      >
-        <span id="prefix-text" class="kinetic-word">Construimos</span>
-      </button>{" "}
-      <span class="kinetic-word">tu</span>
-      <br />
-      <button
-        type="button"
-        id="hero-swap-btn"
-        class="interactive-word-btn inline-block text-left"
-        aria-label="Alternar palabra clave (click)"
-        title="Haz click para alternar palabra"
-      >
-        <span
-          id="hero-swap-word"
-          class="kinetic-word active-keyword inline-block"
+      <span class="title-line block whitespace-nowrap">
+        <button
+          type="button"
+          id="swap-prefix"
+          class="kinetic-word-btn inline-block text-left"
+          aria-label="Alternar acción (click)"
+          title="Haz click para alternar"
         >
-          futuro
-        </span>
-      </button>{" "}
-      <button
-        type="button"
-        id="swap-suffix"
-        class="kinetic-word-btn inline-block text-left"
-        aria-label="Alternar cierre (click)"
-        title="Haz click para alternar"
-      >
-        <span id="suffix-text" class="kinetic-word">contigo</span>
-      </button>
+          <span id="prefix-text" class="kinetic-word">Construimos</span>
+        </button>{" "}
+        <span class="kinetic-word">tu</span>
+      </span>
+      <span class="title-line block whitespace-nowrap">
+        <button
+          type="button"
+          id="hero-swap-btn"
+          class="interactive-word-btn inline-block text-left"
+          aria-label="Alternar palabra clave (click)"
+          title="Haz click para alternar palabra"
+        >
+          <span
+            id="hero-swap-word"
+            class="kinetic-word active-keyword inline-block"
+          >
+            futuro
+          </span>
+        </button>{" "}
+        <button
+          type="button"
+          id="swap-suffix"
+          class="kinetic-word-btn inline-block text-left"
+          aria-label="Alternar cierre (click)"
+          title="Haz click para alternar"
+        >
+          <span id="suffix-text" class="kinetic-word">contigo</span>
+        </button>
+      </span>
     </h1>
 
     <p
       id="hero-body"
       class="mt-9 max-w-md translate-y-4 text-sm font-medium leading-relaxed text-muted-foreground opacity-0 sm:text-base"
     >
-      Construimos tecnología que une personas, crea confianza y hace que las
-      cosas funcionen mejor. Startup colombiana, seria y joven.
+      Creamos tecnología que une personas, genera confianza y hace que el
+      día a día funcione mejor. Somos una empresa colombiana joven y seria.
     </p>
 
     <div id="hero-cta" class="mt-12 flex translate-y-4 flex-wrap items-center gap-x-8 gap-y-5 opacity-0">
@@ -128,6 +132,11 @@ const HERO_IMAGE =
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m0 0l-6-6m6 6l6-6" />
     </svg>
   </a>
+
+  {/* Crédito de foto — sutil */}
+  <p class="absolute bottom-3 left-4 z-10 text-[10px] text-foreground/30 sm:left-6 lg:left-8">
+    Foto de <a href="https://unsplash.com/es/@heyquilia?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer" class="underline decoration-foreground/20 underline-offset-2 hover:text-foreground/50">Quilia</a> en <a href="https://unsplash.com/es/fotos/dos-mujeres-saltando-en-la-calle-durante-el-dia-87EqZAWN-v8?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer" class="underline decoration-foreground/20 underline-offset-2 hover:text-foreground/50">Unsplash</a>
+  </p>
 </section>
 
 <style>
@@ -164,6 +173,12 @@ const HERO_IMAGE =
     line-height: 0.98;
   }
 
+  .title-line {
+    display: block;
+    white-space: nowrap;
+    overflow: visible;
+  }
+
   .kinetic-word-btn,
   .interactive-word-btn {
     background: transparent;
@@ -186,7 +201,6 @@ const HERO_IMAGE =
   .kinetic-word {
     display: inline-block;
     font-weight: 700;
-    will-change: font-weight, transform;
     transform-origin: bottom center;
     transition:
       font-weight 380ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -276,20 +290,32 @@ const HERO_IMAGE =
 </style>
 
 <script>
+  let autoRotateTimer: number | null = null;
+
+  function stopHeroAutoRotation() {
+    if (autoRotateTimer !== null) {
+      clearInterval(autoRotateTimer);
+      autoRotateTimer = null;
+    }
+  }
+
   function initHeroWordInteraction() {
+    stopHeroAutoRotation();
+
     const swapBtn = document.getElementById("hero-swap-btn");
     const swapWord = document.getElementById("hero-swap-word");
     const prefixBtn = document.getElementById("swap-prefix");
     const prefixText = document.getElementById("prefix-text");
     const suffixBtn = document.getElementById("swap-suffix");
     const suffixText = document.getElementById("suffix-text");
+    const heroTitle = document.getElementById("hero-title");
 
     const keywords = [
       { text: "futuro", color: "var(--accent)" },
-      { text: "software", color: "var(--primary-high)" },
-      { text: "producto", color: "var(--brand-pink)" },
-      { text: "impacto", color: "var(--brand-yellow)" },
-      { text: "comunidad", color: "var(--accent)" },
+      { text: "negocio", color: "var(--primary-high)" },
+      { text: "equipo", color: "var(--brand-pink)" },
+      { text: "gente", color: "var(--brand-yellow)" },
+      { text: "confianza", color: "var(--accent)" },
       { text: "propósito", color: "var(--brand-pink)" },
     ];
 
@@ -300,6 +326,7 @@ const HERO_IMAGE =
     let preIdx = 0;
     let sufIdx = 0;
     let isKwAnimating = false;
+    let isHovering = false;
 
     function triggerSquashStretch(el: HTMLElement | null, updateFn: () => void) {
       if (!el) return;
@@ -315,7 +342,7 @@ const HERO_IMAGE =
       }, 400);
     }
 
-    swapBtn?.addEventListener("click", () => {
+    function advanceKeyword() {
       if (isKwAnimating) return;
       isKwAnimating = true;
 
@@ -332,6 +359,19 @@ const HERO_IMAGE =
       setTimeout(() => {
         isKwAnimating = false;
       }, 400);
+    }
+
+    function startAutoRotation() {
+      stopHeroAutoRotation();
+      autoRotateTimer = window.setInterval(() => {
+        if (document.hidden || isHovering) return;
+        advanceKeyword();
+      }, 3000);
+    }
+
+    swapBtn?.addEventListener("click", () => {
+      advanceKeyword();
+      startAutoRotation(); // Reiniciar ciclo tras interacción manual
     });
 
     prefixBtn?.addEventListener("click", () => {
@@ -339,6 +379,7 @@ const HERO_IMAGE =
       triggerSquashStretch(prefixText, () => {
         if (prefixText) prefixText.textContent = prefixes[preIdx];
       });
+      startAutoRotation();
     });
 
     suffixBtn?.addEventListener("click", () => {
@@ -346,7 +387,29 @@ const HERO_IMAGE =
       triggerSquashStretch(suffixText, () => {
         if (suffixText) suffixText.textContent = suffixes[sufIdx];
       });
+      startAutoRotation();
     });
+
+    // Pausar en hover para no interrumpir la lectura del usuario
+    heroTitle?.addEventListener("mouseenter", () => {
+      isHovering = true;
+    });
+
+    heroTitle?.addEventListener("mouseleave", () => {
+      isHovering = false;
+      startAutoRotation();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopHeroAutoRotation();
+      } else {
+        startAutoRotation();
+      }
+    });
+
+    // Iniciar rotación automática cada 3 segundos
+    startAutoRotation();
   }
 
   if (document.readyState === "complete" || document.readyState === "interactive") {
@@ -355,4 +418,5 @@ const HERO_IMAGE =
     document.addEventListener("DOMContentLoaded", initHeroWordInteraction);
   }
   document.addEventListener("astro:page-load", initHeroWordInteraction);
+  document.addEventListener("astro:before-swap", stopHeroAutoRotation);
 </script>

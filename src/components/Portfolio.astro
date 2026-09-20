@@ -16,13 +16,16 @@
  */
 
 import { PORTFOLIO_PROJECTS } from "@/constants/portfolio";
+import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
+
+const PROJECT_IMAGE_WIDTHS = [480, 800, 1100];
 ---
 
 <section id="proyectos" class="relative overflow-hidden bg-background py-24 lg:py-32">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     {/* Encabezado: "Qué hicimos" (sin eyebrows) */}
-    <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end lg:mb-14">
+    <div class="mb-10 lg:mb-14">
       <div id="portfolio-header" class="flex items-start gap-4 sm:gap-6 max-w-xl translate-y-6 opacity-0">
         {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
         <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
@@ -35,49 +38,46 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
 
         <div>
           <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-            Qué hicimos
+            Qué hemos logrado
           </h2>
           <p class="mt-3 text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
-            Software a medida que cuida personas y plataformas que crean comunidad real.
+            Proyectos que cuidan personas y crean comunidad de verdad.
           </p>
         </div>
-      </div>
-
-      {/* Flechas de Navegación (planas, sin box-shadow ni bordes) */}
-      <div class="flex items-center gap-2.5">
-        <button
-          type="button"
-          id="carousel-prev"
-          class="carousel-nav-btn flex size-11 items-center justify-center rounded-full bg-surface-secondary text-white transition-colors duration-150 hover:bg-white/20 active:scale-95 disabled:opacity-25 disabled:pointer-events-none"
-          aria-label="Proyecto anterior"
-        >
-          <ArrowLeft class="size-5" />
-        </button>
-        <button
-          type="button"
-          id="carousel-next"
-          class="carousel-nav-btn flex size-11 items-center justify-center rounded-full bg-surface-secondary text-white transition-colors duration-150 hover:bg-white/20 active:scale-95 disabled:opacity-25 disabled:pointer-events-none"
-          aria-label="Siguiente proyecto"
-        >
-          <ArrowRight class="size-5" />
-        </button>
       </div>
     </div>
   </div>
 
   {/* Pista del Carousel (Snap horizontal) */}
   <div class="carousel-viewport relative w-full overflow-hidden px-4 sm:px-6 lg:px-8">
+    {/* Flechas de Navegación: superpuestas sobre el carrusel, centradas verticalmente */}
+    <button
+      type="button"
+      id="carousel-prev"
+      class="carousel-nav-btn absolute left-2 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-foreground transition-colors duration-150 hover:bg-brand-yellow active:scale-95 disabled:opacity-30 disabled:pointer-events-none sm:left-4"
+      aria-label="Proyecto anterior"
+    >
+      <ArrowLeft class="size-5" />
+    </button>
+    <button
+      type="button"
+      id="carousel-next"
+      class="carousel-nav-btn absolute right-2 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-foreground transition-colors duration-150 hover:bg-brand-yellow active:scale-95 disabled:opacity-30 disabled:pointer-events-none sm:right-4"
+      aria-label="Siguiente proyecto"
+    >
+      <ArrowRight class="size-5" />
+    </button>
     <div
       id="portfolio-track"
-      class="carousel-track flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 pt-1 scrollbar-none sm:gap-8 lg:gap-10"
+      class="carousel-track flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 pt-1 scrollbar-none sm:gap-6 lg:gap-10"
       tabindex="0"
       role="region"
-      aria-label="Carrusel Qué hicimos"
+      aria-label="Carrusel Qué hemos logrado"
     >
       {
         PORTFOLIO_PROJECTS.map((project, index) => (
           <article
-            class={`js-portfolio-item project-card project-card--${project.themeColor} squircle group relative w-[90vw] flex-shrink-0 snap-center overflow-hidden p-7 transition-all duration-300 sm:w-[84vw] sm:p-10 md:w-[78vw] lg:w-[72vw] xl:w-[1100px] lg:p-14 text-white`}
+            class={`js-portfolio-item project-card project-card--${project.themeColor} squircle group relative w-[82vw] flex-shrink-0 snap-center overflow-hidden p-7 transition-all duration-300 sm:w-[78vw] sm:p-10 md:w-[72vw] lg:w-[68vw] xl:w-[1100px] lg:p-14 text-white`}
             data-index={index}
           >
             {/* Grid 2 Columnas: Contenido Emocional & Fotografía */}
@@ -103,6 +103,8 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
                 <div class="mt-8 flex items-center">
                   <a
                     href={project.ctaLink}
+                    target={project.ctaLink.startsWith("http") ? "_blank" : undefined}
+                    rel={project.ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
                     class="project-btn inline-flex items-center gap-2.5 rounded-xl bg-white px-7 py-3.5 text-xs font-bold tracking-wider text-black uppercase transition-transform duration-150 hover:bg-white/95 active:scale-95 sm:text-sm"
                   >
                     <span>{project.ctaText}</span>
@@ -116,7 +118,9 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
                 <div class="media-frame squircle relative aspect-[16/11] w-full overflow-hidden lg:aspect-[4/3]">
                   <div class="chroma-media h-full w-full">
                     <img
-                      src={project.image}
+                      src={unsplashResize(project.image, 800, 70)}
+                      srcset={unsplashSrcSet(project.image, PROJECT_IMAGE_WIDTHS, 70)}
+                      sizes="(min-width: 1024px) 500px, 90vw"
                       alt={project.imageAlt}
                       class="project-card-img h-full w-full object-cover"
                       loading="lazy"
@@ -161,11 +165,37 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
     cursor: grab;
   }
 
+  /* Fade en el borde derecho: señala que hay más tarjetas por descubrir */
+  .carousel-viewport::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 44px;
+    background: linear-gradient(to right, transparent, var(--background));
+    opacity: 1;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @media (min-width: 640px) {
+    .carousel-viewport::after {
+      width: 72px;
+    }
+  }
+
+  .carousel-viewport.is-at-end::after {
+    opacity: 0;
+  }
+
   /* While dragging (mouse only — see script): instant tracking, no text selection */
   .carousel-track.is-dragging {
     scroll-behavior: auto;
     cursor: grabbing;
     user-select: none;
+    will-change: scroll-position;
   }
 
   .carousel-track .project-btn {
@@ -262,10 +292,6 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
 
   .project-card--violet:hover .media-frame {
     border-color: rgba(255, 255, 255, 0.5);
-    box-shadow:
-      0 0 38px -4px rgba(255, 106, 51, 0.75),
-      0 0 16px rgba(139, 69, 204, 0.6),
-      0 16px 36px -8px rgba(0, 0, 0, 0.6);
   }
 
   /* ── BLEEPY: ROSA VIVO CON NEON RIM ── */
@@ -316,6 +342,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
 
   function initPortfolioCarousel() {
     const track = document.getElementById("portfolio-track");
+    const viewport = document.querySelector<HTMLElement>(".carousel-viewport");
     const prevBtn = document.getElementById("carousel-prev") as HTMLButtonElement | null;
     const nextBtn = document.getElementById("carousel-next") as HTMLButtonElement | null;
     const indicators = document.querySelectorAll<HTMLElement>(".carousel-indicator");
@@ -331,6 +358,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
       });
       if (prevBtn) prevBtn.disabled = activeIndex === 0;
       if (nextBtn) nextBtn.disabled = activeIndex === cards.length - 1;
+      viewport?.classList.toggle("is-at-end", activeIndex === cards.length - 1);
     };
 
     const scrollToCard = (index: number) => {
@@ -391,6 +419,21 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
     let dragMoved = false;
     let dragStartX = 0;
     let dragStartScroll = 0;
+    let rafId: number | null = null;
+    let pendingScrollLeft: number | null = null;
+
+    // Velocidad suavizada (EMA) en px/ms para detectar "flicks" rápidos al soltar
+    let velocityX = 0;
+    let lastMoveX = 0;
+    let lastMoveTime = 0;
+
+    const applyPendingScroll = () => {
+      rafId = null;
+      if (pendingScrollLeft !== null) {
+        track.scrollLeft = pendingScrollLeft;
+        pendingScrollLeft = null;
+      }
+    };
 
     track.addEventListener("pointerdown", (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
@@ -398,6 +441,9 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
       dragMoved = false;
       dragStartX = e.clientX;
       dragStartScroll = track.scrollLeft;
+      lastMoveX = e.clientX;
+      lastMoveTime = e.timeStamp;
+      velocityX = 0;
       track.classList.add("is-dragging");
       track.setPointerCapture(e.pointerId);
     });
@@ -406,19 +452,43 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
       if (!isDragging) return;
       const delta = e.clientX - dragStartX;
       if (Math.abs(delta) > 4) dragMoved = true;
-      track.scrollLeft = dragStartScroll - delta;
+
+      const dt = e.timeStamp - lastMoveTime;
+      if (dt > 0) {
+        const instantVelocity = (e.clientX - lastMoveX) / dt;
+        velocityX = velocityX * 0.7 + instantVelocity * 0.3;
+      }
+      lastMoveX = e.clientX;
+      lastMoveTime = e.timeStamp;
+
+      // Batchear el update de scrollLeft en un solo rAF por frame (evita reflow por cada pointermove)
+      pendingScrollLeft = dragStartScroll - delta;
+      if (rafId === null) rafId = requestAnimationFrame(applyPendingScroll);
     });
 
     const endDrag = (e: PointerEvent) => {
       if (!isDragging) return;
       isDragging = false;
       track.classList.remove("is-dragging");
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        applyPendingScroll();
+      }
       try {
         track.releasePointerCapture(e.pointerId);
       } catch {
         // el pointer ya pudo haber liberado el capture (p. ej. pointercancel)
       }
-      if (dragMoved) scrollToCard(getCurrentActiveIndex());
+      if (dragMoved) {
+        // Flick rápido: avanza/retrocede una card extra en la dirección del gesto,
+        // en vez de quedarse solo con la card más cercana al centro.
+        const FLICK_THRESHOLD = 0.4; // px/ms
+        const baseIndex = getCurrentActiveIndex();
+        let targetIndex = baseIndex;
+        if (velocityX < -FLICK_THRESHOLD) targetIndex = Math.min(baseIndex + 1, cards.length - 1);
+        else if (velocityX > FLICK_THRESHOLD) targetIndex = Math.max(baseIndex - 1, 0);
+        scrollToCard(targetIndex);
+      }
     };
 
     track.addEventListener("pointerup", endDrag);

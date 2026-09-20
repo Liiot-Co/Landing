@@ -45,6 +45,7 @@
  * fragmentos clínicos.
  */
 import { PHILOSOPHY_TEXT } from "@/lib/philosophy";
+import { unsplashResize } from "@/lib/images";
 
 /*
  * Sujeto = el lector ("pagaste", "te entregaron", "recibiste"), nunca
@@ -54,9 +55,9 @@ import { PHILOSOPHY_TEXT } from "@/lib/philosophy";
  * no de la industria genérica que Liiot vino a cambiar.
  */
 const obstacles = [
-  { n: "01", text: "Pagaste por horas. Nunca por confianza." },
-  { n: "02", text: "Te entregaron código que nadie vuelve a mirar." },
-  { n: "03", text: "Recibiste un producto que nunca aprendiste a querer." },
+  { n: "01", text: "Pagaste por horas y nunca por la confianza que necesitabas." },
+  { n: "02", text: "Te entregaron algo que nadie vuelve a revisar." },
+  { n: "03", text: "Recibiste un producto que nunca sentiste como tuyo." },
 ];
 
 /*
@@ -65,9 +66,9 @@ const obstacles = [
  * 01↔01, 02↔02, 03↔03, no solo implícita en el tono general del párrafo.
  */
 const resolutions = [
-  { n: "01", text: "Aquí facturamos compromiso, no horas." },
-  { n: "02", text: "Aquí el código se queda — lo seguimos entendiendo." },
-  { n: "03", text: "Aquí no paramos hasta que lo sientas tuyo." },
+  { n: "01", text: "Solo pagas por lo que de verdad funciona." },
+  { n: "02", text: "Lo que hacemos se queda, y seguimos entendiendo por qué está ahí." },
+  { n: "03", text: "No paramos hasta que lo sientas tuyo de verdad." },
 ];
 
 const words = PHILOSOPHY_TEXT.split(" ");
@@ -97,12 +98,12 @@ const words = PHILOSOPHY_TEXT.split(" ");
 
               <div>
                 <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-                  No somos una<br /><span class="text-brand-pink" data-annotate="el-reto">fábrica de código</span>
+                  Ya conoces<br /><span class="text-brand-pink" data-annotate="el-reto">esta historia</span>
                 </h2>
                 {/* Nombra la pelea ANTES de la lista — sin esto, una lista de frases
                     negativas se lee, al escanear, como una descripción de Liiot */}
                 <p class="mt-4 text-base font-bold text-muted-foreground sm:text-lg">
-                  Esto es lo que combatimos, todos los días:
+                  Esto es lo que todos hemos vivido y lo que decidimos cambiar:
                 </p>
               </div>
             </div>
@@ -141,7 +142,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
           <div class="story-collage relative mx-auto mt-4 aspect-[4/5] w-full max-w-[220px] lg:mx-0 lg:mt-0 lg:max-w-none">
             <figure class="story-photo story-photo--cold absolute inset-3 overflow-hidden rounded-2xl">
               <img
-                src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=700&auto=format&fit=crop"
+                src={unsplashResize("https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=700&auto=format&fit=crop", 460, 70)}
                 alt="Un escritorio vacío y genérico, sin nadie detrás"
                 class="h-full w-full object-cover grayscale"
                 loading="lazy"
@@ -184,7 +185,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
                 {
                   words.map((word) => (
                     <span
-                      class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0 blur-[12px] will-change-[transform,filter,opacity]"
+                      class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0"
                       data-annotate={word === "problema" ? "por-que-existimos" : undefined}
                     >
                       {word}
@@ -218,7 +219,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
           <div class="story-collage relative mx-auto mt-4 aspect-[4/5] w-full max-w-[260px] lg:mx-0 lg:mt-0 lg:max-w-none">
             <figure class="story-photo story-photo--a absolute left-0 top-0 w-[72%] overflow-hidden rounded-2xl">
               <img
-                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop"
+                src={unsplashResize("https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop", 520, 70)}
                 alt="El equipo de Liiot revisando código juntos, señalando la pantalla"
                 class="h-full w-full object-cover"
                 loading="lazy"
@@ -226,7 +227,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
             </figure>
             <figure class="story-photo story-photo--b absolute bottom-0 right-0 w-[58%] overflow-hidden rounded-2xl">
               <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop"
+                src={unsplashResize("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop", 520, 70)}
                 alt="Personas del equipo riendo mientras trabajan juntas"
                 class="h-full w-full object-cover"
                 loading="lazy"
@@ -247,22 +248,25 @@ const words = PHILOSOPHY_TEXT.split(" ");
   }
 
   /*
-   * Estado por defecto (mobile / prefers-reduced-motion / antes de que el JS
-   * active el modo cine): flujo normal, sin pin ni corte — dos paneles
-   * apilados, cada uno legible por sí solo.
+   * Estado por defecto (prefers-reduced-motion / antes de que el JS active
+   * el modo cine): flujo normal, sin pin ni corte — dos paneles apilados,
+   * cada uno legible por sí solo.
    */
   .story-layer {
     min-height: 0;
   }
 
   /*
-   * Modo cine (`landing-motion.ts` añade esta clase solo en desktop con
-   * motion permitido, justo antes de crear el ScrollTrigger con pin — así
-   * `end: "+=140%"` se calcula sobre el 100vh real, no sobre el alto
-   * apilado). Los paneles pasan a superponerse a pantalla completa.
+   * Modo cine (`landing-motion.ts` añade esta clase en todos los tamaños,
+   * salvo `prefers-reduced-motion`, justo antes de crear el ScrollTrigger
+   * con pin — así `end: "+=140%"` se calcula sobre el alto real de pantalla,
+   * no sobre el alto apilado). Los paneles pasan a superponerse a pantalla
+   * completa. `100dvh` evita que la barra de direcciones móvil recorte el
+   * pin (con fallback a `100vh` para navegadores sin soporte).
    */
   .story-stage.is-cinematic {
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
 
@@ -283,6 +287,25 @@ const words = PHILOSOPHY_TEXT.split(" ");
       100% 100%,
       var(--wipe-bottom) 100%
     );
+  }
+
+  /*
+   * En pantallas angostas, el texto de ambos paneles (encabezado + lista +
+   * puente/resoluciones) ya ocupa casi todo el alto disponible del viewport
+   * pinneado — el collage fotográfico no cabe sin recortarse. Se oculta solo
+   * mientras el modo cine está activo (en flujo normal, sin pin, sigue
+   * visible) y el texto pasa a alinearse arriba en vez de centrarse, para
+   * que un recorte por overflow afecte el final de la lista, no el titular.
+   */
+  @media (max-width: 1023.98px) {
+    .story-stage.is-cinematic .story-collage {
+      display: none;
+    }
+
+    .story-stage.is-cinematic .story-layer {
+      align-items: flex-start;
+      padding-top: 4.5rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -3,6 +3,8 @@
  * Minimalista, sin números, sin pills y con gran impacto emocional.
  */
 
+import { LIIOT_BOOKING_URL } from "./contact";
+
 export interface PortfolioProject {
   slug: string;
   title: string;
@@ -19,22 +21,22 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
   {
     slug: "liiot-custom",
     title: "Liiot Custom",
-    subtitle: "Desarrollo a medida · Caso SG-SST",
+    subtitle: "Herramienta a medida · Caso SG-SST",
     description:
-      "Software a medida con propósito humano. Diseñamos y construimos SG-SST: una plataforma integral que automatiza la seguridad laboral y transforma la prevención en una cultura viva de cuidado.",
+      "Automatizamos la seguridad laboral para que la prevención sea parte de la cultura, no una obligación que nadie cumple.",
     image:
       "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
-    imageAlt: "Liiot Custom — Desarrollo a medida y plataforma SG-SST",
+    imageAlt: "Liiot Custom — Herramienta a medida para seguridad laboral",
     themeColor: "violet",
-    ctaText: "Crear tu proyecto",
-    ctaLink: "#agendar",
+    ctaText: "Empecemos juntos",
+    ctaLink: LIIOT_BOOKING_URL,
   },
   {
     slug: "bleepy",
     title: "Bleepy",
     subtitle: "Plataforma de creadores & empresas · Coming soon",
     description:
-      "Nuestra plataforma para unir marcas y creadores en torno a contenido orgánico real. Construimos comunidad auténtica y tracción genuina sin depender de pauta fría.",
+      "Unimos marcas y creadores para crear contenido auténtico que conecta, sin depender de publicidad fría.",
     image:
       "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1400&auto=format&fit=crop",
     imageAlt: "Bleepy — Plataforma de creadores y marcas",

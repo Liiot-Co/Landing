@@ -25,7 +25,7 @@ const recipes: Record<
 > = {
   tech: [
     { color: "var(--color-primary-high)", x: 20, y: 25, size: 46 },
-    { color: "var(--color-primary)", x: 78, y: 20, size: 42 },
+    { color: "var(--color-primary-high)", x: 78, y: 20, size: 42 },
     { color: "var(--color-brand-pink)", x: 65, y: 78, size: 30 },
     { color: "var(--color-primary-high)", x: 22, y: 80, size: 38 },
   ],
@@ -40,20 +40,30 @@ const recipes: Record<
     { color: "var(--color-accent)", x: 82, y: 15, size: 42 },
     { color: "var(--color-brand-yellow)", x: 78, y: 82, size: 30 },
     { color: "var(--color-brand-pink)", x: 18, y: 82, size: 28 },
-    { color: "var(--color-primary)", x: 50, y: 50, size: 46 },
+    { color: "var(--color-primary-high)", x: 50, y: 50, size: 46 },
   ],
   aurora: [
-    { color: "var(--color-primary-high)", x: 30, y: 30, size: 42 },
-    { color: "var(--color-accent)", x: 72, y: 68, size: 42 },
+    { color: "var(--color-primary-high)", x: 28, y: 28, size: 46 },
+    { color: "var(--color-accent)", x: 50, y: 50, size: 44 },
+    { color: "var(--color-accent)", x: 74, y: 70, size: 46 },
   ],
 };
 
 const blobs = recipes[recipe];
+
+// Capa base fija (sin blur/animación propios, se blurea junto al resto vía
+// .morph-gradient) que apila un radial-gradient por blob en su posición de
+// reposo — cubre todo el lienzo desde el primer frame para que nunca se vea
+// un hueco oscuro entre nubes mientras el drift las mueve. Misma técnica que
+// csshero.org/mesher (varios radial-gradient color→transparent apilados).
+const meshBase = blobs
+  .map((b) => `radial-gradient(circle at ${b.x}% ${b.y}%, ${b.color}, transparent 70%)`)
+  .join(", ");
 ---
 
 <div
   class:list={["morph-gradient pointer-events-none absolute inset-0 overflow-hidden", className]}
-  style={`opacity:${opacity}; mix-blend-mode:${blend};`}
+  style={`opacity:${opacity}; mix-blend-mode:${blend}; background-image:${meshBase};`}
   aria-hidden="true"
 >
   {

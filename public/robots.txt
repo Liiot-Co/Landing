@@ -1,0 +1,12 @@
+# robots.txt for Liiot (https://liiot.dev)
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://liiot.dev/sitemap-index.xml
+Sitemap: https://liiot.dev/sitemap.xml
+
+# LLM Discoverability
+# https://llmstxt.org/
+# Discoverable documentation and context for Large Language Models
+# Files: /llms.txt and /llm.txt

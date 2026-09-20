@@ -1,5 +1,18 @@
 ---
 import "@/styles/global.css";
+import SEO from "@/components/seo/SEO.astro";
+import { HERO_IMAGE, HERO_IMAGE_WIDTHS } from "@/constants/hero";
+import { unsplashResize, unsplashSrcSet } from "@/lib/images";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+  noindex?: boolean;
+}
+
+const { title, description, image, canonical, noindex } = Astro.props;
 ---
 
 <html lang="es">
@@ -8,15 +21,40 @@ import "@/styles/global.css";
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+
+    {/* Preconnect a los orígenes externos críticos (fuente + imagen LCP del Hero) */}
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+
+    {/* Precarga de la imagen LCP del Hero, con las mismas variantes que consume <img> ahí */}
     <link
-      href="https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="image"
+      href={unsplashResize(HERO_IMAGE, 1536, 65)}
+      imagesrcset={unsplashSrcSet(HERO_IMAGE, HERO_IMAGE_WIDTHS, 65)}
+      imagesizes="100vw"
+      fetchpriority="high"
     />
-    <title>Liiot | Construimos tu futuro contigo</title>
-    <meta
-      name="description"
-      content="Liiot es un estudio de desarrollo colombiano que construye software con propósito. No vendemos horas, construimos futuro junto a ustedes."
+
+    {/* Fuente cargada de forma no bloqueante (preload + swap a stylesheet on-load) para no retrasar el first paint */}
+    <link
+      rel="preload"
+      as="style"
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap"
+      />
+    </noscript>
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      canonical={canonical}
+      noindex={noindex}
     />
   </head>
   <body class="dark noise-overlay">

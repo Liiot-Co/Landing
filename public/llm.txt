@@ -1,0 +1,56 @@
+# Liiot
+
+> Liiot es un estudio de ingeniería de software y tecnología con propósito. Desarrollamos herramientas digitales a medida, plataformas web escalables y soluciones de automatización orientadas a impacto real de negocio, colaborando como socios tecnológicos de largo plazo.
+
+Sitio Web: https://liiot.dev  
+Contacto: hola@liiot.dev  
+Ubicación: Colombia (cobertura global)  
+
+## Filosofía y Propuesta de Valor
+
+- **Propósito ante todo**: "El problema nunca fue la tecnología sino construirla sin mirar a quién la usa." Construimos software pensado en la experiencia de las personas reales que lo operan diariamente.
+- **Socios, no vendedores de horas**: No facturamos horas vacías ni dejamos proyectos abandonados; co-creamos soluciones con objetivos claros de impacto y negocio.
+- **Entregas ágiles y transparentes**: Iteraciones semanales visibles, sin jerarquías intermedias ni burocracia.
+- **Evolución post-lanzamiento**: El despliegue a producción es el punto de partida; aprendemos del uso real para optimizar, mantener y escalar la herramienta.
+
+## Servicios Principales
+
+- [Liiot Custom - Software a Medida](https://liiot.dev/#proyectos): Desarrollo de sistemas web y plataformas internas para optimizar operaciones complejas, reemplazar hojas de cálculo caóticas y automatizar flujos de trabajo críticos.
+- [Plataformas Digitales y MVPs](https://liiot.dev/#proyectos): Conceptualización, diseño UX/UI y desarrollo de extremo a extremo para nuevos productos digitales y startups.
+- [Automatización de Procesos Operativos](https://liiot.dev/#como-trabajamos): Integración de sistemas, digitalización de normativas (ej. SG-SST) y optimización de productividad empresarial.
+- [Consultoría Tecnológica & Arquitectura](https://liiot.dev/#agendar): Asesoría técnica estratégica, selección de stacks tecnológicos modernos y arquitectura cloud escalable.
+
+## Casos y Proyectos Destacados
+
+- [Liiot Custom (Caso SG-SST)](https://liiot.dev/#proyectos):
+  - *Descripción*: Herramienta especializada para la gestión y cumplimiento de Seguridad y Salud en el Trabajo (SG-SST).
+  - *Impacto*: Convierte la prevención de riesgos y la recolección de evidencias en una dinámica fluida, eliminando el papeleo inútil y la fricción burocrática.
+- [Bleepy](https://liiot.dev/#proyectos):
+  - *Descripción*: Plataforma colaborativa que conecta directamente a marcas y empresas con creadores de contenido auténticos.
+  - *Impacto*: Facilita acuerdos comerciales y campañas orgánicas sin depender de la publicidad tradicional o agencias intermediarias lentas.
+
+## Metodología de Trabajo
+
+1. **Entendemos tu negocio**: Diagnóstico sincero y escucha activa para comprender a fondo los dolores reales y a los usuarios.
+2. **Construimos juntos**: Avances tangibles cada semana, prototipado rápido y feedback continuo.
+3. **Crecemos juntos**: Medición de adopción, soporte técnico y acompañamiento continuo post-lanzamiento.
+
+## Equipo Fundador y Liderazgo
+
+- **Dana Sofia Sánchez** — Chief Executive Officer (CEO)
+  - Dirección estratégica, desarrollo de negocio y visión de impacto.
+  - Perfil: https://www.linkedin.com/in/dana-sofia-s%C3%A1nchez-ortiz-364176211/
+- **Jean Pierre Ortiz** — Chief Technology Officer (CTO)
+  - Arquitectura de software, dirección técnica y estándares de ingeniería.
+  - Perfil: https://www.linkedin.com/in/jean-pierre-ortiz-murcia-76a5031b3/
+- **David Ocaño** — Chief Commercial Officer (CCO)
+  - Estrategia comercial, alianzas y experiencia del cliente.
+  - Perfil: https://www.linkedin.com/in/juan-david-oca%C3%B1o-huertas-868b40301/
+
+## Enlaces Oficiales y Canales de Contacto
+
+- Sitio Web: https://liiot.dev
+- Correo Electrónico: hola@liiot.dev
+- Agendar Consultoría: https://calendar.app.google/bEq3dn4x2TZCiVE46
+- LinkedIn: https://www.linkedin.com/company/liiot
+- Instagram: https://www.instagram.com/liiot

@@ -1,0 +1,192 @@
+---
+/**
+ * SEO.astro — Gestión integral de metadatos, OpenGraph, Twitter Cards y JSON-LD (Schema.org).
+ */
+import {
+  LIIOT_EMAIL,
+  LIIOT_CALENDLY_URL,
+  LIIOT_LINKEDIN_URL,
+  LIIOT_INSTAGRAM_URL,
+} from "@/constants/contact";
+import { TEAM_MEMBERS } from "@/constants/team";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+  type?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = "Liiot | Construimos tu futuro contigo",
+  description = "Liiot construye tecnología con propósito, no vendemos horas sino futuro junto a ti. Software a medida, plataformas escalables y automatización en Colombia.",
+  canonical,
+  image = "/og-image.svg",
+  type = "website",
+  noindex = false,
+} = Astro.props;
+
+// Normalización de URLs absolutas
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : "https://liiot.dev";
+const canonicalURL = canonical || new URL(Astro.url.pathname, siteUrl).toString();
+const ogImageURL = image.startsWith("http") ? image : new URL(image, siteUrl).toString();
+
+// Schema.org JSON-LD estructurado bajo especificación @graph
+const schemaGraph = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Organization", "ProfessionalService"],
+      "@id": `${siteUrl}/#organization`,
+      "name": "Liiot",
+      "legalName": "Liiot",
+      "url": siteUrl,
+      "logo": `${siteUrl}/favicon.svg`,
+      "image": ogImageURL,
+      "description": "Estudio de ingeniería de software y tecnología con propósito. Creamos software a medida, productos digitales escalables y soluciones de automatización de procesos.",
+      "email": LIIOT_EMAIL,
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CO",
+      },
+      "sameAs": [
+        LIIOT_LINKEDIN_URL,
+        LIIOT_INSTAGRAM_URL,
+        LIIOT_CALENDLY_URL,
+      ],
+      "founder": TEAM_MEMBERS.map((member) => ({
+        "@type": "Person",
+        "name": member.name,
+        "jobTitle": member.role,
+        "url": member.linkedin,
+      })),
+      "employee": TEAM_MEMBERS.map((member) => ({
+        "@type": "Person",
+        "name": member.name,
+        "jobTitle": member.role,
+        "url": member.linkedin,
+      })),
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "contactType": "sales and technical consulting",
+          "email": LIIOT_EMAIL,
+          "url": LIIOT_CALENDLY_URL,
+          "availableLanguage": ["Spanish", "English"],
+        },
+      ],
+      "knowsAbout": [
+        "Desarrollo de Software a Medida",
+        "Ingeniería de Software",
+        "Automatización de Procesos Empresariales",
+        "Sistemas SG-SST Digitales",
+        "Plataformas Web y SaaS",
+        "Arquitectura de Software Cloud",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      "url": siteUrl,
+      "name": "Liiot",
+      "description": "Construimos tecnología con propósito. No vendemos horas sino futuro junto a ti.",
+      "publisher": {
+        "@id": `${siteUrl}/#organization`,
+      },
+      "inLanguage": "es",
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/#webpage`,
+      "url": canonicalURL,
+      "name": title,
+      "description": description,
+      "isPartOf": {
+        "@id": `${siteUrl}/#website`,
+      },
+      "about": {
+        "@id": `${siteUrl}/#organization`,
+      },
+      "inLanguage": "es",
+    },
+    {
+      "@type": "Service",
+      "@id": `${siteUrl}/#service-custom-software`,
+      "name": "Liiot Custom - Software a Medida",
+      "serviceType": "Custom Software Development",
+      "provider": {
+        "@id": `${siteUrl}/#organization`,
+      },
+      "description": "Desarrollo de sistemas a medida y automatizaciones operativas (ej. caso SG-SST) para transformar tareas burocráticas en cultura ágil.",
+      "areaServed": "Worldwide",
+    },
+    {
+      "@type": "Service",
+      "@id": `${siteUrl}/#service-digital-products`,
+      "name": "Lanzamiento de Plataformas y Productos Digitales (Bleepy)",
+      "serviceType": "Digital Product Engineering",
+      "provider": {
+        "@id": `${siteUrl}/#organization`,
+      },
+      "description": "Desarrollo de plataformas modernas que conectan audiencias, marcas y creadores de contenido sin fricción publicitaria.",
+      "areaServed": "Worldwide",
+    },
+    {
+      "@type": "Service",
+      "@id": `${siteUrl}/#service-consulting`,
+      "name": "Consultoría Tecnológica & Arquitectura",
+      "serviceType": "Technology Consulting",
+      "provider": {
+        "@id": `${siteUrl}/#organization`,
+      },
+      "description": "Acompañamiento técnico directo con fundadores e ingenieros seniors para definir la estrategia y arquitectura digital adecuada.",
+      "areaServed": "Worldwide",
+    },
+  ],
+};
+---
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Metadatos Básicos -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="author" content="Liiot" />
+<meta name="application-name" content="Liiot" />
+<meta
+  name="robots"
+  content={noindex
+    ? "noindex, nofollow"
+    : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"}
+/>
+<meta name="theme-color" content="#0B0710" />
+
+<!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content="Liiot" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:image:alt" content="Liiot — Construimos tu futuro contigo" />
+<meta property="og:locale" content="es_CO" />
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalURL} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageURL} />
+<meta name="twitter:image:alt" content="Liiot — Construimos tu futuro contigo" />
+
+<!-- Descubrimiento para Motores y LLMs -->
+<link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Context (llms.txt)" />
+<link rel="alternate" type="text/plain" href="/llm.txt" title="LLM Context (llm.txt)" />
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json" set:html={JSON.stringify(schemaGraph)} />

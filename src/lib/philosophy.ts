@@ -6,4 +6,4 @@
  * general que Liiot vino a cambiar.
  */
 export const PHILOSOPHY_TEXT =
-  "El problema nunca fue la tecnología. Fue construirla sin mirar a quién la usa.";
+  "El problema nunca fue la tecnología sino construirla sin mirar a quién la usa.";

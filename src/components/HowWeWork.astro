@@ -20,12 +20,15 @@ import {
   TrendingUp,
   Sprout,
 } from "lucide-astro";
+import { unsplashResize, unsplashSrcSet } from "@/lib/images";
+
+const STEP_IMAGE_WIDTHS = [480, 800, 1100];
 
 const steps = [
   {
-    title: "Entendemos tu visión",
+    title: "Entendemos tu negocio",
     emotion:
-      "Menos supuestos, más empatía. Nos sentamos contigo a entender qué enciende de verdad el corazón de tu comunidad.",
+      "Nos sentamos contigo a escuchar sin supuestos para entender qué mueve a tu gente.",
     image:
       "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop",
     theme: "violet",
@@ -38,14 +41,14 @@ const steps = [
       },
       {
         icon: Sparkles,
-        text: "Tecnología que nace del propósito humano",
+        text: "Tecnología que nace de las personas, no al revés",
       },
     ],
   },
   {
     title: "Construimos juntos",
     emotion:
-      "Cero burocracia, pura química. Cada avance se siente tuyo porque lo soñamos, probamos y pulimos hombro a hombro.",
+      "Sin burocracia ni intermediarios, cada avance es tuyo porque lo construimos hombro a hombro.",
     image:
       "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=1200&auto=format&fit=crop",
     theme: "orange",
@@ -54,7 +57,7 @@ const steps = [
     points: [
       {
         icon: Zap,
-        text: "Sprints vivos con avances cada semana",
+        text: "Avances cada semana, sin esperas largas",
       },
       {
         icon: Users,
@@ -65,7 +68,7 @@ const steps = [
   {
     title: "Crecemos juntos",
     emotion:
-      "El lanzamiento es solo el inicio del viaje. Aprendemos de tu gente para que el software nunca deje de latir ni de sumar valor.",
+      "Lanzar es el inicio, no el final, aprendemos de tu gente para que siga creciendo.",
     image:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
     theme: "pink",
@@ -74,11 +77,11 @@ const steps = [
     points: [
       {
         icon: TrendingUp,
-        text: "Impacto y conexión en personas reales",
+        text: "Gente usando y disfrutando lo que construimos",
       },
       {
         icon: Sprout,
-        text: "Una alianza que sigue viva en el tiempo",
+        text: "Una relación que sigue viva después del lanzamiento",
       },
     ],
   },
@@ -103,7 +106,7 @@ const steps = [
           Trabajamos contigo,<br />no para ti
         </h2>
         <p class="mt-4 max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
-          Una alianza cercana donde cada iteración suma. Software diseñado a escala humana, construido con la energía de crear juntos.
+          Cada paso lo damos juntos, construido con la energía de crear contigo.
         </p>
       </div>
     </div>
@@ -156,7 +159,9 @@ const steps = [
                   <div class="media-frame squircle relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/11] lg:aspect-[4/3]">
                     <div class="chroma-media h-full w-full">
                       <img
-                        src={step.image}
+                        src={unsplashResize(step.image, 800, 70)}
+                        srcset={unsplashSrcSet(step.image, STEP_IMAGE_WIDTHS, 70)}
+                        sizes="(min-width: 1024px) 500px, 90vw"
                         alt={`Liiot · ${step.title}`}
                         class="how-card-img h-full w-full object-cover"
                         loading="lazy"
@@ -187,7 +192,6 @@ const steps = [
     position: sticky;
     top: calc(5.5rem + var(--stack-index) * 1.5rem);
     z-index: calc(10 + var(--stack-index));
-    will-change: clip-path, transform;
     border: none;
     border-radius: 44px;
     corner-smoothing: 60%;
@@ -343,29 +347,35 @@ const steps = [
     const cards = document.querySelectorAll<HTMLElement>(".how-card");
     if (cards.length < 2) return;
 
+    let ticking = false;
     const onScroll = () => {
-      cards.forEach((card, i) => {
-        if (i === cards.length - 1) return;
-        const nextCard = cards[i + 1];
-        if (!nextCard) return;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        cards.forEach((card, i) => {
+          if (i === cards.length - 1) return;
+          const nextCard = cards[i + 1];
+          if (!nextCard) return;
 
-        const cardRect = card.getBoundingClientRect();
-        const nextRect = nextCard.getBoundingClientRect();
+          const cardRect = card.getBoundingClientRect();
+          const nextRect = nextCard.getBoundingClientRect();
 
-        if (nextRect.top <= cardRect.bottom && nextRect.top > cardRect.top) {
-          const overlap = (cardRect.bottom - nextRect.top) / cardRect.height;
-          const clamped = Math.min(Math.max(overlap, 0), 1);
-          const scale = 1 - clamped * 0.04;
-          const brightness = 1 - clamped * 0.12;
-          card.style.transform = `scale(${scale})`;
-          card.style.filter = `brightness(${brightness})`;
-        } else if (nextRect.top <= cardRect.top) {
-          card.style.transform = "scale(0.96)";
-          card.style.filter = "brightness(0.88)";
-        } else {
-          card.style.transform = "scale(1)";
-          card.style.filter = "brightness(1)";
-        }
+          if (nextRect.top <= cardRect.bottom && nextRect.top > cardRect.top) {
+            const overlap = (cardRect.bottom - nextRect.top) / cardRect.height;
+            const clamped = Math.min(Math.max(overlap, 0), 1);
+            const scale = 1 - clamped * 0.04;
+            const brightness = 1 - clamped * 0.12;
+            card.style.transform = `scale(${scale})`;
+            card.style.filter = `brightness(${brightness})`;
+          } else if (nextRect.top <= cardRect.top) {
+            card.style.transform = "scale(0.96)";
+            card.style.filter = "brightness(0.88)";
+          } else {
+            card.style.transform = "scale(1)";
+            card.style.filter = "brightness(1)";
+          }
+        });
+        ticking = false;
       });
     };
 
