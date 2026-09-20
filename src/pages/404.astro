@@ -1,0 +1,283 @@
+---
+/**
+ * 404 — "arma el camino de regreso": las 4 piezas geométricas del isotipo
+ * de Liiot (mismos paths que LiiotMarkAnimated.astro) aparecen dispersas y
+ * a la deriva por la pantalla. Cada pieza es un <button> independiente,
+ * apilado exactamente sobre una silueta guía (`mark-ghost`) mediante
+ * `position: absolute; inset: 0` dentro del mismo `mark-stage` — así su
+ * posición de reposo (`translate(0,0)`) coincide siempre con el lugar
+ * correcto del isotipo, sin calcular coordenadas por JS. El desplazamiento
+ * disperso inicial vive en variables CSS (`--sx/--sy/--sr`) por pieza.
+ *
+ * Al tocar una pieza, pierde su offset y "vuela" a su lugar (transición
+ * CSS, misma curva spring que ya usan las fotos de OurStory.astro). Al
+ * completar las 4, `notfound-puzzle.ts` añade `.is-complete` y revela el
+ * CTA de vuelta al inicio. `prefers-reduced-motion`: el juego se salta,
+ * las piezas nacen ya colocadas y el CTA aparece de inmediato.
+ */
+import Layout from "@/components/layouts/Layout.astro";
+import LiiotMark from "@/components/ui/LiiotMarkAnimated.astro";
+import MorphGradient from "@/components/ui/MorphGradient.astro";
+
+const PIECES = [
+  {
+    id: 1,
+    color: "var(--primary-high)",
+    sx: "-36vw",
+    sy: "-22vh",
+    sr: "-34deg",
+    d: "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19",
+  },
+  {
+    id: 2,
+    color: "var(--accent)",
+    sx: "38vw",
+    sy: "-20vh",
+    sr: "30deg",
+    d: "M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19",
+  },
+  {
+    id: 3,
+    color: "var(--brand-pink)",
+    sx: "32vw",
+    sy: "26vh",
+    sr: "50deg",
+    d: "M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38",
+  },
+  {
+    id: 4,
+    color: "var(--brand-yellow)",
+    sx: "-34vw",
+    sy: "28vh",
+    sr: "-48deg",
+    d: "M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38",
+  },
+];
+---
+
+<Layout
+  title="Página no encontrada — Liiot"
+  description="Esta página se perdió en el camino. Ayúdanos a armar de nuevo el isotipo de Liiot y vuelve al inicio."
+  noindex
+>
+  <main
+    id="notfound-stage"
+    class="notfound-stage relative flex flex-col items-center justify-center bg-background px-4 py-6 text-center sm:py-10"
+  >
+    <MorphGradient recipe="hybrid" blend="screen" opacity={0.3} />
+
+    <a
+      href="/"
+      class="absolute left-4 top-4 z-20 opacity-70 transition-opacity duration-200 hover:opacity-100 sm:left-8 sm:top-8"
+      aria-label="Liiot — Volver al inicio"
+    >
+      <LiiotMark class="size-7" color="white" />
+    </a>
+
+    <div class="relative z-10 flex flex-col items-center">
+      <span class="section-eyebrow text-brand-pink">Error 404</span>
+
+      <h1 class="headline-editorial mt-3 text-3xl text-foreground sm:text-4xl lg:text-5xl">
+        Esta página<br />se nos perdió.
+      </h1>
+
+      <div id="mark-stage" class="mark-stage relative my-6 sm:my-8">
+        <svg class="mark-ghost" viewBox="0 0 48 48" aria-hidden="true">
+          {PIECES.map((p) => <path d={p.d} />)}
+        </svg>
+
+        {
+          PIECES.map((p) => (
+            <button
+              type="button"
+              class="mark-piece"
+              data-piece={p.id}
+              style={`--sx:${p.sx}; --sy:${p.sy}; --sr:${p.sr};`}
+              aria-label={`Colocar pieza ${p.id} de 4`}
+            >
+              <span class="mark-piece__bob" style={`animation-delay:${-p.id * 0.85}s`}>
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                  <path d={p.d} fill={p.color} />
+                </svg>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div id="notfound-copy" class="notfound-copy">
+        <div id="notfound-game" class="notfound-copy__panel">
+          <p class="max-w-sm text-base font-bold text-muted-foreground sm:text-lg">
+            Toca cada pieza para armar el camino de regreso.
+          </p>
+          <p
+            id="notfound-progress"
+            class="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/60"
+            aria-live="polite"
+          >
+            0 / 4 piezas
+          </p>
+        </div>
+
+        <div id="notfound-success" class="notfound-copy__panel flex flex-col items-center gap-4">
+          <p class="max-w-sm text-base font-bold text-foreground sm:text-lg">
+            Listo. Por aquí sí se llega.
+          </p>
+          <a
+            href="/"
+            class="btn-physical btn-physical--violet inline-flex items-center gap-3 rounded-xl px-8 py-4 text-sm uppercase tracking-[0.1em]"
+          >
+            Volver al inicio
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .notfound-stage {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .mark-stage {
+    width: clamp(150px, min(30vw, 24vh), 260px);
+    aspect-ratio: 1;
+  }
+
+  .mark-ghost,
+  .mark-piece {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mark-ghost path {
+    fill: var(--foreground);
+    opacity: 0.08;
+  }
+
+  .mark-piece {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(0.62);
+    transition: transform 850ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .mark-piece svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
+    transition: transform 200ms ease;
+  }
+
+  .mark-piece:not(.is-placed):hover svg,
+  .mark-piece:not(.is-placed):focus-visible svg {
+    transform: scale(1.08);
+  }
+
+  .mark-piece.is-placed {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    pointer-events: none;
+  }
+
+  .mark-piece__bob {
+    display: block;
+    animation: piece-bob 4.5s ease-in-out infinite;
+  }
+
+  .mark-piece.is-placed .mark-piece__bob {
+    animation: none;
+  }
+
+  @keyframes piece-bob {
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate(0, -8px) rotate(3deg);
+    }
+  }
+
+  @keyframes mark-complete-glow {
+    0% {
+      filter: drop-shadow(0 0 0 rgba(139, 69, 204, 0));
+    }
+    40% {
+      filter: drop-shadow(0 0 28px rgba(139, 69, 204, 0.55));
+    }
+    100% {
+      filter: drop-shadow(0 0 0 rgba(139, 69, 204, 0));
+    }
+  }
+
+  .mark-stage.is-complete {
+    animation: mark-complete-glow 1200ms ease-out;
+  }
+
+  /*
+   * Grid overlap: ambos paneles ocupan la misma celda (1/1), así el grid
+   * mide su alto como el máximo de los dos en vez de sumarlos uno debajo
+   * del otro — el panel oculto (opacity:0) no empuja el layout ni fuerza
+   * scroll en la página, que debe caber siempre en un solo viewport.
+   */
+  .notfound-copy {
+    display: grid;
+    justify-items: center;
+  }
+
+  .notfound-copy__panel {
+    grid-area: 1 / 1;
+    transition:
+      opacity 400ms ease,
+      transform 400ms ease;
+  }
+
+  #notfound-success {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition-delay: 150ms;
+  }
+
+  .notfound-stage.is-complete #notfound-game {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+  }
+
+  .notfound-stage.is-complete #notfound-success {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark-piece,
+    .mark-piece svg,
+    .notfound-copy__panel {
+      transition: none;
+    }
+
+    .mark-piece__bob {
+      animation: none;
+    }
+
+    .mark-stage.is-complete {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import "@/scripts/notfound-puzzle";
+</script>
