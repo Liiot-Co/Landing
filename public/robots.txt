@@ -1,10 +1,10 @@
-# robots.txt for Liiot (https://liiot.dev)
+# robots.txt for Liiot (https://www.liiot.app)
 User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://liiot.dev/sitemap-index.xml
-Sitemap: https://liiot.dev/sitemap.xml
+Sitemap: https://www.liiot.app/sitemap-index.xml
+Sitemap: https://www.liiot.app/sitemap.xml
 
 # LLM Discoverability
 # https://llmstxt.org/

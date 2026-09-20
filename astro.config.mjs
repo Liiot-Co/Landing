@@ -1,12 +1,16 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
+import { loadEnv } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
+const env = loadEnv(process.env.NODE_ENV || 'production', process.cwd(), '');
+const siteUrl = env.SITE_URL || process.env.SITE_URL || 'https://www.liiot.app';
+
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://liiot.dev',
+  site: siteUrl,
   integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],

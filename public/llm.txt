@@ -2,7 +2,7 @@
 
 > Liiot es un estudio de ingeniería de software y tecnología con propósito. Desarrollamos herramientas digitales a medida, plataformas web escalables y soluciones de automatización orientadas a impacto real de negocio, colaborando como socios tecnológicos de largo plazo.
 
-Sitio Web: https://liiot.dev  
+Sitio Web: https://www.liiot.app  
 Contacto: hola@liiot.dev  
 Ubicación: Colombia (cobertura global)  
 
@@ -15,17 +15,17 @@ Ubicación: Colombia (cobertura global)
 
 ## Servicios Principales
 
-- [Liiot Custom - Software a Medida](https://liiot.dev/#proyectos): Desarrollo de sistemas web y plataformas internas para optimizar operaciones complejas, reemplazar hojas de cálculo caóticas y automatizar flujos de trabajo críticos.
-- [Plataformas Digitales y MVPs](https://liiot.dev/#proyectos): Conceptualización, diseño UX/UI y desarrollo de extremo a extremo para nuevos productos digitales y startups.
-- [Automatización de Procesos Operativos](https://liiot.dev/#como-trabajamos): Integración de sistemas, digitalización de normativas (ej. SG-SST) y optimización de productividad empresarial.
-- [Consultoría Tecnológica & Arquitectura](https://liiot.dev/#agendar): Asesoría técnica estratégica, selección de stacks tecnológicos modernos y arquitectura cloud escalable.
+- [Liiot Custom - Software a Medida](https://www.liiot.app/#proyectos): Desarrollo de sistemas web y plataformas internas para optimizar operaciones complejas, reemplazar hojas de cálculo caóticas y automatizar flujos de trabajo críticos.
+- [Plataformas Digitales y MVPs](https://www.liiot.app/#proyectos): Conceptualización, diseño UX/UI y desarrollo de extremo a extremo para nuevos productos digitales y startups.
+- [Automatización de Procesos Operativos](https://www.liiot.app/#como-trabajamos): Integración de sistemas, digitalización de normativas (ej. SG-SST) y optimización de productividad empresarial.
+- [Consultoría Tecnológica & Arquitectura](https://www.liiot.app/#agendar): Asesoría técnica estratégica, selección de stacks tecnológicos modernos y arquitectura cloud escalable.
 
 ## Casos y Proyectos Destacados
 
-- [Liiot Custom (Caso SG-SST)](https://liiot.dev/#proyectos):
+- [Liiot Custom (Caso SG-SST)](https://www.liiot.app/#proyectos):
   - *Descripción*: Herramienta especializada para la gestión y cumplimiento de Seguridad y Salud en el Trabajo (SG-SST).
   - *Impacto*: Convierte la prevención de riesgos y la recolección de evidencias en una dinámica fluida, eliminando el papeleo inútil y la fricción burocrática.
-- [Bleepy](https://liiot.dev/#proyectos):
+- [Bleepy](https://www.liiot.app/#proyectos):
   - *Descripción*: Plataforma colaborativa que conecta directamente a marcas y empresas con creadores de contenido auténticos.
   - *Impacto*: Facilita acuerdos comerciales y campañas orgánicas sin depender de la publicidad tradicional o agencias intermediarias lentas.
 
@@ -49,7 +49,7 @@ Ubicación: Colombia (cobertura global)
 
 ## Enlaces Oficiales y Canales de Contacto
 
-- Sitio Web: https://liiot.dev
+- Sitio Web: https://www.liiot.app
 - Correo Electrónico: hola@liiot.dev
 - Agendar Consultoría: https://calendar.app.google/bEq3dn4x2TZCiVE46
 - LinkedIn: https://www.linkedin.com/company/liiot

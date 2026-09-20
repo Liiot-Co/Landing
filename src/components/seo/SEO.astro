@@ -29,7 +29,7 @@ const {
 } = Astro.props;
 
 // Normalización de URLs absolutas
-const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : "https://liiot.dev";
+const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : "https://www.liiot.app";
 const canonicalURL = canonical || new URL(Astro.url.pathname, siteUrl).toString();
 const ogImageURL = image.startsWith("http") ? image : new URL(image, siteUrl).toString();
 
