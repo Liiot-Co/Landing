@@ -31,12 +31,12 @@ const MORPH_STATES: MorphState[] = [
   },
   {
     label: "propósito",
-    color: "#FF4D6D",
+    color: "#e04b66",
     d: "M24,40 C14,32 2,24 2,14 C2,6 8,2 14,2 C18,2 22,5 24,9 C26,5 30,2 34,2 C40,2 46,6 46,14 C46,24 34,32 24,40 Z",
   },
   {
     label: "impacto",
-    color: "#FFC300",
+    color: "#e2b31c",
     d: "M24,2 L29,17 L46,17 L32,27 L37,44 L24,34 L11,44 L16,27 L2,17 L19,17 Z",
   },
   {
@@ -46,7 +46,7 @@ const MORPH_STATES: MorphState[] = [
   },
   {
     label: "confianza",
-    color: "#FF4D6D",
+    color: "#e04b66",
     d: "M24,2 L40,10 L40,24 C40,34 32,42 24,46 C16,42 8,34 8,24 L8,10 Z",
   },
 ];

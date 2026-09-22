@@ -1,0 +1,176 @@
+---
+/**
+ * LogoScrollTraveler — Acompañante de viaje lateral que materializa:
+ * "y al hacer scroll como si se encontrara va viajando hasta la siguiente sección."
+ *
+ * - Fondo completo en GRIS: el isotipo viaja junto al usuario por las 4 secciones.
+ * - Conforme el scroll avanza, el isotipo "encuentra" cada pieza y la enciende
+ *   en su color oficial mientras viaja verticalmente de sección en sección.
+ */
+---
+
+<aside
+  id="logo-scroll-traveler"
+  class="fixed left-5 xl:left-8 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center opacity-0 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] select-none"
+  aria-label="Progreso del viaje Liiot"
+>
+  {/* Isotipo viajero que va armándose pieza a pieza */}
+  <div class="traveler-mark-stage relative size-9 sm:size-10 transition-transform duration-300 hover:scale-110 pointer-events-auto">
+    <svg
+      viewBox="0 0 48 48"
+      class="h-full w-full overflow-visible"
+      aria-hidden="true"
+    >
+      {/* 4 piezas base en gris */}
+      <path
+        id="traveler-p1"
+        d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+        class="traveler-piece traveler-piece--grey"
+      />
+      <path
+        id="traveler-p2"
+        d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
+        class="traveler-piece traveler-piece--grey"
+      />
+      <path
+        id="traveler-p3"
+        d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
+        class="traveler-piece traveler-piece--grey"
+      />
+      <path
+        id="traveler-p4"
+        d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
+        class="traveler-piece traveler-piece--grey"
+      />
+    </svg>
+  </div>
+
+  {/* Riel con 4 estaciones de viaje */}
+  <div class="traveler-rail relative flex flex-col items-center mt-4 pointer-events-auto">
+    {/* Línea base */}
+    <div class="traveler-track w-[2px] h-32 bg-border/40 rounded-full overflow-hidden">
+      {/* Relleno dinámico según el scroll */}
+      <div id="traveler-track-fill" class="w-full bg-gradient-to-b from-primary-high via-accent to-brand-yellow transition-all duration-300 h-0"></div>
+    </div>
+
+    {/* 4 Puntos de escala */}
+    <div class="absolute inset-0 flex flex-col justify-between items-center py-0.5">
+      <a
+        href="#el-reto"
+        class="traveler-station group flex items-center justify-center size-3 rounded-full border border-border bg-background transition-all hover:scale-125"
+        data-station="1"
+        aria-label="Ir a sección 1: El reto"
+      >
+        <span class="sr-only">01 El reto</span>
+        <span class="station-dot size-1.5 rounded-full transition-colors bg-muted-foreground/40"></span>
+      </a>
+
+      <a
+        href="#como-trabajamos"
+        class="traveler-station group flex items-center justify-center size-3 rounded-full border border-border bg-background transition-all hover:scale-125"
+        data-station="2"
+        aria-label="Ir a sección 2: Cómo trabajamos"
+      >
+        <span class="sr-only">02 Método</span>
+        <span class="station-dot size-1.5 rounded-full transition-colors bg-muted-foreground/40"></span>
+      </a>
+
+      <a
+        href="#proyectos"
+        class="traveler-station group flex items-center justify-center size-3 rounded-full border border-border bg-background transition-all hover:scale-125"
+        data-station="3"
+        aria-label="Ir a sección 3: Proyectos"
+      >
+        <span class="sr-only">03 Logros</span>
+        <span class="station-dot size-1.5 rounded-full transition-colors bg-muted-foreground/40"></span>
+      </a>
+
+      <a
+        href="#equipo"
+        class="traveler-station group flex items-center justify-center size-3 rounded-full border border-border bg-background transition-all hover:scale-125"
+        data-station="4"
+        aria-label="Ir a sección 4: Equipo"
+      >
+        <span class="sr-only">04 Equipo</span>
+        <span class="station-dot size-1.5 rounded-full transition-colors bg-muted-foreground/40"></span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<style>
+  .traveler-piece {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      fill 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      filter 450ms ease;
+  }
+
+  .traveler-piece--grey {
+    fill: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+  }
+  :global(.light) .traveler-piece--grey {
+    fill: rgba(11, 7, 16, 0.16);
+  }
+
+  .traveler-piece--p1-active {
+    fill: var(--primary-high) !important;
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px var(--primary-high));
+  }
+
+  .traveler-piece--p2-active {
+    fill: var(--accent) !important;
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px var(--accent));
+  }
+
+  .traveler-piece--p3-active {
+    fill: var(--brand-pink) !important;
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px var(--brand-pink));
+  }
+
+  .traveler-piece--p4-active {
+    fill: var(--brand-yellow) !important;
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px var(--brand-yellow));
+  }
+
+  /* Estado completado */
+  .is-traveler-complete .traveler-mark-stage {
+    animation: travelerPulse 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes travelerPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); filter: drop-shadow(0 0 12px var(--brand-yellow)); }
+  }
+
+  /* Estaciones activas */
+  .traveler-station.is-active {
+    border-color: currentColor;
+    transform: scale(1.2);
+  }
+  .traveler-station.is-active[data-station="1"] .station-dot {
+    background-color: var(--primary-high);
+  }
+  .traveler-station.is-active[data-station="2"] .station-dot {
+    background-color: var(--accent);
+  }
+  .traveler-station.is-active[data-station="3"] .station-dot {
+    background-color: var(--brand-pink);
+  }
+  .traveler-station.is-active[data-station="4"] .station-dot {
+    background-color: var(--brand-yellow);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #logo-scroll-traveler {
+      display: none !important;
+    }
+  }
+</style>

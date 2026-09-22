@@ -20,7 +20,7 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
   class="relative flex h-screen min-h-[680px] items-end overflow-hidden bg-background"
 >
   {/* Fondo — la foto se ve completa; solo una viñeta local sostiene el texto */}
-  <div id="hero-bg" class="absolute inset-0 opacity-0">
+  <div id="hero-bg" class="absolute inset-0">
     <img
       src={unsplashResize(HERO_IMAGE, 1536, 65)}
       srcset={unsplashSrcSet(HERO_IMAGE, HERO_IMAGE_WIDTHS, 65)}
@@ -49,7 +49,7 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     {/* Titular interactivo con tipografía cinética suave y líneas estables anti-shift */}
     <h1
       id="hero-title"
-      class="headline-editorial hero-kinetic-title max-w-5xl translate-y-8 text-[clamp(2.1rem,9.6vw,6.4rem)] leading-[0.98] text-foreground opacity-0 sm:text-[clamp(3.2rem,8.2vw,6.5rem)] lg:text-[clamp(4rem,6.8vw,6.8rem)]"
+      class="headline-editorial hero-kinetic-title max-w-5xl text-[clamp(2.1rem,9.6vw,6.4rem)] leading-[0.98] text-foreground sm:text-[clamp(3.2rem,8.2vw,6.5rem)] lg:text-[clamp(4rem,6.8vw,6.8rem)]"
     >
       <span class="title-line block whitespace-nowrap">
         <button
@@ -92,13 +92,13 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 
     <p
       id="hero-body"
-      class="mt-9 max-w-md translate-y-4 text-sm font-medium leading-relaxed text-muted-foreground opacity-0 sm:text-base"
+      class="mt-9 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base"
     >
       Creamos tecnología que une personas, genera confianza y hace que el
       día a día funcione mejor. Somos una empresa colombiana joven y seria.
     </p>
 
-    <div id="hero-cta" class="mt-12 flex translate-y-4 flex-wrap items-center gap-x-8 gap-y-5 opacity-0">
+    <div id="hero-cta" class="mt-12 flex flex-wrap items-center gap-x-8 gap-y-5">
       <a
         href={LIIOT_CALENDLY_URL}
         target="_blank"

@@ -5,21 +5,16 @@
 import { Linkedin } from "lucide-astro";
 import { TEAM_MEMBERS } from "@/constants/team";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
+import LogoPieceHeading from "@/components/ui/LogoPieceHeading.astro";
 
 const PHOTO_WIDTHS = [400, 700];
 ---
 
 <section id="equipo" class="relative overflow-hidden bg-surface-secondary py-28 lg:py-36">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div id="team-header" class="mb-16 flex items-start gap-4 sm:gap-6 max-w-2xl translate-y-6 opacity-0 lg:mb-20">
-      {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
-      <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
-        <span class="size-2 rounded-full bg-primary-high mb-3"></span>
-        <span class="section-eyebrow-vertical">
-          El equipo
-        </span>
-        <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
-      </div>
+    <div id="team-header" class="mb-16 flex items-start gap-4 sm:gap-6 max-w-2xl lg:mb-20">
+      {/* Pieza 4 del isotipo Liiot (construcción final del isotipo completo) */}
+      <LogoPieceHeading step={4} />
 
       <div>
         <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
@@ -39,7 +34,7 @@ const PHOTO_WIDTHS = [400, 700];
             href={member.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            class="js-team-card group block translate-y-6 opacity-0"
+            class="js-team-card group block"
           >
             <div class="media-duotone media-duotone-reveal team-photo relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
               <img

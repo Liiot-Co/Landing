@@ -18,6 +18,7 @@
 import { PORTFOLIO_PROJECTS } from "@/constants/portfolio";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-astro";
+import LogoPieceHeading from "@/components/ui/LogoPieceHeading.astro";
 
 const PROJECT_IMAGE_WIDTHS = [480, 800, 1100];
 ---
@@ -26,15 +27,9 @@ const PROJECT_IMAGE_WIDTHS = [480, 800, 1100];
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     {/* Encabezado: "Qué hicimos" (sin eyebrows) */}
     <div class="mb-10 lg:mb-14">
-      <div id="portfolio-header" class="flex items-start gap-4 sm:gap-6 max-w-xl translate-y-6 opacity-0">
-        {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
-        <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
-          <span class="size-2 rounded-full bg-accent mb-3"></span>
-          <span class="section-eyebrow-vertical">
-            Proyectos
-          </span>
-          <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
-        </div>
+      <div id="portfolio-header" class="flex items-start gap-4 sm:gap-6 max-w-xl">
+        {/* Pieza 3 del isotipo Liiot (construcción progresiva al scrollear) */}
+        <LogoPieceHeading step={3} />
 
         <div>
           <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">

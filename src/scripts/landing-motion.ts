@@ -26,17 +26,26 @@ const INIT_ATTR = "data-landing-motion-init";
 /** Standard "fade up" reveal — the one entrance pattern used sitewide. */
 function reveal(selector: string, delay = 0, fast = false) {
   const preset = fast ? motionEnterFast : motionEnter;
-  gsap.to(selector, { opacity: 1, y: 0, duration: preset.duration, delay, ease: preset.ease });
+  gsap.fromTo(
+    selector,
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: preset.duration, delay, ease: preset.ease, overwrite: "auto" }
+  );
 }
 
 function revealGroup(elements: NodeListOf<Element> | Element[], each = 0.1) {
-  gsap.to(elements, {
-    opacity: 1,
-    y: 0,
-    duration: motionEnter.duration,
-    ease: motionEnter.ease,
-    stagger: staggerFromStart(each),
-  });
+  gsap.fromTo(
+    elements,
+    { opacity: 0, y: 20 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: motionEnter.duration,
+      ease: motionEnter.ease,
+      stagger: staggerFromStart(each),
+      overwrite: "auto",
+    }
+  );
 }
 
 /** Fires `run` once, the first time `trigger` scrolls to `start` — the ScrollTrigger take on Motion's `inView`. */
@@ -46,10 +55,23 @@ function onSectionEnter(trigger: string, start: string, run: (element: Element) 
     start,
     once: true,
     onEnter: (self) => run(self.trigger as Element),
+    onRefresh: (self) => {
+      if (self.progress > 0) run(self.trigger as Element);
+    },
   });
 }
 
+/** Activates progressive piece build for the given section header. */
+function buildLogoPiece(headerSelector: string) {
+  const step = document.querySelector<HTMLElement>(`${headerSelector} .logo-build-step`);
+  if (step) step.classList.add("is-built");
+}
+
 function applyReducedMotionStates() {
+  document.querySelectorAll<HTMLElement>(".logo-build-step").forEach((el) => {
+    el.classList.add("is-built");
+  });
+
   const setBulk = (selector: string, styles: Record<string, string>) => {
     document.querySelectorAll<HTMLElement>(selector).forEach((el) => {
       Object.assign(el.style, styles);
@@ -82,10 +104,9 @@ function applyReducedMotionStates() {
 }
 
 function setupHero() {
-  reveal("#hero-bg", 0);
-  reveal("#hero-title", 0.28);
-  reveal("#hero-body", 0.46, true);
-  reveal("#hero-cta", 0.58, true);
+  reveal("#hero-title", 0.1);
+  reveal("#hero-body", 0.25, true);
+  reveal("#hero-cta", 0.35, true);
 }
 
 /**
@@ -127,6 +148,7 @@ function setupStory() {
     anticipatePin: 1,
     onEnter: () => {
       reveal("#villain-header");
+      buildLogoPiece("#villain-header");
       revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
       reveal("#villain-pivot", 0.3, true);
       reveal("#story-bridge", 0.5, true);
@@ -162,12 +184,16 @@ function setupStory() {
 }
 
 function setupHowWeWork() {
-  onSectionEnter("#como-trabajamos", triggerStart.section, () => reveal("#how-header"));
+  onSectionEnter("#como-trabajamos", triggerStart.section, () => {
+    reveal("#how-header");
+    buildLogoPiece("#how-header");
+  });
 }
 
 function setupPortfolio() {
   onSectionEnter("#proyectos", triggerStart.section, (element) => {
     reveal("#portfolio-header");
+    buildLogoPiece("#portfolio-header");
     revealGroup(element.querySelectorAll(".js-portfolio-item"), 0.15);
   });
 }
@@ -175,6 +201,7 @@ function setupPortfolio() {
 function setupTeam() {
   onSectionEnter("#equipo", triggerStart.section, (element) => {
     reveal("#team-header");
+    buildLogoPiece("#team-header");
     revealGroup(element.querySelectorAll(".js-team-card"), 0.1);
   });
 }
@@ -185,6 +212,98 @@ function setupFinalCta() {
 
 function setupFooter() {
   onSectionEnter("#footer-mark", triggerStart.footer, () => reveal("#footer-mark"));
+}
+
+function setupLogoScrollTraveler() {
+  const traveler = document.getElementById("logo-scroll-traveler");
+  if (!traveler) return;
+
+  const p1 = document.getElementById("traveler-p1");
+  const p2 = document.getElementById("traveler-p2");
+  const p3 = document.getElementById("traveler-p3");
+  const p4 = document.getElementById("traveler-p4");
+  const trackFill = document.getElementById("traveler-track-fill");
+  const stations = traveler.querySelectorAll<HTMLElement>(".traveler-station");
+
+  const storyStage = document.getElementById("story-stage");
+  const teamSection = document.getElementById("equipo");
+  if (!storyStage || !teamSection) return;
+
+  // Aparece al entrar a OurStory y se oculta al salir de Team
+  ScrollTrigger.create({
+    trigger: storyStage,
+    start: "top 60%",
+    endTrigger: teamSection,
+    end: "bottom 30%",
+    onEnter: () => {
+      traveler.style.opacity = "1";
+      traveler.style.pointerEvents = "auto";
+    },
+    onLeave: () => {
+      traveler.style.opacity = "0";
+      traveler.style.pointerEvents = "none";
+    },
+    onEnterBack: () => {
+      traveler.style.opacity = "1";
+      traveler.style.pointerEvents = "auto";
+    },
+    onLeaveBack: () => {
+      traveler.style.opacity = "0";
+      traveler.style.pointerEvents = "none";
+    },
+  });
+
+  const setStepState = (step: number) => {
+    p1?.classList.toggle("traveler-piece--p1-active", step >= 1);
+    p2?.classList.toggle("traveler-piece--p2-active", step >= 2);
+    p3?.classList.toggle("traveler-piece--p3-active", step >= 3);
+    p4?.classList.toggle("traveler-piece--p4-active", step >= 4);
+
+    traveler.classList.toggle("is-traveler-complete", step >= 4);
+
+    stations.forEach((st) => {
+      const sNum = parseInt(st.getAttribute("data-station") || "0", 10);
+      st.classList.toggle("is-active", sNum <= step);
+    });
+
+    if (trackFill) {
+      const pct = Math.max(0, Math.min(100, ((step - 1) / 3) * 100));
+      trackFill.style.height = `${pct}%`;
+    }
+  };
+
+  // Triggers por sección para encender cada pieza a medida que se viaja
+  ScrollTrigger.create({
+    trigger: "#story-reto",
+    start: "top 80%",
+    end: "bottom 20%",
+    onEnter: () => setStepState(1),
+    onEnterBack: () => setStepState(1),
+  });
+
+  ScrollTrigger.create({
+    trigger: "#como-trabajamos",
+    start: "top 75%",
+    end: "bottom 25%",
+    onEnter: () => setStepState(2),
+    onEnterBack: () => setStepState(2),
+  });
+
+  ScrollTrigger.create({
+    trigger: "#proyectos",
+    start: "top 75%",
+    end: "bottom 25%",
+    onEnter: () => setStepState(3),
+    onEnterBack: () => setStepState(3),
+  });
+
+  ScrollTrigger.create({
+    trigger: "#equipo",
+    start: "top 75%",
+    end: "bottom 25%",
+    onEnter: () => setStepState(4),
+    onEnterBack: () => setStepState(4),
+  });
 }
 
 /**
@@ -220,8 +339,8 @@ function setupSmoothAnchors() {
 }
 
 function init() {
-  if (document.body.getAttribute(INIT_ATTR) === "1") return;
-  document.body.setAttribute(INIT_ATTR, "1");
+  // Limpiar instancias previas de ScrollTrigger para soportar HMR y reloads sin bloquearse
+  ScrollTrigger.getAll().forEach((t) => t.kill());
 
   setupSmoothAnchors();
 
@@ -237,9 +356,11 @@ function init() {
   setupTeam();
   setupFinalCta();
   setupFooter();
+  setupLogoScrollTraveler();
 
   // Late-loading media (hero photo, portfolio images) can shift section
   // offsets after ScrollTrigger has already measured them.
+  ScrollTrigger.refresh();
   window.addEventListener("load", () => ScrollTrigger.refresh());
 }
 
@@ -248,4 +369,11 @@ if (document.readyState === "complete" || document.readyState === "interactive")
   init();
 } else {
   document.addEventListener("DOMContentLoaded", init);
+}
+
+// Resiliencia para HMR en Vite durante desarrollo
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    init();
+  });
 }

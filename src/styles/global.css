@@ -37,9 +37,15 @@ body {
   --accent-light: #FF8A5C;
   --accent-foreground: #0B0710;
 
-  /* Acentos decorativos — brandbook §Color: amarillo (informativo), rosa (emocional) */
-  --brand-yellow: #FFC300;
-  --brand-pink: #FF4D6D;
+  /* Acentos decorativos — brandbook §Color & design system: amarillo (#e2b31c), rosa (#e04b66) */
+  --brand-yellow: #e2b31c;
+  --brand-pink: #e04b66;
+  --color-yellow: #e2b31c;
+  --color-pink: #e04b66;
+  --dt-color-yellow: #e2b31c;
+  --dt-color-pink: #e04b66;
+  --status-warning: #e2b31c;
+  --status-error: #e04b66;
 
   --secondary: #F0EDE8;
   --secondary-foreground: #0B0710;
@@ -47,7 +53,7 @@ body {
   --muted: #F0EDE8;
   --muted-foreground: rgba(11, 7, 16, 0.55);
 
-  --destructive: #FF4D6D;
+  --destructive: #e04b66;
   --destructive-foreground: #FFFFFF;
 
   --border: rgba(11, 7, 16, 0.08);
@@ -56,8 +62,8 @@ body {
 
   --chart-1: #5A228B;
   --chart-2: #FF6A33;
-  --chart-3: #FFC300;
-  --chart-4: #FF4D6D;
+  --chart-3: #e2b31c;
+  --chart-4: #e04b66;
   --chart-5: #8B45CC;
 
   --sidebar: #F0EDE8;
@@ -99,8 +105,14 @@ body {
   --accent-light: #FF8A5C;
   --accent-foreground: #07040F;
 
-  --brand-yellow: #FFC300;
-  --brand-pink: #FF4D6D;
+  --brand-yellow: #e2b31c;
+  --brand-pink: #e04b66;
+  --color-yellow: #e2b31c;
+  --color-pink: #e04b66;
+  --dt-color-yellow: #e2b31c;
+  --dt-color-pink: #e04b66;
+  --status-warning: #e2b31c;
+  --status-error: #e04b66;
 
   --secondary: #241C38;
   --secondary-foreground: #FFFFFF;
@@ -108,7 +120,7 @@ body {
   --muted: #241C38;
   --muted-foreground: rgba(255, 255, 255, 0.55);
 
-  --destructive: #FF4D6D;
+  --destructive: #e04b66;
   --destructive-foreground: #FFFFFF;
 
   --border: rgba(255, 255, 255, 0.08);
@@ -117,8 +129,8 @@ body {
 
   --chart-1: #8B45CC;
   --chart-2: #FF6A33;
-  --chart-3: #FFC300;
-  --chart-4: #FF4D6D;
+  --chart-3: #e2b31c;
+  --chart-4: #e04b66;
   --chart-5: #5A228B;
 
   --sidebar: #0F0A1A;
@@ -159,6 +171,10 @@ body {
   --color-accent-foreground: var(--accent-foreground);
   --color-brand-yellow: var(--brand-yellow);
   --color-brand-pink: var(--brand-pink);
+  --color-yellow: var(--color-yellow);
+  --color-pink: var(--color-pink);
+  --color-status-warning: var(--status-warning);
+  --color-status-error: var(--status-error);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);

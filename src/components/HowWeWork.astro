@@ -21,6 +21,7 @@ import {
   Sprout,
 } from "lucide-astro";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
+import LogoPieceHeading from "@/components/ui/LogoPieceHeading.astro";
 
 const STEP_IMAGE_WIDTHS = [480, 800, 1100];
 
@@ -91,15 +92,9 @@ const steps = [
 <section id="como-trabajamos" class="relative bg-surface-secondary py-24 lg:py-32">
   <div class="container relative mx-auto px-4 sm:px-6 lg:px-8">
     {/* Encabezado editorial con eyebrow vertical lateral */}
-    <div id="how-header" class="mb-12 flex items-start gap-4 sm:gap-6 translate-y-6 opacity-0 lg:mb-16">
-      {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
-      <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
-        <span class="size-2 rounded-full bg-accent mb-3"></span>
-        <span class="section-eyebrow-vertical">
-          Nuestro método
-        </span>
-        <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
-      </div>
+    <div id="how-header" class="mb-12 flex items-start gap-4 sm:gap-6 lg:mb-16">
+      {/* Pieza 2 del isotipo Liiot (construcción progresiva al scrollear) */}
+      <LogoPieceHeading step={2} />
 
       <div class="max-w-2xl">
         <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
