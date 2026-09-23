@@ -79,7 +79,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
     {/* PANEL 1 — El reto: la fricción que el visitante ya conoce */}
     <div
       id="story-reto"
-      class="story-layer story-layer--reto relative z-[1] flex items-center overflow-hidden bg-background py-24 lg:py-16"
+      class="story-layer story-layer--reto relative z-[1] flex items-center overflow-hidden bg-background py-12 sm:py-16 lg:py-16"
     >
       <span class="story-folio absolute right-4 top-4 lg:right-8 lg:top-8" aria-hidden="true">01</span>
 
@@ -147,7 +147,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
         Recortada con un clip-path diagonal que el scroll abre sobre el panel 1. */}
     <div
       id="por-que-existimos"
-      class="story-layer story-layer--filosofia relative z-[2] flex items-center overflow-hidden bg-surface-elevated py-24 lg:py-16"
+      class="story-layer story-layer--filosofia relative z-[2] flex items-center overflow-hidden bg-surface-elevated py-12 sm:py-16 lg:py-16"
     >
       <div id="story-mesh" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
       <div id="story-mesh-scrim" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
@@ -282,7 +282,8 @@ const words = PHILOSOPHY_TEXT.split(" ");
 
     .story-stage.is-cinematic .story-layer {
       align-items: flex-start;
-      padding-top: 4.5rem;
+      padding-top: 3.5rem;
+      padding-bottom: 2rem;
     }
   }
 

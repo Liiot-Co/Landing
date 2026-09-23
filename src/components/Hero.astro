@@ -17,7 +17,7 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 
 <section
   id="hero"
-  class="relative flex h-screen min-h-[680px] items-end overflow-hidden bg-background"
+  class="relative flex h-screen min-h-[580px] sm:min-h-[680px] items-end overflow-hidden bg-background"
 >
   {/* Fondo — la foto se ve completa; con skeleton shimmer loader y LQIP para LCP óptimo */}
   <div id="hero-bg" class="absolute inset-0 bg-[#07040F] overflow-hidden">
@@ -65,7 +65,7 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     <MorphGradient recipe="hybrid" blend="soft-light" opacity={0.20} />
   </div>
 
-  <div class="container relative z-10 mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
+  <div class="container relative z-10 mx-auto px-4 pb-12 sm:px-6 sm:pb-20 lg:px-8 lg:pb-28">
     {/* Titular interactivo con tipografía cinética suave y líneas estables anti-shift */}
     <h1
       id="hero-title"

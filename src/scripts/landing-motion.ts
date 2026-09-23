@@ -127,14 +127,17 @@ function setupStory() {
 
   stage.classList.add("is-cinematic");
 
-  const SKEW = 14; // total diagonal spread (percentage points) between the top and bottom edge
+  const isMobile = window.innerWidth < 768;
+  const SKEW = isMobile ? 8 : 14;
   let philRevealed = false;
 
   ScrollTrigger.create({
     trigger: stage,
     start: "top top",
-    end: "+=140%",
-    scrub: 0.4,
+    // En móviles: pin de sólo +55% (un swipe natural de pulgar) en lugar de +140%
+    end: isMobile ? "+=55%" : "+=90%",
+    // Scrub más reactivo en móviles (0.18s) para respuesta táctil instantánea sin lag
+    scrub: isMobile ? 0.18 : 0.35,
     pin: true,
     anticipatePin: 1,
     onEnter: () => {
@@ -144,13 +147,18 @@ function setupStory() {
       reveal("#story-bridge", 0.5, true);
     },
     onUpdate: (self) => {
-      const center = 100 + SKEW / 2 - self.progress * (200 + SKEW);
-      const top = Math.min(100, center + SKEW / 2);
-      const bottom = Math.min(100, center - SKEW / 2);
+      // Interpolación lineal proporcional en todo el progreso:
+      // Cuando progress va de 0 a 1, la cortina viaja exactamente de 100% a 0%
+      // Eliminando el tiempo muerto donde la pantalla quedaba congelada
+      const center = (100 + SKEW) - self.progress * (100 + SKEW * 2);
+      const top = Math.max(0, Math.min(100, center));
+      const bottom = Math.max(0, Math.min(100, center - SKEW));
       filosofia.style.setProperty("--wipe-top", `${top}%`);
       filosofia.style.setProperty("--wipe-bottom", `${bottom}%`);
 
-      if (!philRevealed && self.progress > 0.52) {
+      // En móviles revelamos el texto desde el 20% de avance para feedback visual inmediato
+      const threshold = isMobile ? 0.20 : 0.38;
+      if (!philRevealed && self.progress > threshold) {
         philRevealed = true;
         gsap.fromTo(
           filosofia.querySelectorAll(".js-phil-word"),
@@ -162,7 +170,7 @@ function setupStory() {
             scale: 1,
             duration: 0.8,
             ease: motionEnter.ease,
-            stagger: staggerFromStart(0.05),
+            stagger: staggerFromStart(0.04),
             onComplete: function () {
               gsap.set(filosofia.querySelectorAll(".js-phil-word"), { willChange: "auto" });
             },
