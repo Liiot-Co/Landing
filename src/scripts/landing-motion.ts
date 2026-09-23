@@ -75,7 +75,7 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark",
+    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #bg-piece-how, #bg-piece-portfolio, #bg-piece-team, #bg-piece-final",
     { opacity: "1", transform: "translateY(0px)" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
@@ -201,117 +201,102 @@ function setupFooter() {
   onSectionEnter("#footer-mark", triggerStart.footer, () => reveal("#footer-mark"));
 }
 
-function setupLogoConvergence() {
-  const container = document.getElementById("logo-scroll-convergence");
-  const p1 = document.getElementById("convergence-piece-1");
-  const p2 = document.getElementById("convergence-piece-2");
-  const p3 = document.getElementById("convergence-piece-3");
-  const p4 = document.getElementById("convergence-piece-4");
-  const section3 = document.getElementById("como-trabajamos");
-  const finalCta = document.getElementById("agendar");
+function setupSectionBackgroundParallax() {
+  const pHow = document.getElementById("bg-piece-how");
+  const pPort = document.getElementById("bg-piece-portfolio");
+  const pTeam = document.getElementById("bg-piece-team");
+  const pFinal = document.getElementById("bg-piece-final");
+
+  // Sección 3: "Cómo trabajamos" (Pieza 1) — Parallax asimétrico diagonal en el fondo
+  if (pHow) {
+    gsap.fromTo(
+      pHow,
+      { y: -130, x: 45, rotation: -24 },
+      {
+        y: 150,
+        x: -45,
+        rotation: 12,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#como-trabajamos",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      }
+    );
+  }
+
+  // Sección 4: "Qué hemos logrado" / Proyectos (Pieza 2) — Parallax en cuadrante opuesto
+  if (pPort) {
+    gsap.fromTo(
+      pPort,
+      { y: -150, x: -50, rotation: 30 },
+      {
+        y: 160,
+        x: 40,
+        rotation: -14,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#proyectos",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      }
+    );
+  }
+
+  // Sección 5: "Nuestro equipo" (Pieza 3) — Parallax asimétrico lateral
+  if (pTeam) {
+    gsap.fromTo(
+      pTeam,
+      { y: -120, x: 50, rotation: -36 },
+      {
+        y: 140,
+        x: -35,
+        rotation: 18,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#equipo",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      }
+    );
+  }
+
+  // Sección 6: "Crezcamos juntos" / Final CTA (Pieza 4) — Parallax previo al clímax
+  if (pFinal) {
+    gsap.fromTo(
+      pFinal,
+      { y: -100, x: -40, rotation: 38 },
+      {
+        y: 120,
+        x: 30,
+        rotation: -10,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#agendar",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      }
+    );
+  }
+
+  // Clímax lumínico del logo ensamblado en la tarjeta final
   const finalTarget = document.getElementById("final-logo-target");
-
-  if (!container || !p1 || !p2 || !p3 || !p4 || !section3 || !finalCta) return;
-
-  const paths = container.querySelectorAll<SVGPathElement>(".convergence-path");
-
-  // Generador de coordenadas aleatorias asimétricas y ángulos duros de estética brutalista
-  const angles = [-90, -45, 0, 45, 90];
-  const pickAngle = () => angles[Math.floor(Math.random() * angles.length)];
-  const rand = (min: number, max: number) => +(min + Math.random() * (max - min)).toFixed(1);
-
-  // Cuadrantes de margen para garantizar dispersión sin pisar el texto central
-  const p1X = rand(-38, -22);
-  const p1Y = rand(-32, -14);
-  const p1Rot = pickAngle();
-
-  const p2X = rand(22, 38);
-  const p2Y = rand(-30, -12);
-  const p2Rot = pickAngle();
-
-  const p3X = rand(-36, -20);
-  const p3Y = rand(12, 30);
-  const p3Rot = pickAngle();
-
-  const p4X = rand(20, 36);
-  const p4Y = rand(14, 32);
-  const p4Rot = pickAngle();
-
-  // Color opaco inicial: gris cemento / carbón mate (#4A4A4D)
-  gsap.set(paths, { fill: "#4A4A4D" });
-
-  // Posiciones aleatorias iniciales dispersas
-  gsap.set(p1, { x: `${p1X}vw`, y: `${p1Y}vh`, rotation: p1Rot, scale: 0.85, opacity: 0 });
-  gsap.set(p2, { x: `${p2X}vw`, y: `${p2Y}vh`, rotation: p2Rot, scale: 0.85, opacity: 0 });
-  gsap.set(p3, { x: `${p3X}vw`, y: `${p3Y}vh`, rotation: p3Rot, scale: 0.85, opacity: 0 });
-  gsap.set(p4, { x: `${p4X}vw`, y: `${p4Y}vh`, rotation: p4Rot, scale: 0.85, opacity: 0 });
-
-  // Visibilidad: inicia en la Sección 3 ("Cómo trabajamos"). Hero e Historia permanecen limpios.
-  ScrollTrigger.create({
-    trigger: section3,
-    start: "top 75%",
-    endTrigger: finalCta,
-    end: "bottom 15%",
-    onEnter: () => gsap.to(container, { opacity: 1, duration: 0.35, ease: "power2.out" }),
-    onLeaveBack: () => gsap.to(container, { opacity: 0, duration: 0.3, ease: "power2.in" }),
-    onLeave: () => gsap.to(container, { opacity: 0, duration: 0.3, ease: "power2.in" }),
-    onEnterBack: () => gsap.to(container, { opacity: 1, duration: 0.35, ease: "power2.out" }),
-  });
-
-  // Timeline scrubbed desde Sección 3 hasta el centro de FinalCTA
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: section3,
-      start: "top 65%",
-      endTrigger: finalCta,
-      end: "center 52%",
-      scrub: 1.0,
-    },
-  });
-
-  // Sección 3: Revelación de las piezas opacas en sus posiciones aleatorias
-  tl.to([p1, p2, p3, p4], { opacity: 0.95, duration: 0.12, ease: "none" }, 0);
-
-  // Secciones 4 ("Qué hemos logrado" / Proyectos) y 5 ("Equipo"):
-  // Desplazamiento asimétrico mecánico continuo descendiendo con el scroll
-  tl.to(p1, { x: `${(p1X * 0.6).toFixed(1)}vw`, y: `${(p1Y * 0.65).toFixed(1)}vh`, rotation: p1Rot * 0.5, duration: 0.55, ease: "none" }, 0.12)
-    .to(p2, { x: `${(p2X * 0.6).toFixed(1)}vw`, y: `${(p2Y * 0.65).toFixed(1)}vh`, rotation: p2Rot * 0.5, duration: 0.55, ease: "none" }, 0.12)
-    .to(p3, { x: `${(p3X * 0.6).toFixed(1)}vw`, y: `${(p3Y * 0.65).toFixed(1)}vh`, rotation: p3Rot * 0.5, duration: 0.55, ease: "none" }, 0.12)
-    .to(p4, { x: `${(p4X * 0.6).toFixed(1)}vw`, y: `${(p4Y * 0.65).toFixed(1)}vh`, rotation: p4Rot * 0.5, duration: 0.55, ease: "none" }, 0.12);
-
-  // Clímax mecánico brutalista en Sección Final (#agendar):
-  // Convergencia física hacia (0, 0), rotación a 0° y mutación a blanco sólido (#FFFFFF)
-  tl.to(
-    [p1, p2, p3, p4],
-    {
-      x: 0,
-      y: 0,
-      rotation: 0,
-      scale: 1,
-      opacity: 1,
-      duration: 0.25,
-      ease: "power3.out",
-    },
-    0.72
-  );
-
-  tl.to(
-    paths,
-    {
-      fill: "#FFFFFF",
-      duration: 0.2,
-      ease: "power2.out",
-    },
-    0.75
-  );
-
-  // Celebración lumínica al llegar al destino final
-  ScrollTrigger.create({
-    trigger: finalCta,
-    start: "top 60%",
-    onEnter: () => finalTarget?.classList.add("is-converged"),
-    onLeaveBack: () => finalTarget?.classList.remove("is-converged"),
-  });
+  if (finalTarget) {
+    ScrollTrigger.create({
+      trigger: "#agendar",
+      start: "top 60%",
+      onEnter: () => finalTarget.classList.add("is-converged"),
+      onLeaveBack: () => finalTarget.classList.remove("is-converged"),
+    });
+  }
 }
 
 /**
@@ -364,7 +349,7 @@ function init() {
   setupTeam();
   setupFinalCta();
   setupFooter();
-  setupLogoConvergence();
+  setupSectionBackgroundParallax();
 
   // Late-loading media (hero photo, portfolio images) can shift section
   // offsets after ScrollTrigger has already measured them.
