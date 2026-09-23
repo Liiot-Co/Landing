@@ -304,57 +304,85 @@ body {
     @apply font-bold tracking-tighter leading-[0.95];
   }
 
-  /* Botón físico — degradado vertical sutil + luz interior arriba / sombra abajo,
-     como un botón con volumen real. Reemplaza el barrido diagonal brillante. */
+  /* ════════════════════════════════════════════════════════════════════
+     BOTONES NEO-BRUTALISTAS EDITORIALES
+     Plano sin relieve 3D ni biseles, bordes definidos nítidos (2px),
+     tipografía limpia y micro-interacción mecánica con sombra sólida dura
+     (offset puro sin desenfoque).
+     ════════════════════════════════════════════════════════════════════ */
+  .btn-editorial,
   .btn-physical {
-    @apply relative isolate font-bold border-0;
+    @apply relative isolate font-bold tracking-[0.1em] uppercase select-none;
+    border-radius: 10px;
+    border-width: 2px;
+    border-style: solid;
+    will-change: transform, box-shadow;
     transition:
-      transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
-      filter 200ms cubic-bezier(0.4, 0, 0.2, 1);
+      transform 140ms cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 140ms cubic-bezier(0.2, 0, 0, 1),
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease;
   }
 
+  .btn-editorial:hover,
   .btn-physical:hover {
-    filter: brightness(1.06);
+    transform: translate(-3px, -3px);
   }
 
+  .btn-editorial:active,
   .btn-physical:active {
-    transform: translateY(1px) scale(0.99);
+    transform: translate(3px, 3px);
   }
 
+  /* Variante Violeta (Hero y 404 sobre fondo oscuro) */
+  .btn-editorial--violet,
   .btn-physical--violet {
-    color: white;
-    background-image: linear-gradient(180deg, color-mix(in oklab, var(--color-primary-high) 90%, white 5%) 0%, var(--color-primary) 30%, color-mix(in oklab, var(--color-primary) 83%, black) 100% );
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.32),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-      0 10px 24px -12px color-mix(in oklab, var(--color-primary) 65%, transparent);
+    background-color: var(--primary);
+    background-image: none !important;
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+    box-shadow: 4px 4px 0px 0px #FFFFFF;
   }
 
+  .btn-editorial--violet:hover,
+  .btn-physical--violet:hover {
+    background-color: #FFFFFF;
+    background-image: none !important;
+    color: #07040F;
+    border-color: #FFFFFF;
+    box-shadow: 7px 7px 0px 0px var(--brand-pink);
+    filter: none;
+  }
+
+  .btn-editorial--violet:active,
   .btn-physical--violet:active {
-    box-shadow:
-      inset 0 1px 3px rgba(0, 0, 0, 0.35),
-      0 4px 10px -6px color-mix(in oklab, var(--color-primary) 55%, transparent);
+    box-shadow: 1px 1px 0px 0px #FFFFFF;
   }
 
+  /* Variante Oscura (Final CTA sobre banner naranja humano) */
+  .btn-editorial--dark,
   .btn-physical--dark {
-    color: white;
-    background-image: linear-gradient(
-      180deg,
-      color-mix(in oklab, #07040f 78%, white 10%) 0%,
-      #07040f 55%,
-      black 100%
-    );
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.5),
-      0 12px 26px -14px rgba(0, 0, 0, 0.65);
+    background-color: #07040F;
+    background-image: none !important;
+    color: #FFFFFF;
+    border-color: #07040F;
+    box-shadow: 4px 4px 0px 0px #07040F;
   }
 
+  .btn-editorial--dark:hover,
+  .btn-physical--dark:hover {
+    background-color: #FFFFFF;
+    background-image: none !important;
+    color: #07040F;
+    border-color: #07040F;
+    box-shadow: 7px 7px 0px 0px #07040F;
+    filter: none;
+  }
+
+  .btn-editorial--dark:active,
   .btn-physical--dark:active {
-    box-shadow:
-      inset 0 1px 3px rgba(0, 0, 0, 0.5),
-      0 4px 10px -6px rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 0px 0px #07040F;
   }
 
   /* Imagen de marca — desatura la foto y le pasa un velo violeta→naranja en blend "color".

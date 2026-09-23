@@ -75,7 +75,7 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #bg-piece-how, #bg-piece-portfolio, #bg-piece-team, #consolidate-p1, #consolidate-p2, #consolidate-p3, #consolidate-p4",
+    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio, #editorial-piece-team, #consolidate-p1, #consolidate-p2, #consolidate-p3, #consolidate-p4",
     { opacity: "1", transform: "none" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
@@ -201,71 +201,47 @@ function setupFooter() {
   onSectionEnter("#footer-mark", triggerStart.footer, () => reveal("#footer-mark"));
 }
 
-function setupSectionBackgroundParallax() {
-  const pHow = document.getElementById("bg-piece-how");
-  const pPort = document.getElementById("bg-piece-portfolio");
-  const pTeam = document.getElementById("bg-piece-team");
-  const pFinal = document.getElementById("bg-piece-final");
+function setupEditorialLogoPieces() {
+  const pieces = [
+    { id: "#editorial-piece-how", trigger: "#como-trabajamos" },
+    { id: "#editorial-piece-portfolio", trigger: "#proyectos" },
+    { id: "#editorial-piece-team", trigger: "#equipo" },
+  ];
 
-  // Sección 3: "Cómo trabajamos" (Pieza 1) — Parallax asimétrico diagonal en el fondo
-  if (pHow) {
+  pieces.forEach(({ id, trigger }) => {
+    const el = document.querySelector<HTMLElement>(id);
+    if (!el) return;
+
+    // Entrada editorial elegante y nítida a la altura del headline
     gsap.fromTo(
-      pHow,
-      { y: -130, x: 45, rotation: -24 },
+      el,
+      { opacity: 0, y: 20, scale: 0.94 },
       {
-        y: 150,
-        x: -45,
-        rotation: 12,
-        ease: "none",
+        opacity: 0.85,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: "power2.out",
         scrollTrigger: {
-          trigger: "#como-trabajamos",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
+          trigger,
+          start: "top 80%",
+          once: true,
         },
       }
     );
-  }
 
-  // Sección 4: "Qué hemos logrado" / Proyectos (Pieza 2) — Parallax en cuadrante opuesto
-  if (pPort) {
-    gsap.fromTo(
-      pPort,
-      { y: -150, x: -50, rotation: 30 },
-      {
-        y: 160,
-        x: 40,
-        rotation: -14,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#proyectos",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      }
-    );
-  }
-
-  // Sección 5: "Nuestro equipo" (Pieza 3) — Parallax asimétrico lateral
-  if (pTeam) {
-    gsap.fromTo(
-      pTeam,
-      { y: -120, x: 50, rotation: -36 },
-      {
-        y: 140,
-        x: -35,
-        rotation: 18,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#equipo",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      }
-    );
-  }
+    // Micro-parallax editorial sutil a lo largo del scroll de la sección
+    gsap.to(el, {
+      y: -14,
+      ease: "none",
+      scrollTrigger: {
+        trigger,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.2,
+      },
+    });
+  });
 }
 
 /**
@@ -371,7 +347,7 @@ function init() {
   setupTeam();
   setupFinalCta();
   setupFooter();
-  setupSectionBackgroundParallax();
+  setupEditorialLogoPieces();
   setupLogoConsolidation();
 
   // Late-loading media (hero photo, portfolio images) can shift section
