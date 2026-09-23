@@ -88,19 +88,20 @@ const steps = [
 ];
 ---
 
-<section id="como-trabajamos" class="relative overflow-hidden bg-surface-secondary py-24 lg:py-32">
-  {/* Figura geométrica monumental de fondo (Pieza 1 de Liiot) */}
-  <div
-    id="bg-piece-how"
-    class="pointer-events-none absolute -right-20 sm:-right-10 lg:right-4 top-1/4 z-0 w-[380px] sm:w-[480px] lg:w-[600px] select-none opacity-15 will-change-transform"
-    aria-hidden="true"
-  >
-    <svg viewBox="0 0 48 48" class="size-full overflow-visible">
-      <path
-        d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
-        fill="#FFFFFF"
-      />
-    </svg>
+<section id="como-trabajamos" class="relative bg-surface-secondary py-24 lg:py-32">
+  {/* Figura geométrica monumental de fondo (Pieza 1 de Liiot) contenida sin romper position:sticky */}
+  <div class="pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
+    <div
+      id="bg-piece-how"
+      class="absolute -right-20 sm:-right-10 lg:right-4 top-1/4 w-[380px] sm:w-[480px] lg:w-[600px] select-none opacity-15 will-change-transform"
+    >
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible">
+        <path
+          d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+          fill="#FFFFFF"
+        />
+      </svg>
+    </div>
   </div>
 
   <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">

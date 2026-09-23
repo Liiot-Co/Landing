@@ -75,8 +75,8 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #bg-piece-how, #bg-piece-portfolio, #bg-piece-team, #bg-piece-final",
-    { opacity: "1", transform: "translateY(0px)" },
+    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #bg-piece-how, #bg-piece-portfolio, #bg-piece-team, #consolidate-p1, #consolidate-p2, #consolidate-p3, #consolidate-p4",
+    { opacity: "1", transform: "none" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
     opacity: "1",
@@ -266,37 +266,59 @@ function setupSectionBackgroundParallax() {
       }
     );
   }
+}
 
-  // Sección 6: "Crezcamos juntos" / Final CTA (Pieza 4) — Parallax previo al clímax
-  if (pFinal) {
-    gsap.fromTo(
-      pFinal,
-      { y: -100, x: -40, rotation: 38 },
-      {
-        y: 120,
-        x: 30,
-        rotation: -10,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#agendar",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      }
-    );
-  }
-
-  // Clímax lumínico del logo ensamblado en la tarjeta final
+/**
+ * Consolidación física del isotipo Liiot en la sección final (#agendar).
+ * Las 4 piezas inician dispersas en los extremos del espacio de la sección,
+ * y al hacer scroll hacia la tarjeta "Crezcamos juntos", convergen
+ * simultáneamente hacia el centro, rotan a 0° y se consolidan en el isotipo completo.
+ */
+function setupLogoConsolidation() {
+  const finalCta = document.getElementById("agendar");
   const finalTarget = document.getElementById("final-logo-target");
-  if (finalTarget) {
-    ScrollTrigger.create({
-      trigger: "#agendar",
-      start: "top 60%",
-      onEnter: () => finalTarget.classList.add("is-converged"),
-      onLeaveBack: () => finalTarget.classList.remove("is-converged"),
-    });
-  }
+  const cp1 = document.getElementById("consolidate-p1");
+  const cp2 = document.getElementById("consolidate-p2");
+  const cp3 = document.getElementById("consolidate-p3");
+  const cp4 = document.getElementById("consolidate-p4");
+
+  if (!finalCta || !finalTarget || !cp1 || !cp2 || !cp3 || !cp4) return;
+
+  // Estado inicial disperso en el espacio del CTA final (piezas grandes y asimétricas)
+  gsap.set(cp1, { x: "-26vw", y: "-16vh", scale: 2.2, rotation: -50, opacity: 0.15 });
+  gsap.set(cp2, { x: "26vw", y: "-14vh", scale: 2.2, rotation: 45, opacity: 0.15 });
+  gsap.set(cp3, { x: "-22vw", y: "15vh", scale: 2.2, rotation: 65, opacity: 0.15 });
+  gsap.set(cp4, { x: "22vw", y: "13vh", scale: 2.2, rotation: -55, opacity: 0.15 });
+
+  // Timeline con scrub: conforme el scroll entra a la sección, las 4 piezas viajan físicamente
+  // y se ensamblan con precisión en el centro exacto (0, 0)
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: finalCta,
+      start: "top 85%",
+      end: "center 52%",
+      scrub: 1.2,
+      onUpdate: (self) => {
+        if (self.progress > 0.9) {
+          finalTarget.classList.add("is-consolidated");
+        } else {
+          finalTarget.classList.remove("is-consolidated");
+        }
+      },
+    },
+  });
+
+  tl.to(
+    [cp1, cp2, cp3, cp4],
+    {
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotation: 0,
+      opacity: 1,
+      ease: "power2.out",
+    }
+  );
 }
 
 /**
@@ -350,6 +372,7 @@ function init() {
   setupFinalCta();
   setupFooter();
   setupSectionBackgroundParallax();
+  setupLogoConsolidation();
 
   // Late-loading media (hero photo, portfolio images) can shift section
   // offsets after ScrollTrigger has already measured them.
