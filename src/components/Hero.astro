@@ -19,18 +19,38 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
   id="hero"
   class="relative flex h-screen min-h-[680px] items-end overflow-hidden bg-background"
 >
-  {/* Fondo — la foto se ve completa; solo una viñeta local sostiene el texto */}
-  <div id="hero-bg" class="absolute inset-0">
+  {/* Fondo — la foto se ve completa; con skeleton shimmer loader y LQIP para LCP óptimo */}
+  <div id="hero-bg" class="absolute inset-0 bg-[#07040F] overflow-hidden">
+    {/* Skeleton / Shimmer loader de alta velocidad mientras descarga la foto */}
+    <div
+      id="hero-image-skeleton"
+      class="hero-skeleton absolute inset-0 transition-opacity duration-700 pointer-events-none"
+      aria-hidden="true"
+    ></div>
+
+    {/* Imagen en ultra-baja resolución (LQIP) para First Meaningful Paint instantáneo */}
     <img
+      src={unsplashResize(HERO_IMAGE, 64, 25)}
+      alt=""
+      aria-hidden="true"
+      class="absolute inset-0 h-full w-full object-cover filter blur-xl scale-110 pointer-events-none opacity-60"
+    />
+
+    {/* Imagen LCP principal de alta resolución con carga progresiva y revelado suave */}
+    <img
+      id="hero-main-img"
       src={unsplashResize(HERO_IMAGE, 1536, 65)}
       srcset={unsplashSrcSet(HERO_IMAGE, HERO_IMAGE_WIDTHS, 65)}
       sizes="100vw"
-      alt=""
-      aria-hidden="true"
-      class="hero-bg-img h-full w-full object-cover"
+      alt="Dos mujeres saltando en la calle con energía creativa"
+      class="hero-bg-img absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 ease-out will-change-transform"
       loading="eager"
       fetchpriority="high"
+      decoding="sync"
+      onload="this.classList.remove('opacity-0'); this.classList.add('opacity-100'); document.getElementById('hero-image-skeleton')?.classList.add('opacity-0');"
+      onerror="this.src='https://images.unsplash.com/photo-1521669246297-b04a27e36f07?w=1200&q=70'; this.classList.remove('opacity-0');"
     />
+
     {/* Radial gradient: matices vibrantes sutiles integrados con el diseño */}
     <div
       class="hero-radial-gradient absolute inset-0 pointer-events-none"
@@ -38,7 +58,7 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     >
     </div>
     <div
-      class="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-background via-background/25 to-transparent"
+      class="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-background via-background/25 to-transparent pointer-events-none"
       aria-hidden="true"
     >
     </div>
@@ -133,13 +153,41 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     </svg>
   </a>
 
-  {/* Crédito de foto — sutil */}
-  <p class="absolute bottom-3 left-4 z-10 text-[10px] text-foreground/30 sm:left-6 lg:left-8">
-    Foto de <a href="https://unsplash.com/es/@heyquilia?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer" class="underline decoration-foreground/20 underline-offset-2 hover:text-foreground/50">Quilia</a> en <a href="https://unsplash.com/es/fotos/dos-mujeres-saltando-en-la-calle-durante-el-dia-87EqZAWN-v8?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer" class="underline decoration-foreground/20 underline-offset-2 hover:text-foreground/50">Unsplash</a>
-  </p>
+  {/* Script inmediato para revelar imagen si ya está en caché del navegador (0ms LCP) */}
+  <script is:inline>
+    (function () {
+      const img = document.getElementById("hero-main-img");
+      if (img && img.complete) {
+        img.classList.remove("opacity-0");
+        img.classList.add("opacity-100");
+        const sk = document.getElementById("hero-image-skeleton");
+        if (sk) sk.classList.add("opacity-0");
+      }
+    })();
+  </script>
 </section>
 
 <style>
+  .hero-skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(15, 9, 28, 0.95) 0%,
+      rgba(42, 22, 68, 0.45) 50%,
+      rgba(15, 9, 28, 0.95) 100%
+    );
+    background-size: 200% 100%;
+    animation: heroShimmer 2.2s ease-in-out infinite;
+  }
+
+  @keyframes heroShimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
   .hero-bg-img {
     animation: hero-slow-scale 20s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
   }
