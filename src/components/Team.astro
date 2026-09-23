@@ -5,26 +5,20 @@
 import { Linkedin } from "lucide-astro";
 import { TEAM_MEMBERS } from "@/constants/team";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
-import LogoPieceHeading from "@/components/ui/LogoPieceHeading.astro";
 
 const PHOTO_WIDTHS = [400, 700];
 ---
 
 <section id="equipo" class="relative overflow-hidden bg-surface-secondary py-28 lg:py-36">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div id="team-header" class="mb-16 flex items-start gap-4 sm:gap-6 max-w-2xl lg:mb-20">
-      {/* Pieza 4 del isotipo Liiot (construcción final del isotipo completo) */}
-      <LogoPieceHeading step={4} />
-
-      <div>
-        <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          Nuestro <span data-annotate="equipo">equipo</span>
-        </h2>
-        <p class="mt-6 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
-          Un equipo pequeño que se conoce, se apoya y construye junto, eso se
-          nota en cada proyecto.
-        </p>
-      </div>
+    <div id="team-header" class="mb-16 max-w-2xl lg:mb-20">
+      <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+        Nuestro <span data-annotate="equipo">equipo</span>
+      </h2>
+      <p class="mt-6 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
+        Un equipo pequeño que se conoce, se apoya y construye junto, eso se
+        nota en cada proyecto.
+      </p>
     </div>
 
     <div class="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-3">

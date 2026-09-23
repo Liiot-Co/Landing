@@ -46,7 +46,6 @@
  */
 import { PHILOSOPHY_TEXT } from "@/lib/philosophy";
 import { unsplashResize } from "@/lib/images";
-import LogoPieceHeading from "@/components/ui/LogoPieceHeading.astro";
 
 /*
  * Sujeto = el lector ("pagaste", "te entregaron", "recibiste"), nunca
@@ -87,20 +86,15 @@ const words = PHILOSOPHY_TEXT.split(" ");
       <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
           <div>
-            <div id="villain-header" class="flex items-start gap-4 sm:gap-6 max-w-3xl">
-              {/* Pieza 1 del isotipo Liiot (construcción progresiva al scrollear) */}
-              <LogoPieceHeading step={1} />
-
-              <div>
-                <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-                  Ya conoces<br /><span class="text-brand-pink" data-annotate="el-reto">esta historia</span>
-                </h2>
-                {/* Nombra la pelea ANTES de la lista — sin esto, una lista de frases
-                    negativas se lee, al escanear, como una descripción de Liiot */}
-                <p class="mt-4 text-base font-bold text-muted-foreground sm:text-lg">
-                  Esto es lo que todos hemos vivido y lo que decidimos cambiar:
-                </p>
-              </div>
+            <div id="villain-header" class="max-w-3xl">
+              <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+                Ya conoces<br /><span class="text-brand-pink" data-annotate="el-reto">esta historia</span>
+              </h2>
+              {/* Nombra la pelea ANTES de la lista — sin esto, una lista de frases
+                  negativas se lee, al escanear, como una descripción de Liiot */}
+              <p class="mt-4 text-base font-bold text-muted-foreground sm:text-lg">
+                Esto es lo que todos hemos vivido y lo que decidimos cambiar:
+              </p>
             </div>
 
             <ul class="mt-8 flex flex-col gap-4 lg:mt-10">

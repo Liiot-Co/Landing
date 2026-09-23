@@ -61,17 +61,8 @@ function onSectionEnter(trigger: string, start: string, run: (element: Element) 
   });
 }
 
-/** Activates progressive piece build for the given section header. */
-function buildLogoPiece(headerSelector: string) {
-  const decorator = document.querySelector<HTMLElement>(`${headerSelector} .headline-piece-decorator`);
-  if (decorator) decorator.classList.add("is-active");
-}
 
 function applyReducedMotionStates() {
-  document.querySelectorAll<HTMLElement>(".logo-build-step").forEach((el) => {
-    el.classList.add("is-built");
-  });
-
   const setBulk = (selector: string, styles: Record<string, string>) => {
     document.querySelectorAll<HTMLElement>(selector).forEach((el) => {
       Object.assign(el.style, styles);
@@ -148,7 +139,6 @@ function setupStory() {
     anticipatePin: 1,
     onEnter: () => {
       reveal("#villain-header");
-      buildLogoPiece("#villain-header");
       revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
       reveal("#villain-pivot", 0.3, true);
       reveal("#story-bridge", 0.5, true);
@@ -186,14 +176,12 @@ function setupStory() {
 function setupHowWeWork() {
   onSectionEnter("#como-trabajamos", triggerStart.section, () => {
     reveal("#how-header");
-    buildLogoPiece("#how-header");
   });
 }
 
 function setupPortfolio() {
   onSectionEnter("#proyectos", triggerStart.section, (element) => {
     reveal("#portfolio-header");
-    buildLogoPiece("#portfolio-header");
     revealGroup(element.querySelectorAll(".js-portfolio-item"), 0.15);
   });
 }
@@ -201,7 +189,6 @@ function setupPortfolio() {
 function setupTeam() {
   onSectionEnter("#equipo", triggerStart.section, (element) => {
     reveal("#team-header");
-    buildLogoPiece("#team-header");
     revealGroup(element.querySelectorAll(".js-team-card"), 0.1);
   });
 }
@@ -214,88 +201,93 @@ function setupFooter() {
   onSectionEnter("#footer-mark", triggerStart.footer, () => reveal("#footer-mark"));
 }
 
-function setupFloatingLogoAssembly() {
-  const stage = document.getElementById("floating-logo-stage");
-  if (!stage) return;
-
-  const p1 = document.getElementById("floating-p1");
-  const p2 = document.getElementById("floating-p2");
-  const p3 = document.getElementById("floating-p3");
-  const p4 = document.getElementById("floating-p4");
-  const counter = document.getElementById("floating-logo-counter");
-
+function setupLogoConvergence() {
+  const container = document.getElementById("logo-scroll-convergence");
+  const p1 = document.getElementById("convergence-piece-1");
+  const p2 = document.getElementById("convergence-piece-2");
+  const p3 = document.getElementById("convergence-piece-3");
+  const p4 = document.getElementById("convergence-piece-4");
   const storyStage = document.getElementById("story-stage");
-  const teamSection = document.getElementById("equipo");
-  if (!storyStage || !teamSection) return;
+  const finalCta = document.getElementById("agendar");
+  const finalTarget = document.getElementById("final-logo-target");
 
-  // Aparece al entrar a OurStory y se oculta al llegar a FinalCTA (donde el logo completo toma el centro)
+  if (!container || !p1 || !p2 || !p3 || !p4 || !storyStage || !finalCta) return;
+
+  // Control de visibilidad del viewport: aparece al entrar a OurStory,
+  // se mantiene activo durante todo el viaje y se desvanece suavemente
+  // si el usuario regresa al Hero o baja hacia el Footer.
   ScrollTrigger.create({
     trigger: storyStage,
-    start: "top 65%",
-    endTrigger: teamSection,
-    end: "bottom 30%",
-    onEnter: () => {
-      stage.style.opacity = "1";
-      stage.style.pointerEvents = "auto";
-    },
-    onLeave: () => {
-      stage.style.opacity = "0";
-      stage.style.pointerEvents = "none";
-    },
-    onEnterBack: () => {
-      stage.style.opacity = "1";
-      stage.style.pointerEvents = "auto";
-    },
-    onLeaveBack: () => {
-      stage.style.opacity = "0";
-      stage.style.pointerEvents = "none";
+    start: "top 70%",
+    endTrigger: finalCta,
+    end: "bottom 15%",
+    onEnter: () => gsap.to(container, { opacity: 1, duration: 0.5, ease: "power2.out" }),
+    onLeaveBack: () => gsap.to(container, { opacity: 0, duration: 0.4, ease: "power2.in" }),
+    onLeave: () => gsap.to(container, { opacity: 0, duration: 0.35, ease: "power2.in" }),
+    onEnterBack: () => gsap.to(container, { opacity: 1, duration: 0.4, ease: "power2.out" }),
+  });
+
+  // Posiciones dispersas iniciales en los 4 márgenes de la pantalla (blanco puro)
+  gsap.set(p1, { x: "-35vw", y: "-24vh", rotation: -30, scale: 0.82, opacity: 0 });
+  gsap.set(p2, { x: "35vw", y: "-14vh", rotation: 26, scale: 0.82, opacity: 0 });
+  gsap.set(p3, { x: "-32vw", y: "20vh", rotation: 38, scale: 0.82, opacity: 0 });
+  gsap.set(p4, { x: "33vw", y: "25vh", rotation: -32, scale: 0.82, opacity: 0 });
+
+  // Timeline con scrub continuo desde OurStory hasta el centro de FinalCTA
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: storyStage,
+      start: "top 60%",
+      endTrigger: finalCta,
+      end: "center 52%",
+      scrub: 1.2,
     },
   });
 
-  const setAssemblyStep = (step: number) => {
-    p1?.classList.toggle("floating-piece--p1-active", step >= 1);
-    p2?.classList.toggle("floating-piece--p2-active", step >= 2);
-    p3?.classList.toggle("floating-piece--p3-active", step >= 3);
-    p4?.classList.toggle("floating-piece--p4-active", step >= 4);
+  // Etapa 1 (OurStory 0 -> 0.25): Pieza 1 aparece flotando en el margen superior izquierdo
+  tl.to(p1, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0)
+    .to(p1, { x: "-31vw", y: "-18vh", rotation: -24, duration: 0.25, ease: "none" }, 0);
 
-    stage.classList.toggle("is-complete", step >= 4);
+  // Etapa 2 (Cómo trabajamos 0.22 -> 0.48): Pieza 2 aparece en el margen superior derecho y viaja con la 1
+  tl.to(p2, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0.22)
+    .to(p1, { x: "-26vw", y: "-10vh", rotation: -18, duration: 0.26, ease: "none" }, 0.25)
+    .to(p2, { x: "29vw", y: "-8vh", rotation: 20, duration: 0.26, ease: "none" }, 0.25);
 
-    if (counter) {
-      counter.textContent = `${Math.min(4, Math.max(0, step))}/4`;
-    }
-  };
+  // Etapa 3 (Proyectos 0.48 -> 0.72): Pieza 3 aparece en el margen inferior izquierdo
+  tl.to(p3, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0.48)
+    .to(p1, { x: "-20vw", y: "-4vh", rotation: -12, duration: 0.24, ease: "none" }, 0.5)
+    .to(p2, { x: "23vw", y: "2vh", rotation: 15, duration: 0.24, ease: "none" }, 0.5)
+    .to(p3, { x: "-24vw", y: "15vh", rotation: 28, duration: 0.24, ease: "none" }, 0.5);
 
-  // Triggers por sección para acumular cada pieza al moverse con la pantalla
+  // Etapa 4 (Equipo 0.70 -> 0.85): Pieza 4 aparece en el margen inferior derecho — las 4 piezas activas
+  tl.to(p4, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0.7)
+    .to(p1, { x: "-14vw", y: "-2vh", rotation: -6, duration: 0.15, ease: "none" }, 0.72)
+    .to(p2, { x: "15vw", y: "0vh", rotation: 8, duration: 0.15, ease: "none" }, 0.72)
+    .to(p3, { x: "-15vw", y: "8vh", rotation: 16, duration: 0.15, ease: "none" }, 0.72)
+    .to(p4, { x: "18vw", y: "14vh", rotation: -18, duration: 0.15, ease: "none" }, 0.72);
+
+  // Clímax: Convergencia física de las 4 piezas hacia el centro exacto (0, 0)
+  // ensamblándose en el isotipo completo de Liiot
+  tl.to(
+    [p1, p2, p3, p4],
+    {
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 1,
+      opacity: 1,
+      duration: 0.15,
+      ease: "power2.out",
+    },
+    0.85
+  );
+
+  // Feedback de celebración lumínica al llegar al destino final
   ScrollTrigger.create({
-    trigger: "#story-reto",
-    start: "top 80%",
-    end: "bottom 20%",
-    onEnter: () => setAssemblyStep(1),
-    onEnterBack: () => setAssemblyStep(1),
-  });
-
-  ScrollTrigger.create({
-    trigger: "#como-trabajamos",
-    start: "top 75%",
-    end: "bottom 25%",
-    onEnter: () => setAssemblyStep(2),
-    onEnterBack: () => setAssemblyStep(2),
-  });
-
-  ScrollTrigger.create({
-    trigger: "#proyectos",
-    start: "top 75%",
-    end: "bottom 25%",
-    onEnter: () => setAssemblyStep(3),
-    onEnterBack: () => setAssemblyStep(3),
-  });
-
-  ScrollTrigger.create({
-    trigger: "#equipo",
-    start: "top 75%",
-    end: "bottom 25%",
-    onEnter: () => setAssemblyStep(4),
-    onEnterBack: () => setAssemblyStep(4),
+    trigger: finalCta,
+    start: "top 60%",
+    onEnter: () => finalTarget?.classList.add("is-converged"),
+    onLeaveBack: () => finalTarget?.classList.remove("is-converged"),
   });
 }
 
@@ -349,7 +341,7 @@ function init() {
   setupTeam();
   setupFinalCta();
   setupFooter();
-  setupFloatingLogoAssembly();
+  setupLogoConvergence();
 
   // Late-loading media (hero photo, portfolio images) can shift section
   // offsets after ScrollTrigger has already measured them.

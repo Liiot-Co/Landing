@@ -21,7 +21,6 @@ import {
   Sprout,
 } from "lucide-astro";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
-import LogoPieceHeading from "@/components/ui/LogoPieceHeading.astro";
 
 const STEP_IMAGE_WIDTHS = [480, 800, 1100];
 
@@ -91,19 +90,14 @@ const steps = [
 
 <section id="como-trabajamos" class="relative bg-surface-secondary py-24 lg:py-32">
   <div class="container relative mx-auto px-4 sm:px-6 lg:px-8">
-    {/* Encabezado editorial con eyebrow vertical lateral */}
-    <div id="how-header" class="mb-12 flex items-start gap-4 sm:gap-6 lg:mb-16">
-      {/* Pieza 2 del isotipo Liiot (construcción progresiva al scrollear) */}
-      <LogoPieceHeading step={2} />
-
-      <div class="max-w-2xl">
-        <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          Trabajamos contigo,<br />no para ti
-        </h2>
-        <p class="mt-4 max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
-          Cada paso lo damos juntos, construido con la energía de crear contigo.
-        </p>
-      </div>
+    {/* Encabezado editorial */}
+    <div id="how-header" class="mb-12 max-w-2xl lg:mb-16">
+      <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+        Trabajamos contigo,<br />no para ti
+      </h2>
+      <p class="mt-4 max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
+        Cada paso lo damos juntos, construido con la energía de crear contigo.
+      </p>
     </div>
 
     {/* Contenedor de Tarjetas Apiladas (Sticky Stack) */}
