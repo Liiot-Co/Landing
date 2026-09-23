@@ -1,20 +1,16 @@
 ---
 /**
- * LogoPieceHeading — Reemplazo editorial para los eyebrows en los encabezados.
- * Muestra el isotipo oficial de Liiot construyéndose pieza a pieza:
+ * LogoPieceHeading — Elemento decorativo geométrico en cada titular:
+ * "cada parte linea o circulo esta como decoración en los headlines y se va
+ * armando al hacer scroll al moverse con la pantalla creando el logo del final."
  *
- * "Debe ir haciéndose por parte y debe ser gris desde el fondo y al hacer scroll
- * como si se encontrara va viajando hasta la siguiente sección."
+ * Paso 1 (OurStory / El reto):   Línea / Columna izquierda (Violeta Tech: #8B45CC)
+ * Paso 2 (HowWeWork / Método):   Línea / Columna derecha (Naranja Humano: #FF6A33)
+ * Paso 3 (Portfolio / Logros):   Curva / Círculo inferior (Rosa: #e04b66)
+ * Paso 4 (Team / Equipo):        Curva / Círculo superior (Amarillo: #e2b31c)
  *
- * - Fondo completo en GRIS: las 4 piezas del isotipo están presentes desde el fondo
- *   en un gris neutro elegante, mostrando la silueta completa.
- * - Piezas de pasos anteriores (id < step): ya están integradas en sus colores de marca.
- * - Pieza del paso actual (id === step): nace gris en el fondo, y al hacer scroll
- *   hacia la sección se "encuentra", cobrando vida con la física spring de Liiot
- *   (cubic-bezier(0.34, 1.56, 0.64, 1)), transformándose a su color de marca con destello.
- * - Piezas futuras (id > step): permanecen en gris neutro en el fondo esperando su turno.
- * - Conector viajero inferior: una línea con un haz de luz viajero que desciende
- *   con el scroll guiando el flujo visual hacia la siguiente sección.
+ * Inicia en un tono gris neutro en el fondo, y al entrar en viewport cobra vida
+ * en su color de marca y se prepara para unirse al logo en pantalla.
  */
 interface Props {
   step: 1 | 2 | 3 | 4;
@@ -23,286 +19,148 @@ interface Props {
 
 const { step, class: className = "" } = Astro.props as Props;
 
-const PIECES = [
-  {
-    id: 1,
-    name: "stem-left",
+const PIECE_CONFIG = {
+  1: {
+    type: "line",
+    name: "Columna izquierda",
     color: "var(--primary-high)", // #8B45CC
     d: "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19",
-    sx: "-24px",
-    sy: "-18px",
-    sr: "-28deg",
   },
-  {
-    id: 2,
-    name: "stem-right",
+  2: {
+    type: "line",
+    name: "Columna derecha",
     color: "var(--accent)", // #FF6A33
     d: "M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19",
-    sx: "24px",
-    sy: "-16px",
-    sr: "24deg",
   },
-  {
-    id: 3,
-    name: "curve-bottom",
+  3: {
+    type: "circle",
+    name: "Curva inferior",
     color: "var(--brand-pink)", // #e04b66
     d: "M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38",
-    sx: "20px",
-    sy: "20px",
-    sr: "36deg",
   },
-  {
-    id: 4,
-    name: "curve-top",
+  4: {
+    type: "circle",
+    name: "Curva superior",
     color: "var(--brand-yellow)", // #e2b31c
     d: "M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38",
-    sx: "-22px",
-    sy: "20px",
-    sr: "-36deg",
   },
-];
+} as const;
+
+const piece = PIECE_CONFIG[step];
 ---
 
 <div
   class:list={[
-    "logo-build-step flex flex-col items-center pt-1.5 select-none flex-shrink-0 group/logo-step",
+    "headline-piece-decorator flex flex-col items-center pt-1 select-none flex-shrink-0 group/piece",
     className,
   ]}
-  data-logo-step={step}
-  aria-label={`Paso ${step} de 4: construcción del isotipo Liiot`}
+  data-piece-step={step}
+  id={`headline-piece-${step}`}
+  aria-label={`Decoración ${piece.type}: ${piece.name}`}
 >
-  <div class="logo-mark-stage relative size-10 sm:size-11 transition-transform duration-300 hover:scale-110">
+  <div class="relative size-8 sm:size-9 transition-transform duration-300 hover:scale-110">
     <svg
       viewBox="0 0 48 48"
       class="h-full w-full overflow-visible"
       aria-hidden="true"
     >
-      {/* 1. Silueta base completa en gris tenue */}
-      <g class="mark-ghost-base">
-        {PIECES.map((p) => (
-          <path d={p.d} class="piece-ghost-path" />
-        ))}
-      </g>
-
-      {/* 2. Las 4 piezas del isotipo:
-             - Futuras (id > step): gris neutro en el fondo esperando su turno
-             - Previas (id < step): ya encontradas y fijadas en su color de marca
-             - Actual (id === step): se encuentra al hacer scroll (pasa de gris a color con spring)
-      */}
-      {
-        PIECES.map((p) => {
-          const isPast = p.id < step;
-          const isCurrent = p.id === step;
-          const isFuture = p.id > step;
-
-          if (isFuture) {
-            return (
-              <path
-                d={p.d}
-                class="mark-piece mark-piece--future"
-                data-piece-id={p.id}
-              />
-            );
-          }
-
-          if (isPast) {
-            return (
-              <path
-                d={p.d}
-                fill={p.color}
-                class="mark-piece mark-piece--locked"
-                data-piece-id={p.id}
-              />
-            );
-          }
-
-          return (
-            <path
-              d={p.d}
-              class="mark-piece mark-piece--current"
-              data-piece-id={p.id}
-              style={`--sx: ${p.sx}; --sy: ${p.sy}; --sr: ${p.sr}; --piece-color: ${p.color};`}
-            />
-          );
-        })
-      }
+      {/* Sombra de apoyo en gris */}
+      <path
+        d={piece.d}
+        class="headline-piece-base"
+      />
+      {/* Pieza geométrica decorativa activa */}
+      <path
+        d={piece.d}
+        class="headline-piece-active"
+        style={`--piece-color: ${piece.color};`}
+      />
     </svg>
   </div>
 
-  {/* Contador de paso minimalista */}
-  <span class="text-[10px] font-mono font-bold tracking-widest text-muted-foreground/60 mt-1.5 tabular-nums">
-    0{step}<span class="opacity-40">/</span>04
-  </span>
-
-  {/* Conector vertical con haz de luz viajero hacia la siguiente sección */}
-  <div class="relative w-[1px] h-12 sm:h-14 bg-border/40 mt-2 overflow-hidden">
-    <div
-      class="travel-beam absolute top-0 left-0 w-full h-1/2"
-      style={`--beam-color: ${PIECES[step - 1].color};`}
-    ></div>
-  </div>
+  {/* Conector vertical minimalista con degradado suave hacia el contenido */}
+  <span class="w-[1.5px] h-10 sm:h-12 bg-gradient-to-b from-border via-border/50 to-transparent mt-2.5"></span>
 </div>
 
 <style>
-  .mark-piece {
+  .headline-piece-decorator path {
     transform-box: fill-box;
     transform-origin: center;
   }
 
-  .piece-ghost-path {
-    fill: currentColor;
-    opacity: 0.08;
-  }
-
-  /* Piezas futuras: visibles en gris neutro en el fondo */
-  .mark-piece--future {
-    fill: rgba(255, 255, 255, 0.18);
+  /* Fondo gris neutro */
+  .headline-piece-base {
+    fill: rgba(255, 255, 255, 0.16);
     opacity: 0.6;
-    transition: fill 400ms ease, opacity 400ms ease;
+    transition: opacity 400ms ease;
   }
-  :global(.light) .mark-piece--future {
-    fill: rgba(11, 7, 16, 0.15);
-    opacity: 0.5;
-  }
-
-  /* Piezas fijadas de pasos anteriores: nítidas en su color de marca */
-  .mark-piece--locked {
-    opacity: 0.95;
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  :global(.light) .headline-piece-base {
+    fill: rgba(11, 7, 16, 0.14);
   }
 
-  /* Pieza actual: ANTES de encontrarse al scrollear
-     Nace gris en el fondo con un suave desplazamiento y pulso */
-  .logo-build-step:not(.is-built) .mark-piece--current {
+  /* Pieza activa: inicia en gris tenue, despierta al color de marca en viewport */
+  .headline-piece-active {
     fill: rgba(255, 255, 255, 0.28);
-    opacity: 0.7;
-    transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(0.75);
-    animation: pieceEncounterPulse 3.5s ease-in-out infinite;
+    opacity: 0.8;
+    transform: scale(0.92);
+    transition:
+      fill 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      filter 600ms ease,
+      opacity 400ms ease;
   }
-  :global(.light) .logo-build-step:not(.is-built) .mark-piece--current {
-    fill: rgba(11, 7, 16, 0.25);
+  :global(.light) .headline-piece-active {
+    fill: rgba(11, 7, 16, 0.22);
   }
 
-  /* Pieza actual: AL HACER SCROLL SE ENCUENTRA ("como si se encontrara")
-     Vuela a su lugar con física spring, enciende su color de marca y emite destello */
-  .logo-build-step.is-built .mark-piece--current {
+  /* Al activarse en scroll */
+  .headline-piece-decorator.is-active .headline-piece-active {
     fill: var(--piece-color);
     opacity: 1;
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    filter: drop-shadow(0 0 10px var(--piece-color));
-    transition:
-      transform 850ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      fill 450ms ease-out,
-      opacity 400ms ease-out,
-      filter 600ms ease-out;
-  }
-
-  @keyframes pieceEncounterPulse {
-    0%, 100% {
-      transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(0.75);
-      opacity: 0.6;
-    }
-    50% {
-      transform: translate(var(--sx), calc(var(--sy) - 4px)) rotate(calc(var(--sr) + 2deg)) scale(0.8);
-      opacity: 0.85;
-    }
-  }
-
-  /* Haz de luz viajero en el conector ("va viajando hasta la siguiente sección") */
-  .travel-beam {
-    background: linear-gradient(to bottom, transparent, var(--beam-color), transparent);
-    animation: travelBeamDown 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  }
-
-  @keyframes travelBeamDown {
-    0% {
-      transform: translateY(-100%);
-      opacity: 0;
-    }
-    30% {
-      opacity: 1;
-    }
-    80% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(220%);
-      opacity: 0;
-    }
-  }
-
-  /* En el paso 4 (Team): coreografía de celebración cuando todas las piezas se unen */
-  .logo-build-step[data-logo-step="4"].is-built .logo-mark-stage {
-    animation: markCompleteCelebration 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s forwards;
-  }
-
-  @keyframes markCompleteCelebration {
-    0% {
-      transform: scale(1);
-    }
-    35% {
-      transform: scale(1.18);
-      filter: drop-shadow(0 0 18px var(--brand-yellow)) drop-shadow(0 0 28px var(--primary-high));
-    }
-    70% {
-      transform: scale(0.96);
-    }
-    100% {
-      transform: scale(1);
-      filter: drop-shadow(0 0 8px rgba(226, 179, 28, 0.4));
-    }
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px var(--piece-color));
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .mark-piece--current,
-    .mark-piece--locked {
+    .headline-piece-active {
       transition: none !important;
-      animation: none !important;
-      transform: translate(0, 0) rotate(0deg) scale(1) !important;
+      fill: var(--piece-color) !important;
       opacity: 1 !important;
-    }
-    .travel-beam {
-      animation: none !important;
-      opacity: 0.5;
-    }
-    .logo-build-step[data-logo-step="4"].is-built .logo-mark-stage {
-      animation: none !important;
+      transform: none !important;
     }
   }
 </style>
 
 <script>
-  function setupLogoBuildObservers() {
-    const steps = document.querySelectorAll<HTMLElement>(".logo-build-step:not([data-observed])");
-    if (!steps.length) return;
+  function setupHeadlinePieceObservers() {
+    const pieces = document.querySelectorAll<HTMLElement>(".headline-piece-decorator:not([data-observed])");
+    if (!pieces.length) return;
 
     if ("IntersectionObserver" in window) {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              entry.target.classList.add("is-built");
-              observer.unobserve(entry.target);
+              entry.target.classList.add("is-active");
             }
           });
         },
-        { rootMargin: "0px 0px -8% 0px", threshold: 0.15 }
+        { rootMargin: "0px 0px -10% 0px", threshold: 0.2 }
       );
 
-      steps.forEach((el) => {
+      pieces.forEach((el) => {
         el.setAttribute("data-observed", "1");
         observer.observe(el);
       });
     } else {
-      steps.forEach((el) => el.classList.add("is-built"));
+      pieces.forEach((el) => el.classList.add("is-active"));
     }
   }
 
-  document.addEventListener("astro:page-load", setupLogoBuildObservers);
+  document.addEventListener("astro:page-load", setupHeadlinePieceObservers);
   if (document.readyState === "complete" || document.readyState === "interactive") {
-    setupLogoBuildObservers();
+    setupHeadlinePieceObservers();
   } else {
-    document.addEventListener("DOMContentLoaded", setupLogoBuildObservers);
+    document.addEventListener("DOMContentLoaded", setupHeadlinePieceObservers);
   }
 </script>

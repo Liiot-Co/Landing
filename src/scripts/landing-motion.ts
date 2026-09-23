@@ -63,8 +63,8 @@ function onSectionEnter(trigger: string, start: string, run: (element: Element) 
 
 /** Activates progressive piece build for the given section header. */
 function buildLogoPiece(headerSelector: string) {
-  const step = document.querySelector<HTMLElement>(`${headerSelector} .logo-build-step`);
-  if (step) step.classList.add("is-built");
+  const decorator = document.querySelector<HTMLElement>(`${headerSelector} .headline-piece-decorator`);
+  if (decorator) decorator.classList.add("is-active");
 }
 
 function applyReducedMotionStates() {
@@ -214,95 +214,88 @@ function setupFooter() {
   onSectionEnter("#footer-mark", triggerStart.footer, () => reveal("#footer-mark"));
 }
 
-function setupLogoScrollTraveler() {
-  const traveler = document.getElementById("logo-scroll-traveler");
-  if (!traveler) return;
+function setupFloatingLogoAssembly() {
+  const stage = document.getElementById("floating-logo-stage");
+  if (!stage) return;
 
-  const p1 = document.getElementById("traveler-p1");
-  const p2 = document.getElementById("traveler-p2");
-  const p3 = document.getElementById("traveler-p3");
-  const p4 = document.getElementById("traveler-p4");
-  const trackFill = document.getElementById("traveler-track-fill");
-  const stations = traveler.querySelectorAll<HTMLElement>(".traveler-station");
+  const p1 = document.getElementById("floating-p1");
+  const p2 = document.getElementById("floating-p2");
+  const p3 = document.getElementById("floating-p3");
+  const p4 = document.getElementById("floating-p4");
+  const counter = document.getElementById("floating-logo-counter");
 
   const storyStage = document.getElementById("story-stage");
   const teamSection = document.getElementById("equipo");
   if (!storyStage || !teamSection) return;
 
-  // Aparece al entrar a OurStory y se oculta al salir de Team
+  // Aparece al entrar a OurStory y se oculta al llegar a FinalCTA (donde el logo completo toma el centro)
   ScrollTrigger.create({
     trigger: storyStage,
-    start: "top 60%",
+    start: "top 65%",
     endTrigger: teamSection,
     end: "bottom 30%",
     onEnter: () => {
-      traveler.style.opacity = "1";
-      traveler.style.pointerEvents = "auto";
+      stage.style.opacity = "1";
+      stage.style.pointerEvents = "auto";
     },
     onLeave: () => {
-      traveler.style.opacity = "0";
-      traveler.style.pointerEvents = "none";
+      stage.style.opacity = "0";
+      stage.style.pointerEvents = "none";
     },
     onEnterBack: () => {
-      traveler.style.opacity = "1";
-      traveler.style.pointerEvents = "auto";
+      stage.style.opacity = "1";
+      stage.style.pointerEvents = "auto";
     },
     onLeaveBack: () => {
-      traveler.style.opacity = "0";
-      traveler.style.pointerEvents = "none";
+      stage.style.opacity = "0";
+      stage.style.pointerEvents = "none";
     },
   });
 
-  const setStepState = (step: number) => {
-    p1?.classList.toggle("traveler-piece--p1-active", step >= 1);
-    p2?.classList.toggle("traveler-piece--p2-active", step >= 2);
-    p3?.classList.toggle("traveler-piece--p3-active", step >= 3);
-    p4?.classList.toggle("traveler-piece--p4-active", step >= 4);
+  const setAssemblyStep = (step: number) => {
+    p1?.classList.toggle("floating-piece--p1-active", step >= 1);
+    p2?.classList.toggle("floating-piece--p2-active", step >= 2);
+    p3?.classList.toggle("floating-piece--p3-active", step >= 3);
+    p4?.classList.toggle("floating-piece--p4-active", step >= 4);
 
-    traveler.classList.toggle("is-traveler-complete", step >= 4);
+    stage.classList.toggle("is-complete", step >= 4);
 
-    stations.forEach((st) => {
-      const sNum = parseInt(st.getAttribute("data-station") || "0", 10);
-      st.classList.toggle("is-active", sNum <= step);
-    });
-
-    if (trackFill) {
-      const pct = Math.max(0, Math.min(100, ((step - 1) / 3) * 100));
-      trackFill.style.height = `${pct}%`;
+    if (counter) {
+      counter.textContent = `${Math.min(4, Math.max(0, step))}/4`;
     }
   };
 
-  // Triggers por sección para encender cada pieza a medida que se viaja
+  // Triggers por sección para acumular cada pieza al moverse con la pantalla
   ScrollTrigger.create({
     trigger: "#story-reto",
     start: "top 80%",
     end: "bottom 20%",
-    onEnter: () => setStepState(1),
-    onEnterBack: () => setStepState(1),
+    onEnter: () => setAssemblyStep(1),
+    onEnterBack: () => setAssemblyStep(1),
   });
 
   ScrollTrigger.create({
     trigger: "#como-trabajamos",
     start: "top 75%",
     end: "bottom 25%",
-    onEnter: () => setStepState(2),
-    onEnterBack: () => setStepState(2),
+    onEnter: () => setAssemblyStep(2),
+    onEnterBack: () => setAssemblyStep(2),
   });
 
   ScrollTrigger.create({
     trigger: "#proyectos",
     start: "top 75%",
     end: "bottom 25%",
-    onEnter: () => setStepState(3),
-    onEnterBack: () => setStepState(3),
+    onEnter: () => setAssemblyStep(3),
+    onEnterBack: () => setAssemblyStep(3),
   });
 
   ScrollTrigger.create({
     trigger: "#equipo",
     start: "top 75%",
     end: "bottom 25%",
-    onEnter: () => setStepState(4),
-    onEnterBack: () => setStepState(4),
+    onEnter: () => setAssemblyStep(4),
+    onEnterBack: () => setAssemblyStep(4),
   });
 }
 
@@ -356,7 +349,7 @@ function init() {
   setupTeam();
   setupFinalCta();
   setupFooter();
-  setupLogoScrollTraveler();
+  setupFloatingLogoAssembly();
 
   // Late-loading media (hero photo, portfolio images) can shift section
   // offsets after ScrollTrigger has already measured them.
