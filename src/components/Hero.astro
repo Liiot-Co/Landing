@@ -31,18 +31,18 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
       loading="eager"
       fetchpriority="high"
     />
-    {/* Radial gradient: colores vibrantes y sutiles de la marca (vividez y creatividad) */}
+    {/* Radial gradient: matices vibrantes sutiles integrados con el diseño */}
     <div
       class="hero-radial-gradient absolute inset-0 pointer-events-none"
       aria-hidden="true"
     >
     </div>
     <div
-      class="absolute inset-x-0 bottom-0 h-[52%] bg-gradient-to-t from-background via-background/30 to-transparent"
+      class="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-background via-background/25 to-transparent"
       aria-hidden="true"
     >
     </div>
-    <MorphGradient recipe="hybrid" blend="screen" opacity={0.38} />
+    <MorphGradient recipe="hybrid" blend="soft-light" opacity={0.20} />
   </div>
 
   <div class="container relative z-10 mx-auto px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
@@ -153,36 +153,29 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     }
   }
 
-  /* Gradiente radial multicapa vibrante y sutil: luz creativa, vividez y calidez de marca */
+  /* Gradiente radial integrado con elegancia: matices vibrantes sutiles y armónicos */
   .hero-radial-gradient {
     background:
-      /* Halo de creatividad y vitalidad: rosa vibrante (Brandbook #e04b66) y naranja cálido (#FF6A33) en el cuadrante superior derecho */
+      /* Toque sutil de calidez y creatividad en el cuadrante superior derecho */
       radial-gradient(
-        ellipse 75% 65% at 82% 18%,
-        rgba(224, 75, 102, 0.38) 0%,
-        rgba(255, 106, 51, 0.28) 35%,
-        rgba(226, 179, 28, 0.16) 62%,
+        ellipse 70% 60% at 80% 20%,
+        rgba(224, 75, 102, 0.18) 0%,
+        rgba(255, 106, 51, 0.13) 35%,
+        rgba(226, 179, 28, 0.07) 60%,
         transparent 80%
       ),
-      /* Resplandor violeta tecnológico (Brandbook #8B45CC) de soporte en el centro superior */
+      /* Matiz violeta suave de identidad tecnológica en el centro superior */
       radial-gradient(
-        ellipse 65% 55% at 35% 25%,
-        rgba(139, 69, 204, 0.34) 0%,
-        rgba(90, 34, 139, 0.2) 46%,
+        ellipse 60% 50% at 35% 25%,
+        rgba(139, 69, 204, 0.18) 0%,
+        rgba(90, 34, 139, 0.10) 45%,
         transparent 75%
       ),
-      /* Luz cálida dorada de optimismo en la zona media */
-      radial-gradient(
-        circle 50vw at 65% 45%,
-        rgba(226, 179, 28, 0.14) 0%,
-        rgba(255, 106, 51, 0.08) 50%,
-        transparent 70%
-      ),
-      /* Viñeta suave de anclaje oscuro para legibilidad cristalina del texto en la esquina inferior izquierda */
+      /* Viñeta sutil de anclaje oscuro para máxima legibilidad del texto en la esquina inferior izquierda */
       radial-gradient(
         ellipse 85% 65% at 15% 95%,
-        rgba(7, 4, 15, 0.86) 0%,
-        rgba(15, 9, 28, 0.5) 45%,
+        rgba(7, 4, 15, 0.82) 0%,
+        rgba(15, 9, 28, 0.42) 45%,
         transparent 75%
       );
   }
