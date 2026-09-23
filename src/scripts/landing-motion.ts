@@ -207,67 +207,80 @@ function setupLogoConvergence() {
   const p2 = document.getElementById("convergence-piece-2");
   const p3 = document.getElementById("convergence-piece-3");
   const p4 = document.getElementById("convergence-piece-4");
-  const storyStage = document.getElementById("story-stage");
+  const section3 = document.getElementById("como-trabajamos");
   const finalCta = document.getElementById("agendar");
   const finalTarget = document.getElementById("final-logo-target");
 
-  if (!container || !p1 || !p2 || !p3 || !p4 || !storyStage || !finalCta) return;
+  if (!container || !p1 || !p2 || !p3 || !p4 || !section3 || !finalCta) return;
 
-  // Control de visibilidad del viewport: aparece al entrar a OurStory,
-  // se mantiene activo durante todo el viaje y se desvanece suavemente
-  // si el usuario regresa al Hero o baja hacia el Footer.
+  const paths = container.querySelectorAll<SVGPathElement>(".convergence-path");
+
+  // Generador de coordenadas aleatorias asimétricas y ángulos duros de estética brutalista
+  const angles = [-90, -45, 0, 45, 90];
+  const pickAngle = () => angles[Math.floor(Math.random() * angles.length)];
+  const rand = (min: number, max: number) => +(min + Math.random() * (max - min)).toFixed(1);
+
+  // Cuadrantes de margen para garantizar dispersión sin pisar el texto central
+  const p1X = rand(-38, -22);
+  const p1Y = rand(-32, -14);
+  const p1Rot = pickAngle();
+
+  const p2X = rand(22, 38);
+  const p2Y = rand(-30, -12);
+  const p2Rot = pickAngle();
+
+  const p3X = rand(-36, -20);
+  const p3Y = rand(12, 30);
+  const p3Rot = pickAngle();
+
+  const p4X = rand(20, 36);
+  const p4Y = rand(14, 32);
+  const p4Rot = pickAngle();
+
+  // Color opaco inicial: gris cemento / carbón mate (#4A4A4D)
+  gsap.set(paths, { fill: "#4A4A4D" });
+
+  // Posiciones aleatorias iniciales dispersas
+  gsap.set(p1, { x: `${p1X}vw`, y: `${p1Y}vh`, rotation: p1Rot, scale: 0.85, opacity: 0 });
+  gsap.set(p2, { x: `${p2X}vw`, y: `${p2Y}vh`, rotation: p2Rot, scale: 0.85, opacity: 0 });
+  gsap.set(p3, { x: `${p3X}vw`, y: `${p3Y}vh`, rotation: p3Rot, scale: 0.85, opacity: 0 });
+  gsap.set(p4, { x: `${p4X}vw`, y: `${p4Y}vh`, rotation: p4Rot, scale: 0.85, opacity: 0 });
+
+  // Visibilidad: inicia en la Sección 3 ("Cómo trabajamos"). Hero e Historia permanecen limpios.
   ScrollTrigger.create({
-    trigger: storyStage,
-    start: "top 70%",
+    trigger: section3,
+    start: "top 75%",
     endTrigger: finalCta,
     end: "bottom 15%",
-    onEnter: () => gsap.to(container, { opacity: 1, duration: 0.5, ease: "power2.out" }),
-    onLeaveBack: () => gsap.to(container, { opacity: 0, duration: 0.4, ease: "power2.in" }),
-    onLeave: () => gsap.to(container, { opacity: 0, duration: 0.35, ease: "power2.in" }),
-    onEnterBack: () => gsap.to(container, { opacity: 1, duration: 0.4, ease: "power2.out" }),
+    onEnter: () => gsap.to(container, { opacity: 1, duration: 0.35, ease: "power2.out" }),
+    onLeaveBack: () => gsap.to(container, { opacity: 0, duration: 0.3, ease: "power2.in" }),
+    onLeave: () => gsap.to(container, { opacity: 0, duration: 0.3, ease: "power2.in" }),
+    onEnterBack: () => gsap.to(container, { opacity: 1, duration: 0.35, ease: "power2.out" }),
   });
 
-  // Posiciones dispersas iniciales en los 4 márgenes de la pantalla (blanco puro)
-  gsap.set(p1, { x: "-35vw", y: "-24vh", rotation: -30, scale: 0.82, opacity: 0 });
-  gsap.set(p2, { x: "35vw", y: "-14vh", rotation: 26, scale: 0.82, opacity: 0 });
-  gsap.set(p3, { x: "-32vw", y: "20vh", rotation: 38, scale: 0.82, opacity: 0 });
-  gsap.set(p4, { x: "33vw", y: "25vh", rotation: -32, scale: 0.82, opacity: 0 });
-
-  // Timeline con scrub continuo desde OurStory hasta el centro de FinalCTA
+  // Timeline scrubbed desde Sección 3 hasta el centro de FinalCTA
   const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: storyStage,
-      start: "top 60%",
+      trigger: section3,
+      start: "top 65%",
       endTrigger: finalCta,
       end: "center 52%",
-      scrub: 1.2,
+      scrub: 1.0,
     },
   });
 
-  // Etapa 1 (OurStory 0 -> 0.25): Pieza 1 aparece flotando en el margen superior izquierdo
-  tl.to(p1, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0)
-    .to(p1, { x: "-31vw", y: "-18vh", rotation: -24, duration: 0.25, ease: "none" }, 0);
+  // Sección 3: Revelación de las piezas opacas en sus posiciones aleatorias
+  tl.to([p1, p2, p3, p4], { opacity: 0.95, duration: 0.12, ease: "none" }, 0);
 
-  // Etapa 2 (Cómo trabajamos 0.22 -> 0.48): Pieza 2 aparece en el margen superior derecho y viaja con la 1
-  tl.to(p2, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0.22)
-    .to(p1, { x: "-26vw", y: "-10vh", rotation: -18, duration: 0.26, ease: "none" }, 0.25)
-    .to(p2, { x: "29vw", y: "-8vh", rotation: 20, duration: 0.26, ease: "none" }, 0.25);
+  // Secciones 4 ("Qué hemos logrado" / Proyectos) y 5 ("Equipo"):
+  // Desplazamiento asimétrico mecánico continuo descendiendo con el scroll
+  tl.to(p1, { x: `${(p1X * 0.6).toFixed(1)}vw`, y: `${(p1Y * 0.65).toFixed(1)}vh`, rotation: p1Rot * 0.5, duration: 0.55, ease: "none" }, 0.12)
+    .to(p2, { x: `${(p2X * 0.6).toFixed(1)}vw`, y: `${(p2Y * 0.65).toFixed(1)}vh`, rotation: p2Rot * 0.5, duration: 0.55, ease: "none" }, 0.12)
+    .to(p3, { x: `${(p3X * 0.6).toFixed(1)}vw`, y: `${(p3Y * 0.65).toFixed(1)}vh`, rotation: p3Rot * 0.5, duration: 0.55, ease: "none" }, 0.12)
+    .to(p4, { x: `${(p4X * 0.6).toFixed(1)}vw`, y: `${(p4Y * 0.65).toFixed(1)}vh`, rotation: p4Rot * 0.5, duration: 0.55, ease: "none" }, 0.12);
 
-  // Etapa 3 (Proyectos 0.48 -> 0.72): Pieza 3 aparece en el margen inferior izquierdo
-  tl.to(p3, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0.48)
-    .to(p1, { x: "-20vw", y: "-4vh", rotation: -12, duration: 0.24, ease: "none" }, 0.5)
-    .to(p2, { x: "23vw", y: "2vh", rotation: 15, duration: 0.24, ease: "none" }, 0.5)
-    .to(p3, { x: "-24vw", y: "15vh", rotation: 28, duration: 0.24, ease: "none" }, 0.5);
-
-  // Etapa 4 (Equipo 0.70 -> 0.85): Pieza 4 aparece en el margen inferior derecho — las 4 piezas activas
-  tl.to(p4, { opacity: 0.9, duration: 0.12, ease: "power1.inOut" }, 0.7)
-    .to(p1, { x: "-14vw", y: "-2vh", rotation: -6, duration: 0.15, ease: "none" }, 0.72)
-    .to(p2, { x: "15vw", y: "0vh", rotation: 8, duration: 0.15, ease: "none" }, 0.72)
-    .to(p3, { x: "-15vw", y: "8vh", rotation: 16, duration: 0.15, ease: "none" }, 0.72)
-    .to(p4, { x: "18vw", y: "14vh", rotation: -18, duration: 0.15, ease: "none" }, 0.72);
-
-  // Clímax: Convergencia física de las 4 piezas hacia el centro exacto (0, 0)
-  // ensamblándose en el isotipo completo de Liiot
+  // Clímax mecánico brutalista en Sección Final (#agendar):
+  // Convergencia física hacia (0, 0), rotación a 0° y mutación a blanco sólido (#FFFFFF)
   tl.to(
     [p1, p2, p3, p4],
     {
@@ -276,13 +289,23 @@ function setupLogoConvergence() {
       rotation: 0,
       scale: 1,
       opacity: 1,
-      duration: 0.15,
-      ease: "power2.out",
+      duration: 0.25,
+      ease: "power3.out",
     },
-    0.85
+    0.72
   );
 
-  // Feedback de celebración lumínica al llegar al destino final
+  tl.to(
+    paths,
+    {
+      fill: "#FFFFFF",
+      duration: 0.2,
+      ease: "power2.out",
+    },
+    0.75
+  );
+
+  // Celebración lumínica al llegar al destino final
   ScrollTrigger.create({
     trigger: finalCta,
     start: "top 60%",

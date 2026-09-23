@@ -2,12 +2,12 @@
 /**
  * LogoScrollConvergence.astro
  *
- * Los 4 fragmentos geométricos del isotipo Liiot en blanco (#FFFFFF),
- * dispersos en los márgenes de la pantalla como arte geométrico flotante.
- * Conforme el usuario hace scroll a través de la historia, cómo trabajamos,
- * proyectos y equipo, los fragmentos se descubren progresivamente y viajan
- * por la pantalla, convergiendo físicamente hasta unirse con precisión
- * matemática en el isotipo completo en la sección final (#agendar).
+ * Fragmentos geométricos del isotipo Liiot con estética brutalista:
+ * - Se activan a partir de la Sección 3 ("Cómo trabajamos").
+ * - Inician en posiciones aleatorias asimétricas y ángulos duros (0°, 45°, 90°).
+ * - Tono mate opaco (gris cemento / carbón crudo #4A4A4D).
+ * - Sin brillos difusos ni floaty tech; formas vectoriales puras y corte mecánico directo.
+ * - Al converger en la sección final (#agendar), mutan a blanco sólido (#FFFFFF).
  */
 ---
 
@@ -18,68 +18,64 @@
 >
   {/* Centro de convergencia relativo al viewport */}
   <div class="relative size-16 sm:size-20">
-    {/* Pieza 1: Tallo izquierdo (Story) */}
+    {/* Pieza 1: Columna izquierda */}
     <div
       id="convergence-piece-1"
-      class="convergence-piece absolute inset-0 text-white will-change-transform"
+      class="convergence-piece absolute inset-0 will-change-transform"
       data-piece="1"
     >
-      <div class="convergence-drift drift-1 h-full w-full">
-        <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_2px_14px_rgba(255,255,255,0.3)]">
-          <path
-            d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
-            fill="#FFFFFF"
-          />
-        </svg>
-      </div>
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible">
+        <path
+          class="convergence-path"
+          d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+          fill="#4A4A4D"
+        />
+      </svg>
     </div>
 
-    {/* Pieza 2: Tallo derecho (How We Work) */}
+    {/* Pieza 2: Columna derecha */}
     <div
       id="convergence-piece-2"
-      class="convergence-piece absolute inset-0 text-white will-change-transform"
+      class="convergence-piece absolute inset-0 will-change-transform"
       data-piece="2"
     >
-      <div class="convergence-drift drift-2 h-full w-full">
-        <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_2px_14px_rgba(255,255,255,0.3)]">
-          <path
-            d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
-            fill="#FFFFFF"
-          />
-        </svg>
-      </div>
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible">
+        <path
+          class="convergence-path"
+          d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
+          fill="#4A4A4D"
+        />
+      </svg>
     </div>
 
-    {/* Pieza 3: Curva inferior (Portfolio) */}
+    {/* Pieza 3: Curva inferior */}
     <div
       id="convergence-piece-3"
-      class="convergence-piece absolute inset-0 text-white will-change-transform"
+      class="convergence-piece absolute inset-0 will-change-transform"
       data-piece="3"
     >
-      <div class="convergence-drift drift-3 h-full w-full">
-        <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_2px_14px_rgba(255,255,255,0.3)]">
-          <path
-            d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
-            fill="#FFFFFF"
-          />
-        </svg>
-      </div>
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible">
+        <path
+          class="convergence-path"
+          d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
+          fill="#4A4A4D"
+        />
+      </svg>
     </div>
 
-    {/* Pieza 4: Curva superior (Team) */}
+    {/* Pieza 4: Curva superior */}
     <div
       id="convergence-piece-4"
-      class="convergence-piece absolute inset-0 text-white will-change-transform"
+      class="convergence-piece absolute inset-0 will-change-transform"
       data-piece="4"
     >
-      <div class="convergence-drift drift-4 h-full w-full">
-        <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_2px_14px_rgba(255,255,255,0.3)]">
-          <path
-            d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
-            fill="#FFFFFF"
-          />
-        </svg>
-      </div>
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible">
+        <path
+          class="convergence-path"
+          d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
+          fill="#4A4A4D"
+        />
+      </svg>
     </div>
   </div>
 </div>
@@ -89,37 +85,8 @@
     transform-origin: center;
   }
 
-  .drift-1 {
-    animation: pieceFloat1 6.5s ease-in-out infinite alternate;
-  }
-  .drift-2 {
-    animation: pieceFloat2 7.2s ease-in-out infinite alternate;
-  }
-  .drift-3 {
-    animation: pieceFloat3 5.8s ease-in-out infinite alternate;
-  }
-  .drift-4 {
-    animation: pieceFloat4 6.9s ease-in-out infinite alternate;
-  }
-
-  @keyframes pieceFloat1 {
-    0% { transform: translateY(0px) rotate(0deg); }
-    100% { transform: translateY(-7px) rotate(2.5deg); }
-  }
-
-  @keyframes pieceFloat2 {
-    0% { transform: translateY(0px) rotate(0deg); }
-    100% { transform: translateY(8px) rotate(-3deg); }
-  }
-
-  @keyframes pieceFloat3 {
-    0% { transform: translateY(0px) rotate(0deg); }
-    100% { transform: translateY(-9px) rotate(-2deg); }
-  }
-
-  @keyframes pieceFloat4 {
-    0% { transform: translateY(0px) rotate(0deg); }
-    100% { transform: translateY(6px) rotate(3deg); }
+  .convergence-path {
+    transition: fill 0.2s linear;
   }
 
   @media (prefers-reduced-motion: reduce) {
