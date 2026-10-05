@@ -130,31 +130,61 @@ function setupStory() {
   const isMobile = window.innerWidth < 768;
   const SKEW = isMobile ? 8 : 14;
   let philRevealed = false;
+  let scrubActive = false;
+  let scrubTimer: ReturnType<typeof setTimeout> | 0 = 0;
+  function setScrub(active: boolean) {
+    if (active === scrubActive) return;
+    scrubActive = active;
+    window.dispatchEvent(new CustomEvent("filosofia-scrub", { detail: { active } }));
+  }
 
   ScrollTrigger.create({
     trigger: stage,
     start: "top top",
-    // En móviles: pin de sólo +55% (un swipe natural de pulgar) en lugar de +140%
     end: isMobile ? "+=55%" : "+=90%",
-    // Scrub más reactivo en móviles (0.18s) para respuesta táctil instantánea sin lag
-    scrub: isMobile ? 0.18 : 0.35,
+    // Scrub prácticamente sincrónico (0.05/0.08) para eliminar el lag y evitar el snap al scrollear hacia arriba
+    scrub: isMobile ? 0.05 : 0.08,
     pin: true,
-    anticipatePin: 1,
+    anticipatePin: 0,
+    fastScrollEnd: true,
+    preventOverlaps: true,
     onEnter: () => {
       reveal("#villain-header");
       revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
       reveal("#villain-pivot", 0.3, true);
       reveal("#story-bridge", 0.5, true);
     },
+    onLeaveBack: () => {
+      // Ocultar capa de filosofía al salir hacia arriba para liberar GPU
+      filosofia.style.visibility = "hidden";
+      filosofia.style.clipPath = "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)";
+      setScrub(false);
+      clearTimeout(scrubTimer);
+    },
     onUpdate: (self) => {
-      // Interpolación lineal proporcional en todo el progreso:
-      // Cuando progress va de 0 a 1, la cortina viaja exactamente de 100% a 0%
-      // Eliminando el tiempo muerto donde la pantalla quedaba congelada
-      const center = (100 + SKEW) - self.progress * (100 + SKEW * 2);
-      const top = Math.max(0, Math.min(100, center));
-      const bottom = Math.max(0, Math.min(100, center - SKEW));
-      filosofia.style.setProperty("--wipe-top", `${top}%`);
-      filosofia.style.setProperty("--wipe-bottom", `${bottom}%`);
+      // Si el progreso llega a cero (scroll up completo), ocultar la capa para 60fps constantes
+      if (self.progress <= 0.001) {
+        filosofia.style.visibility = "hidden";
+        filosofia.style.clipPath = "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)";
+        setScrub(false);
+        return;
+      }
+
+      filosofia.style.visibility = "visible";
+
+      // Cuando ya cubre el 100%, liberar clip-path para no forzar máscara GPU
+      if (self.progress >= 0.999) {
+        filosofia.style.clipPath = "none";
+        setScrub(false);
+      } else {
+        const center = (100 + SKEW) - self.progress * (100 + SKEW * 2);
+        const top = Math.max(0, Math.min(100, center));
+        const bottom = Math.max(0, Math.min(100, center - SKEW));
+        filosofia.style.clipPath = `polygon(${top}% 0%, 100% 0%, 100% 100%, ${bottom}% 100%)`;
+        setScrub(true);
+        clearTimeout(scrubTimer);
+        scrubTimer = setTimeout(() => setScrub(false), 180);
+      }
 
       // En móviles revelamos el texto desde el 20% de avance para feedback visual inmediato
       const threshold = isMobile ? 0.20 : 0.38;
@@ -162,15 +192,15 @@ function setupStory() {
         philRevealed = true;
         gsap.fromTo(
           filosofia.querySelectorAll(".js-phil-word"),
-          { filter: "blur(12px)", willChange: "transform,filter,opacity" },
+          { filter: "blur(8px)", willChange: "transform,filter,opacity" },
           {
             opacity: 1,
             filter: "blur(0px)",
             y: 0,
             scale: 1,
-            duration: 0.8,
+            duration: 0.6,
             ease: motionEnter.ease,
-            stagger: staggerFromStart(0.04),
+            stagger: staggerFromStart(0.03),
             onComplete: function () {
               gsap.set(filosofia.querySelectorAll(".js-phil-word"), { willChange: "auto" });
             },
