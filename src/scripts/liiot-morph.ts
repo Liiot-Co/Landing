@@ -36,8 +36,9 @@ interface PieceMorphState {
 /**
  * Figuras geométricas por pieza, precalculadas una sola vez (no por frame)
  * a partir del centro/radio real de cada pieza en el isotipo original:
- * piezas 1-2 (las barras diagonales largas) → círculo/cuadrado, radio 8;
- * piezas 3-4 (los ganchos pequeños) → triángulo/rombo, radio 5.
+ * cada pieza recorre figuras propias que ninguna otra pieza usa
+ * (1: círculo → hexágono, 2: cuadrado → estrella, 3: triángulo → cruz,
+ * 4: rombo → pentágono), así nunca parece convertirse en otra pieza.
  */
 const PIECE_MORPH_STATES: PieceMorphState[] = [
   {
@@ -69,23 +70,23 @@ const PIECE_MORPH_STATES: PieceMorphState[] = [
     label: "contraste",
     pieces: [
       {
-        // piece 1 → cuadrado
-        d: "M10.04,21.98 L26.04,21.98 L26.04,37.98 L10.04,37.98 Z",
+        // piece 1 → hexágono
+        d: "M26.54,29.98 L22.29,37.34 L13.79,37.34 L9.54,29.98 L13.79,22.62 L22.29,22.62 Z",
         color: "#8B45CC",
       },
       {
-        // piece 2 → círculo
-        d: "M22.21,17.93 C22.21,22.35 25.79,25.93 30.21,25.93 C34.63,25.93 38.21,22.35 38.21,17.93 C38.21,13.51 34.63,9.93 30.21,9.93 C25.79,9.93 22.21,13.51 22.21,17.93 Z",
+        // piece 2 → estrella
+        d: "M30.21,8.93 L32.59,14.65 L38.77,15.15 L34.06,19.18 L35.5,25.21 L30.21,21.98 L24.92,25.21 L26.36,19.18 L21.65,15.15 L27.83,14.65 Z",
         color: "#e2b31c",
       },
       {
-        // piece 3 → rombo
-        d: "M30.21,36.81 L35.21,41.81 L30.21,46.81 L25.21,41.81 Z",
+        // piece 3 → cruz
+        d: "M28.41,36.81 L32.01,36.81 L32.01,40.01 L35.21,40.01 L35.21,43.61 L32.01,43.61 L32.01,46.81 L28.41,46.81 L28.41,43.61 L25.21,43.61 L25.21,40.01 L28.41,40.01 Z",
         color: "#FF6A33",
       },
       {
-        // piece 4 → triángulo
-        d: "M18.04,1.11 L22.37,8.61 L13.71,8.61 Z",
+        // piece 4 → pentágono
+        d: "M18.04,0.81 L23.08,4.47 L21.16,10.4 L14.92,10.4 L13,4.47 Z",
         color: "#e04b66",
       },
     ],
