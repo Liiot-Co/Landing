@@ -9,8 +9,8 @@
  * - Haces de microfibras paralelas que se entrelazan y bifurcan según las corrientes del fluido.
  * - Vórtice interactivo: el cursor inyecta velocidad y deformación angular fluida en el campo.
  * - Impulso longitudinal: paquetes de energía que viajan a lo largo de las líneas de corriente.
- * - Línea génesis: el click siembra una fibra luminosa temporal (~2.8s) que nace en
- *   uClickPos y se alarga serpenteando con el flujo (un solo haz temporal, sin anillo).
+ * - Línea génesis: el click siembra una fibra recta temporal (~2.8s) que nace en
+ *   uClickPos y se alarga como los haces 1-4 (un solo haz temporal, sin anillo ni meandro).
  * - Pausa en visibilidad y compatibilidad estricta con prefers-reduced-motion.
  */
 interface Props {
@@ -136,11 +136,14 @@ const { class: className = "" } = Astro.props;
         vec2 field1 = getFlowField(uv * 2.4, t) + vortex;
         vec2 field2 = getFlowField(uv * 4.2 + vec2(1.8, 3.2), t * 1.25) * 0.5 + vortex * 0.5;
 
+        // Coordenadas deformadas por el flujo vectorial
+        vec2 flowUv = uv + field1 + field2;
+
         // ═══════════════════════════════════════════════════════════════
-        // LÍNEA GÉNESIS: el click siembra una fibra luminosa temporal (~2.8s)
-        // que nace en uClickPos y se alarga serpenteando con el flujo.
+        // LÍNEA GÉNESIS: fibra recta temporal, mismo lenguaje que HAZ 1-4, sin meandro.
         // ═══════════════════════════════════════════════════════════════
-        // Geometría de fibra advectada (una sola línea en abanico, NO anillo completo)
+        // Recta advectada por el flujo que pasa por uClickPos (largo finito
+        // por envolvente longitudinal, NO anillo ni abanico angular)
         vec2 deltaClick = (uv - uClickPos) * aspectVec;
         float distToClick = length(deltaClick);
         float genesisAge = uTime - uClickTime;
@@ -148,20 +151,17 @@ const { class: className = "" } = Astro.props;
         float genesisGlow = 0.0;
         float genesisCore = 0.0;
         float genesisHalo = 0.0;
+        float genesisTrail = 0.0;
+        float genesisGold = 0.0;
 
         if (genesisAge >= 0.0 && genesisAge < 2.8) {
           genesisFade = 1.0 - smoothstep(0.0, 2.8, genesisAge);
           float genesisFront = genesisAge * 0.55;
 
-          // Dirección semilla fija + meandro advectado por el flujo local
-          float flowPhase = (field1.x + field2.x) * 14.0 + (field1.y + field2.y) * 10.0;
-          float seedAng = 0.6;
-          float meander = sin(distToClick * 18.0 - genesisAge * 6.0 + flowPhase);
-          float ang = atan(deltaClick.y, deltaClick.x);
-          float angDiff = abs(atan(sin(ang - seedAng), cos(ang - seedAng)));
-
-          // Máscara angular estrecha: solo un abanico crece desde el punto de click
-          float angMask = exp(-angDiff * angDiff / 0.18);
+          // Recta por uClickPos con la pendiente de HAZ 2 (0.26, el más representativo); sin sin en el master.
+          float GEN_SLOPE = 0.26;
+          float genLinePath = (flowUv.y - uClickPos.y) + GEN_SLOPE * (flowUv.x - uClickPos.x);
+          float dGen = abs(genLinePath);
 
           // Envolvente longitudinal: la fibra nace en el click y se alarga hasta el frente
           float genesisLen = max(genesisFront * 0.5, 0.03);
@@ -169,17 +169,15 @@ const { class: className = "" } = Astro.props;
           float longEnv = exp(-longDelta * longDelta);
           float grown = smoothstep(genesisFront + 0.02, genesisFront - 0.05, distToClick);
 
-          // Distancia a la fibra ideal (arco desde el rayo semilla, con serpenteo)
-          float fiberDist = abs(angDiff * distToClick - meander * 0.035);
-          genesisCore = smoothstep(0.012, 0.0, fiberDist) * angMask * longEnv * grown;
-          genesisHalo = smoothstep(0.08, 0.0, fiberDist) * angMask * longEnv * grown;
+          // Jerarquía de grosores del mismo orden que los haces (core/halo/trail)
+          genesisCore = smoothstep(0.006, 0.0, dGen) * longEnv * grown;
+          genesisHalo = smoothstep(0.07, 0.0, dGen) * longEnv * grown;
+          genesisTrail = smoothstep(0.26, 0.0, dGen) * longEnv * grown;
+          genesisGold = smoothstep(0.002, 0.0, abs(dGen - 0.008)) * longEnv * grown;
 
           // Campo de excitación local que enciende núcleos, halos, nebulosa y polvo
           genesisGlow = exp(-distToClick * 3.2) * genesisFade;
         }
-
-        // Coordenadas deformadas por el flujo vectorial
-        vec2 flowUv = uv + field1 + field2;
 
         // Color base Deep Cosmic Obsidian (#07040F) con tinte atmosférico violeta
         vec3 color = cBg + cPurpleDeep * (0.10 * (1.0 - uv.y) + 0.05 * uv.x);
@@ -335,9 +333,11 @@ const { class: className = "" } = Astro.props;
         color += mix(cBrandYellow, cBrandPink, 0.5) * allCores * (genesisGlow * 1.6);
         color += mix(cPrimaryHigh, cAccent, 0.45) * allHalos * (genesisGlow * 0.95);
 
-        // 6º haz temporal: core fino + halo de la línea génesis
-        vec3 genesisTint = mix(mix(cAccentLight, cBrandYellow, 0.45), cPrimaryHigh, 0.30);
-        color += genesisTint * (genesisCore * 1.35 + genesisHalo * 0.55) * genesisFade;
+        // 6º haz temporal: recta génesis con gradiente de HAZ 2 + filamento dorado + trail
+        vec3 gradGen = mix(cBrandPink, cPrimaryHigh, clamp(flowUv.x * 1.2, 0.0, 1.0));
+        color += gradGen * (genesisCore * 1.25 + genesisHalo * 0.55) * genesisFade;
+        color += cBrandYellow * genesisGold * 1.30 * genesisFade;
+        color += cPurpleDeep * genesisTrail * 0.22 * genesisFade;
 
         // ═══════════════════════════════════════════════════════════════
         // NEBULOSA CROMÁTICA PROCEDURAL LIIOT (Flujo gaseoso en advección)
