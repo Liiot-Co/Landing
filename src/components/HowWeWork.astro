@@ -384,6 +384,51 @@ const steps = t.howWeWork.steps.map((step, index) => ({
       transform: none !important;
     }
   }
+
+  /* Perf: suspend card hover while actively scrolling (`html.is-scrolling`,
+     toggled from landing-motion.ts) so transitions don't recompute mid-scroll;
+     resumes 150ms after scrolling stops. */
+  html.is-scrolling .how-card {
+    pointer-events: none;
+  }
+
+  html.is-scrolling .how-card-img,
+  html.is-scrolling .media-frame,
+  html.is-scrolling .chroma-veil,
+  html.is-scrolling .chroma-sheen {
+    transition: none !important;
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     EDITORIAL PIECES: STATIC TRANSFORM + ONE-SHOT CSS REVEAL
+     Replaces the previous pointer-tracked ("magnetic") rAF parallax, which
+     kept running every frame even off-screen. The transform stays exactly
+     as set inline (static); only opacity transitions, once, staggered per
+     piece, the first time the section enters the viewport.
+     ════════════════════════════════════════════════════════════════════ */
+  @media (prefers-reduced-motion: no-preference) {
+    .js-editorial-piece {
+      transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .editorial-pieces-bg:not(.is-revealed) .js-editorial-piece {
+      opacity: 0 !important;
+      transition: none;
+    }
+
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(1) {
+      transition-delay: 0ms;
+    }
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(2) {
+      transition-delay: 90ms;
+    }
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(3) {
+      transition-delay: 180ms;
+    }
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(4) {
+      transition-delay: 270ms;
+    }
+  }
 </style>
 
 <script>
@@ -434,63 +479,35 @@ const steps = t.howWeWork.steps.map((step, index) => ({
   }
 
   /**
-   * Micro-interacción de parallax magnético en las piezas decorativas de fondo:
-   * Reaccionan suavemente a la posición del cursor sobre la sección.
+   * One-shot reveal for the decorative background pieces: replaces the
+   * previous pointer-tracked ("magnetic") rAF parallax, which kept
+   * recalculating every frame regardless of scroll position or visibility.
+   * The pieces keep their static inline rotation; only a staggered CSS
+   * opacity transition (see `.editorial-pieces-bg.is-revealed` above) fires
+   * once, the first time the section enters the viewport.
    */
-  function initInteractiveBackgroundPieces() {
+  function initEditorialPiecesReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const section = document.getElementById("como-trabajamos");
-    if (!section) return;
+    const bg = section?.querySelector<HTMLElement>(".editorial-pieces-bg");
+    if (!bg) return;
 
-    const pieces = section.querySelectorAll<HTMLElement>(".js-editorial-piece");
-    if (!pieces.length) return;
-
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let rafId = 0;
-
-    const onPointerMove = (e: PointerEvent) => {
-      const rect = section.getBoundingClientRect();
-      if (
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom &&
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right
-      ) {
-        targetX = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-        targetY = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-      } else {
-        targetX = 0;
-        targetY = 0;
-      }
-    };
-
-    const updateParallax = () => {
-      currentX += (targetX - currentX) * 0.04;
-      currentY += (targetY - currentY) * 0.04;
-
-      pieces.forEach((piece) => {
-        const speed = parseFloat(piece.dataset.speed || "0.04");
-        const baseRot = parseFloat(piece.dataset.rotate || "0");
-        const moveX = currentX * speed * 120;
-        const moveY = currentY * speed * 120;
-        const rot = baseRot + currentX * 5;
-        piece.style.transform = `translate3d(${moveX.toFixed(2)}px, ${moveY.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg)`;
-      });
-
-      rafId = requestAnimationFrame(updateParallax);
-    };
-
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    rafId = requestAnimationFrame(updateParallax);
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        if (entries[0]?.isIntersecting) {
+          bg.classList.add("is-revealed");
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(bg);
   }
 
   function initHowMotion() {
     initCardStackMotion();
-    initInteractiveBackgroundPieces();
+    initEditorialPiecesReveal();
   }
 
   if (document.readyState === "complete" || document.readyState === "interactive") {
