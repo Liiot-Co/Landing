@@ -18,6 +18,7 @@
 import Layout from "@/components/layouts/Layout.astro";
 import LiiotMark from "@/components/ui/LiiotMarkAnimated.astro";
 import MorphGradient from "@/components/ui/MorphGradient.astro";
+import { t } from "@/i18n";
 
 const PIECES = [
   {
@@ -56,29 +57,31 @@ const PIECES = [
 ---
 
 <Layout
-  title="Página no encontrada — Liiot"
-  description="Esta página se perdió en el camino. Ayúdanos a armar de nuevo el isotipo de Liiot y vuelve al inicio."
+  title={t.notFound.metaTitle}
+  description={t.notFound.metaDescription}
   noindex
 >
   <main
     id="notfound-stage"
     class="notfound-stage relative flex flex-col items-center justify-center bg-background px-4 py-6 text-center sm:py-10"
+    data-progress-template={t.notFound.progressTemplate}
+    data-piece-placed-template={t.notFound.piecePlacedAria}
   >
     <MorphGradient recipe="hybrid" blend="screen" opacity={0.3} />
 
     <a
       href="/"
       class="absolute left-4 top-4 z-20 opacity-70 transition-opacity duration-200 hover:opacity-100 sm:left-8 sm:top-8"
-      aria-label="Liiot — Volver al inicio"
+      aria-label={t.notFound.homeAria}
     >
       <LiiotMark class="size-7" color="white" />
     </a>
 
     <div class="relative z-10 flex flex-col items-center">
-      <span class="section-eyebrow text-brand-pink">Error 404</span>
+      <span class="section-eyebrow text-brand-pink">{t.notFound.eyebrow}</span>
 
       <h1 class="headline-editorial mt-3 text-3xl text-foreground sm:text-4xl lg:text-5xl">
-        Esta página<br />se nos perdió.
+        {t.notFound.titleLine1}<br />{t.notFound.titleLine2}
       </h1>
 
       <div id="mark-stage" class="mark-stage relative my-6 sm:my-8">
@@ -93,7 +96,7 @@ const PIECES = [
               class="mark-piece"
               data-piece={p.id}
               style={`--sx:${p.sx}; --sy:${p.sy}; --sr:${p.sr};`}
-              aria-label={`Colocar pieza ${p.id} de 4`}
+              aria-label={t.notFound.pieceAria.replace("{id}", String(p.id)).replace("{total}", String(PIECES.length))}
             >
               <span class="mark-piece__bob" style={`animation-delay:${-p.id * 0.85}s`}>
                 <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -108,26 +111,26 @@ const PIECES = [
       <div id="notfound-copy" class="notfound-copy">
         <div id="notfound-game" class="notfound-copy__panel">
           <p class="max-w-sm text-base font-bold text-muted-foreground sm:text-lg">
-            Toca cada pieza para armar el camino de regreso.
+            {t.notFound.instruction}
           </p>
           <p
             id="notfound-progress"
             class="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/60"
             aria-live="polite"
           >
-            0 / 4 piezas
+            {t.notFound.progressTemplate.replace("{placed}", "0").replace("{total}", String(PIECES.length))}
           </p>
         </div>
 
         <div id="notfound-success" class="notfound-copy__panel flex flex-col items-center gap-4">
           <p class="max-w-sm text-base font-bold text-foreground sm:text-lg">
-            Listo. Por aquí sí se llega.
+            {t.notFound.success}
           </p>
           <a
             href="/"
             class="btn-editorial btn-editorial--violet inline-flex items-center gap-3 px-8 py-4 text-sm uppercase tracking-[0.1em]"
           >
-            Volver al inicio
+            {t.notFound.cta}
             <span aria-hidden="true">&rarr;</span>
           </a>
         </div>

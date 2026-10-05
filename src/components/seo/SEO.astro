@@ -9,6 +9,8 @@ import {
   LIIOT_INSTAGRAM_URL,
 } from "@/constants/contact";
 import { TEAM_MEMBERS } from "@/constants/team";
+import { IMAGES } from "@/constants/images";
+import { t } from "@/i18n";
 
 interface Props {
   title?: string;
@@ -20,10 +22,10 @@ interface Props {
 }
 
 const {
-  title = "Liiot | Construimos tu futuro contigo",
-  description = "Liiot construye tecnología con propósito, no vendemos horas sino futuro junto a ti. Software a medida, plataformas escalables y automatización en Colombia.",
+  title = t.seo.defaultTitle,
+  description = t.seo.defaultDescription,
   canonical,
-  image = "/og-image.svg",
+  image = IMAGES.seo.ogImage,
   type = "website",
   noindex = false,
 } = Astro.props;
@@ -43,9 +45,9 @@ const schemaGraph = {
       "name": "Liiot",
       "legalName": "Liiot",
       "url": siteUrl,
-      "logo": `${siteUrl}/favicon.svg`,
+      "logo": `${siteUrl}${IMAGES.seo.favicon}`,
       "image": ogImageURL,
-      "description": "Estudio de ingeniería de software y tecnología con propósito. Creamos software a medida, productos digitales escalables y soluciones de automatización de procesos.",
+      "description": t.seo.schema.organizationDescription,
       "email": LIIOT_EMAIL,
       "address": {
         "@type": "PostalAddress",
@@ -91,7 +93,7 @@ const schemaGraph = {
       "@id": `${siteUrl}/#website`,
       "url": siteUrl,
       "name": "Liiot",
-      "description": "Construimos tecnología con propósito. No vendemos horas sino futuro junto a ti.",
+      "description": t.seo.schema.websiteDescription,
       "publisher": {
         "@id": `${siteUrl}/#organization`,
       },
@@ -114,34 +116,34 @@ const schemaGraph = {
     {
       "@type": "Service",
       "@id": `${siteUrl}/#service-custom-software`,
-      "name": "Liiot Custom - Software a Medida",
+      "name": t.seo.schema.services.customSoftware.name,
       "serviceType": "Custom Software Development",
       "provider": {
         "@id": `${siteUrl}/#organization`,
       },
-      "description": "Desarrollo de sistemas a medida y automatizaciones operativas (ej. caso SG-SST) para transformar tareas burocráticas en cultura ágil.",
+      "description": t.seo.schema.services.customSoftware.description,
       "areaServed": "Worldwide",
     },
     {
       "@type": "Service",
       "@id": `${siteUrl}/#service-digital-products`,
-      "name": "Lanzamiento de Plataformas y Productos Digitales (Bleepy)",
+      "name": t.seo.schema.services.digitalProducts.name,
       "serviceType": "Digital Product Engineering",
       "provider": {
         "@id": `${siteUrl}/#organization`,
       },
-      "description": "Desarrollo de plataformas modernas que conectan audiencias, marcas y creadores de contenido sin fricción publicitaria.",
+      "description": t.seo.schema.services.digitalProducts.description,
       "areaServed": "Worldwide",
     },
     {
       "@type": "Service",
       "@id": `${siteUrl}/#service-consulting`,
-      "name": "Consultoría Tecnológica & Arquitectura",
+      "name": t.seo.schema.services.consulting.name,
       "serviceType": "Technology Consulting",
       "provider": {
         "@id": `${siteUrl}/#organization`,
       },
-      "description": "Acompañamiento técnico directo con fundadores e ingenieros seniors para definir la estrategia y arquitectura digital adecuada.",
+      "description": t.seo.schema.services.consulting.description,
       "areaServed": "Worldwide",
     },
   ],
@@ -172,7 +174,7 @@ const schemaGraph = {
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={ogImageURL} />
-<meta property="og:image:alt" content="Liiot — Construimos tu futuro contigo" />
+<meta property="og:image:alt" content={t.seo.ogImageAlt} />
 <meta property="og:locale" content="es_CO" />
 
 <!-- Twitter / X -->
@@ -181,7 +183,7 @@ const schemaGraph = {
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImageURL} />
-<meta name="twitter:image:alt" content="Liiot — Construimos tu futuro contigo" />
+<meta name="twitter:image:alt" content={t.seo.ogImageAlt} />
 
 <!-- Descubrimiento para Motores y LLMs -->
 <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap-index.xml" />

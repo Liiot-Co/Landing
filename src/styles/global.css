@@ -218,13 +218,13 @@ body {
        corrección de posición al fijar la sección, y eso se ve como un salto
        justo al entrar al modo cinematográfico. */
     /* scroll-padding aligns in-view sections with the fixed nav when using #anchors */
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 5.5rem;
     scrollbar-gutter: stable;
   }
 
   @media (min-width: 640px) {
     html {
-      scroll-padding-top: 5.5rem;
+      scroll-padding-top: 6rem;
     }
   }
 

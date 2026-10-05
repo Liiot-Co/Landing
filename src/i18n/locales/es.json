@@ -1,0 +1,221 @@
+{
+  "seo": {
+    "defaultTitle": "Liiot | Construimos tu futuro contigo",
+    "defaultDescription": "Liiot construye tecnología con propósito. Creamos software a medida y productos digitales para empresas.",
+    "ogImageAlt": "Liiot — Construimos tu futuro contigo",
+    "schema": {
+      "organizationDescription": "Empresa de soluciones de software y tecnología con propósito. Creamos software a medida y productos digitales para empresas.",
+      "websiteDescription": "Construimos tecnología con propósito. No vendemos horas sino futuro junto a ti.",
+      "services": {
+        "customSoftware": {
+          "name": "Liiot Custom - Software a Medida",
+          "description": "Desarrollo de sistemas a medida y automatizaciones operativas (ej. caso SG-SST) para transformar tareas burocráticas en cultura ágil."
+        },
+        "digitalProducts": {
+          "name": "Lanzamiento de Plataformas y Productos Digitales (Bleepy)",
+          "description": "Desarrollo de plataformas modernas que conectan audiencias, marcas y creadores de contenido sin fricción publicitaria."
+        },
+        "consulting": {
+          "name": "Consultoría Tecnológica & Arquitectura",
+          "description": "Acompañamiento técnico directo con fundadores e ingenieros seniors para definir la estrategia y arquitectura digital adecuada."
+        }
+      }
+    }
+  },
+  "navbar": {
+    "brandAria": "Liiot — Inicio",
+    "menuToggleAria": "Abrir menú",
+    "consultingCta": "Agendar consultoría",
+    "links": [
+      { "name": "Por qué existimos", "path": "#por-que-existimos" },
+      { "name": "Cómo trabajamos", "path": "#como-trabajamos" },
+      { "name": "Proyectos", "path": "#proyectos" },
+      { "name": "Equipo", "path": "#equipo" },
+      { "name": "Agendar", "path": "#agendar" }
+    ]
+  },
+  "hero": {
+    "imageAlt": "Dos mujeres saltando en la calle con energía creativa",
+    "aria": {
+      "toggleAction": "Alternar acción (click)",
+      "toggleActionTitle": "Haz click para alternar",
+      "toggleKeyword": "Alternar palabra clave (click)",
+      "toggleKeywordTitle": "Haz click para alternar palabra",
+      "toggleSuffix": "Alternar cierre (click)",
+      "toggleSuffixTitle": "Haz click para alternar",
+      "scrollDown": "Desplazarse a la siguiente sección"
+    },
+    "connector": "tu",
+    "prefixes": ["Construimos", "Diseñamos", "Creamos", "Impulsamos"],
+    "keywords": [
+      { "text": "futuro", "color": "var(--accent)" },
+      { "text": "negocio", "color": "var(--primary-high)" },
+      { "text": "equipo", "color": "var(--brand-pink)" },
+      { "text": "gente", "color": "var(--brand-yellow)" },
+      { "text": "confianza", "color": "var(--accent)" },
+      { "text": "propósito", "color": "var(--brand-pink)" }
+    ],
+    "suffixes": ["contigo", "a tu lado", "en equipo", "de verdad"],
+    "body": "Creamos tecnología que une personas, genera confianza y hace que el día a día funcione mejor. Somos una empresa colombiana joven y seria.",
+    "mainCTA": "Planeamos juntos",
+    "secondCTA": "Conócenos"
+  },
+  "story": {
+    "reto": {
+      "folio": "01",
+      "title": "Ya conoces",
+      "highlight": "esta historia",
+      "subtitle": "Esto es lo que todos hemos vivido y lo que decidimos cambiar:",
+      "obstacles": [
+        { "n": "01", "text": "Pagaste por horas y nunca por la confianza que necesitabas." },
+        { "n": "02", "text": "Te entregaron algo que nadie vuelve a revisar." },
+        { "n": "03", "text": "Recibiste un producto que nunca sentiste como tuyo." }
+      ],
+      "pivot": "No tiene que ser así.",
+      "bridge": "¿Y si existiera otra forma?",
+      "imageAlt": "Un escritorio vacío y genérico, sin nadie detrás",
+      "imageTag": "así no"
+    },
+    "filosofia": {
+      "folio": "02",
+      "quote": "El problema nunca fue la tecnología sino construirla sin mirar a quién la usa.",
+      "subtitle": "Por eso, aquí es distinto:",
+      "resolutions": [
+        { "n": "01", "text": "Solo pagas por lo que de verdad funciona." },
+        { "n": "02", "text": "Lo que hacemos se queda, y seguimos entendiendo por qué está ahí." },
+        { "n": "03", "text": "No paramos hasta que lo sientas tuyo de verdad." }
+      ],
+      "imageAlt1": "El equipo de Liiot revisando código juntos, señalando la pantalla",
+      "imageAlt2": "Personas del equipo riendo mientras trabajan juntas",
+      "stickerCta": "Así construimos →"
+    }
+  },
+  "howWeWork": {
+    "titleLine1": "Trabajamos contigo,",
+    "titleLine2": "no para ti",
+    "subtitle": "Cada paso lo damos juntos, construido con la energía de crear contigo.",
+    "steps": [
+      {
+        "id": "understand",
+        "title": "Entendemos tu negocio",
+        "emotion": "Nos sentamos contigo a escuchar sin supuestos para entender qué mueve a tu gente.",
+        "theme": "violet",
+        "textColor": "light",
+        "rotation": "-2deg",
+        "points": [
+          { "icon": "HeartHandshake", "text": "Escucha honesta, cero tecnicismos vacíos" },
+          { "icon": "Sparkles", "text": "Tecnología que nace de las personas, no al revés" }
+        ]
+      },
+      {
+        "id": "build",
+        "title": "Construimos juntos",
+        "emotion": "Sin burocracia ni intermediarios, cada avance es tuyo porque lo construimos hombro a hombro.",
+        "theme": "orange",
+        "textColor": "dark",
+        "rotation": "2deg",
+        "points": [
+          { "icon": "Zap", "text": "Avances cada semana, sin esperas largas" },
+          { "icon": "Users", "text": "Equipo directo y cercano, sin intermediarios" }
+        ]
+      },
+      {
+        "id": "grow",
+        "title": "Crecemos juntos",
+        "emotion": "Lanzar es el inicio, no el final, aprendemos de tu gente para que siga creciendo.",
+        "theme": "pink",
+        "textColor": "light",
+        "rotation": "-2deg",
+        "points": [
+          { "icon": "TrendingUp", "text": "Gente usando y disfrutando lo que construimos" },
+          { "icon": "Sprout", "text": "Una relación que sigue viva después del lanzamiento" }
+        ]
+      }
+    ]
+  },
+  "portfolio": {
+    "title": "Qué hemos logrado",
+    "subtitle": "Proyectos que cuidan personas y crean comunidad de verdad.",
+    "aria": {
+      "prev": "Proyecto anterior",
+      "next": "Siguiente proyecto",
+      "region": "Carrusel Qué hemos logrado",
+      "goToSlide": "Ir al slide"
+    },
+    "projects": {
+      "liiot-custom": {
+        "title": "Liiot Custom",
+        "subtitle": "Herramienta a medida · Caso SG-SST",
+        "description": "Automatizamos la seguridad laboral para que la prevención sea parte de la cultura, no una obligación que nadie cumple.",
+        "imageAlt": "Liiot Custom — Herramienta a medida para seguridad laboral",
+        "ctaText": "Empecemos juntos"
+      },
+      "bleepy": {
+        "title": "Bleepy",
+        "subtitle": "Plataforma de creadores & empresas · Coming soon",
+        "description": "Unimos marcas y creadores para crear contenido auténtico que conecta, sin depender de publicidad fría.",
+        "imageAlt": "Bleepy — Plataforma de creadores y marcas",
+        "ctaText": "Unirme a la lista de espera"
+      }
+    }
+  },
+  "team": {
+    "titlePrefix": "Nuestro",
+    "titleHighlight": "equipo",
+    "subtitle": "Un equipo pequeño que se conoce, se apoya y construye junto, eso se nota en cada proyecto.",
+    "liveBadge": "Live",
+    "members": {
+      "dana": {
+        "name": "Dana Sofia Sánchez",
+        "role": "CEO",
+        "photoAlt": "Retrato de Dana Sofia Sánchez"
+      },
+      "david": {
+        "name": "David Ocaño",
+        "role": "CCO",
+        "photoAlt": "Retrato de David Ocaño"
+      },
+      "jean": {
+        "name": "Jean Pierre Ortiz",
+        "role": "CTO",
+        "photoAlt": "Retrato de Jean Pierre Ortiz"
+      }
+    }
+  },
+  "finalCta": {
+    "titleHighlight": "Crezcamos",
+    "titleSuffix": "juntos",
+    "subtitle": "Cuéntanos qué necesitas, lo construimos juntos.",
+    "cta": "Agendar consultoría"
+  },
+  "footer": {
+    "contactHeading": "Contacto",
+    "socialHeading": "Redes",
+    "legalHeading": "Legal",
+    "aria": {
+      "linkedin": "Liiot en LinkedIn",
+      "instagram": "Liiot en Instagram"
+    },
+    "legal": {
+      "privacy": "Privacidad",
+      "terms": "Términos"
+    },
+    "tagline": "Jóvenes, serios y con ganas de construir. Hecho en Colombia.",
+    "copyright": "© {year} Liiot. Todos los derechos reservados.",
+    "backToTop": "Volver arriba ↑"
+  },
+  "notFound": {
+    "metaTitle": "Página no encontrada — Liiot",
+    "metaDescription": "Esta página se perdió en el camino. Ayúdanos a armar de nuevo el isotipo de Liiot y vuelve al inicio.",
+    "homeAria": "Liiot — Volver al inicio",
+    "pieceAria": "Colocar pieza {id} de {total}",
+    "piecePlacedAria": "Pieza {id} colocada",
+    "eyebrow": "Error 404",
+    "titleLine1": "Esta página",
+    "titleLine2": "se nos perdió.",
+    "instruction": "Toca cada pieza para armar el camino de regreso.",
+    "progressTemplate": "{placed} / {total} piezas",
+    "success": "Listo. Por aquí sí se llega.",
+    "cta": "Volver al inicio"
+  }
+}

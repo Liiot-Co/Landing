@@ -10,9 +10,11 @@
  * - Transformación ultra-suave del font-weight con Satoshi Variable (550 -> 900).
  */
 import MorphGradient from "@/components/ui/MorphGradient.astro";
+import SectionFade from "@/components/ui/SectionFade.astro";
 import { LIIOT_CALENDLY_URL } from "@/constants/contact";
-import { HERO_IMAGE, HERO_IMAGE_WIDTHS } from "@/constants/hero";
+import { HERO_IMAGE, HERO_IMAGE_WIDTHS, HERO_IMAGE_FALLBACK } from "@/constants/hero";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
+import { t } from "@/i18n";
 ---
 
 <section
@@ -42,13 +44,13 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
       src={unsplashResize(HERO_IMAGE, 1536, 65)}
       srcset={unsplashSrcSet(HERO_IMAGE, HERO_IMAGE_WIDTHS, 65)}
       sizes="100vw"
-      alt="Dos mujeres saltando en la calle con energía creativa"
-      class="hero-bg-img absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 ease-out will-change-transform"
+      alt={t.hero.imageAlt}
+      class="hero-bg-img absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 ease-out"
       loading="eager"
       fetchpriority="high"
       decoding="sync"
       onload="this.classList.remove('opacity-0'); this.classList.add('opacity-100'); document.getElementById('hero-image-skeleton')?.classList.add('opacity-0');"
-      onerror="this.src='https://images.unsplash.com/photo-1521669246297-b04a27e36f07?w=1200&q=70'; this.classList.remove('opacity-0');"
+      onerror={`this.src='${HERO_IMAGE_FALLBACK}'; this.classList.remove('opacity-0');`}
     />
 
     {/* Radial gradient: matices vibrantes sutiles integrados con el diseño */}
@@ -70,42 +72,45 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     <h1
       id="hero-title"
       class="headline-editorial hero-kinetic-title max-w-5xl text-[clamp(2.1rem,9.6vw,6.4rem)] leading-[0.98] text-foreground sm:text-[clamp(3.2rem,8.2vw,6.5rem)] lg:text-[clamp(4rem,6.8vw,6.8rem)]"
+      data-keywords={JSON.stringify(t.hero.keywords)}
+      data-prefixes={JSON.stringify(t.hero.prefixes)}
+      data-suffixes={JSON.stringify(t.hero.suffixes)}
     >
       <span class="title-line block whitespace-nowrap">
         <button
           type="button"
           id="swap-prefix"
           class="kinetic-word-btn inline-block text-left"
-          aria-label="Alternar acción (click)"
-          title="Haz click para alternar"
+          aria-label={t.hero.aria.toggleAction}
+          title={t.hero.aria.toggleActionTitle}
         >
-          <span id="prefix-text" class="kinetic-word">Construimos</span>
+          <span id="prefix-text" class="kinetic-word">{t.hero.prefixes[0]}</span>
         </button>{" "}
-        <span class="kinetic-word">tu</span>
+        <span class="kinetic-word">{t.hero.connector}</span>
       </span>
       <span class="title-line block whitespace-nowrap">
         <button
           type="button"
           id="hero-swap-btn"
           class="interactive-word-btn inline-block text-left"
-          aria-label="Alternar palabra clave (click)"
-          title="Haz click para alternar palabra"
+          aria-label={t.hero.aria.toggleKeyword}
+          title={t.hero.aria.toggleKeywordTitle}
         >
           <span
             id="hero-swap-word"
             class="kinetic-word active-keyword inline-block"
           >
-            futuro
+            {t.hero.keywords[0]?.text ?? "futuro"}
           </span>
         </button>{" "}
         <button
           type="button"
           id="swap-suffix"
           class="kinetic-word-btn inline-block text-left"
-          aria-label="Alternar cierre (click)"
-          title="Haz click para alternar"
+          aria-label={t.hero.aria.toggleSuffix}
+          title={t.hero.aria.toggleSuffixTitle}
         >
-          <span id="suffix-text" class="kinetic-word">contigo</span>
+          <span id="suffix-text" class="kinetic-word">{t.hero.suffixes[0]}</span>
         </button>
       </span>
     </h1>
@@ -114,8 +119,7 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
       id="hero-body"
       class="mt-9 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base"
     >
-      Creamos tecnología que une personas, genera confianza y hace que el
-      día a día funcione mejor. Somos una empresa colombiana joven y seria.
+      {t.hero.body}
     </p>
 
     <div id="hero-cta" class="mt-12 flex flex-wrap items-center gap-x-8 gap-y-5">
@@ -125,33 +129,16 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
         rel="noopener noreferrer"
         class="btn-editorial btn-editorial--violet inline-flex items-center justify-center px-8 py-4 text-sm uppercase tracking-[0.1em]"
       >
-        Agendar consultoría
+       {t.hero.mainCTA}
       </a>
       <a
         href="#el-reto"
         class="text-sm font-bold uppercase tracking-[0.1em] text-foreground underline decoration-accent decoration-2 underline-offset-4 transition-opacity hover:opacity-70"
       >
-        Conoce nuestra filosofía
+        {t.hero.secondCTA}
       </a>
     </div>
   </div>
-
-  {/* Indicador de scroll — círculo sutil */}
-  <a
-    href="#el-reto"
-    aria-label="Desplazarse a la siguiente sección"
-    class="group absolute bottom-8 right-4 z-10 flex size-12 items-center justify-center rounded-full border border-foreground/25 text-foreground/70 transition-colors hover:border-foreground/50 hover:text-foreground sm:right-6 lg:right-8"
-  >
-    <svg
-      class="size-4 animate-bounce"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.75"
-    >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m0 0l-6-6m6 6l6-6" />
-    </svg>
-  </a>
 
   {/* Script inmediato para revelar imagen si ya está en caché del navegador (0ms LCP) */}
   <script is:inline>
@@ -165,6 +152,9 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
       }
     })();
   </script>
+
+  {/* Fade suave hacia la siguiente sección */}
+  <SectionFade position="bottom" color="background" height="h-28 sm:h-44" zIndex="z-[6]" />
 </section>
 
 <style>
@@ -176,7 +166,10 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
       rgba(15, 9, 28, 0.95) 100%
     );
     background-size: 200% 100%;
-    animation: heroShimmer 2.2s ease-in-out infinite;
+    /* Single pass only — the skeleton is hidden by the image's opacity
+       fade-in well before a loop would matter, so looping it forever just
+       burns frames in the background. */
+    animation: heroShimmer 2.2s ease-in-out 1;
   }
 
   @keyframes heroShimmer {
@@ -188,18 +181,9 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     }
   }
 
-  .hero-bg-img {
-    animation: hero-slow-scale 20s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
-  }
-
-  @keyframes hero-slow-scale {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(1.1);
-    }
-  }
+  /* Perpetual fullscreen zoom removed — the hero image now relies solely on
+     its one-time opacity fade-in (see `.hero-bg-img` utility classes above)
+     instead of an infinite GPU-composited scale animation. */
 
   /* Gradiente radial integrado con elegancia: matices vibrantes sutiles y armónicos */
   .hero-radial-gradient {
@@ -373,17 +357,32 @@ import { unsplashResize, unsplashSrcSet } from "@/lib/images";
     const suffixText = document.getElementById("suffix-text");
     const heroTitle = document.getElementById("hero-title");
 
-    const keywords = [
-      { text: "futuro", color: "var(--accent)" },
-      { text: "negocio", color: "var(--primary-high)" },
-      { text: "equipo", color: "var(--brand-pink)" },
-      { text: "gente", color: "var(--brand-yellow)" },
-      { text: "confianza", color: "var(--accent)" },
-      { text: "propósito", color: "var(--brand-pink)" },
-    ];
+    let keywords: Array<{ text: string; color: string }> = [];
+    try {
+      keywords = heroTitle?.dataset.keywords ? JSON.parse(heroTitle.dataset.keywords) : [];
+    } catch {}
+    if (!keywords.length) {
+      keywords = [
+        { text: "futuro", color: "var(--accent)" },
+        { text: "negocio", color: "var(--primary-high)" },
+        { text: "equipo", color: "var(--brand-pink)" },
+        { text: "gente", color: "var(--brand-yellow)" },
+        { text: "confianza", color: "var(--accent)" },
+        { text: "propósito", color: "var(--brand-pink)" },
+      ];
+    }
 
-    const prefixes = ["Construimos", "Diseñamos", "Creamos", "Impulsamos"];
-    const suffixes = ["contigo", "a tu lado", "en equipo", "de verdad"];
+    let prefixes: string[] = [];
+    try {
+      prefixes = heroTitle?.dataset.prefixes ? JSON.parse(heroTitle.dataset.prefixes) : [];
+    } catch {}
+    if (!prefixes.length) prefixes = ["Construimos", "Diseñamos", "Creamos", "Impulsamos"];
+
+    let suffixes: string[] = [];
+    try {
+      suffixes = heroTitle?.dataset.suffixes ? JSON.parse(heroTitle.dataset.suffixes) : [];
+    } catch {}
+    if (!suffixes.length) suffixes = ["contigo", "a tu lado", "en equipo", "de verdad"];
 
     let kwIdx = 0;
     let preIdx = 0;

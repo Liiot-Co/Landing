@@ -7,16 +7,14 @@
  * en textura, rompe el negro dominante del resto del sitio.
  * Fuente: vault §7.
  */
-import MorphGradient from "@/components/ui/MorphGradient.astro";
 import { LIIOT_CALENDLY_URL } from "@/constants/contact";
+import { t } from "@/i18n";
 ---
 
 <section
   id="agendar"
-  class="relative flex min-h-[60vh] sm:min-h-[75vh] items-center overflow-hidden py-16 sm:py-20 lg:py-28"
-  style="background: linear-gradient(160deg, #B84A22 0%, #FF6A33 45%, #FF8A5C 100%);"
+  class="relative z-10 flex min-h-[55vh] sm:min-h-[70vh] items-center pt-20 pb-10 sm:pt-24 sm:pb-14 lg:pt-28 lg:pb-16 scroll-mt-24"
 >
-  <MorphGradient recipe="human" blend="soft-light" opacity={0.5} />
 
   <div class="container relative z-10 mx-auto px-4 text-center sm:px-6 lg:px-8">
     <div id="final-cta-card" class="mx-auto max-w-3xl">
@@ -64,12 +62,12 @@ import { LIIOT_CALENDLY_URL } from "@/constants/contact";
         </div>
       </div>
 
-      <h2 class="headline-editorial text-4xl text-[#07040F] sm:text-6xl lg:text-7xl">
-        <span>Crezcamos</span> juntos
+      <h2 class="headline-editorial text-4xl text-white sm:text-6xl lg:text-7xl">
+        <span class="text-white">{t.finalCta.titleHighlight}</span> <span class="text-white">{t.finalCta.titleSuffix}</span>
       </h2>
 
-      <p class="mx-auto mt-9 max-w-lg text-base font-semibold leading-relaxed text-[#07040F]/80 sm:text-lg">
-        Cuéntanos qué necesitas, lo construimos juntos.
+      <p class="mx-auto mt-9 max-w-lg text-base font-semibold leading-relaxed text-white/80 sm:text-lg">
+        {t.finalCta.subtitle}
       </p>
 
       <div class="mt-12">
@@ -77,9 +75,9 @@ import { LIIOT_CALENDLY_URL } from "@/constants/contact";
           href={LIIOT_CALENDLY_URL}
           target="_blank"
           rel="noopener noreferrer"
-          class="btn-editorial btn-editorial--dark inline-flex items-center gap-3 px-10 py-5 text-sm uppercase tracking-[0.1em]"
+          class="btn-editorial btn-editorial--violet inline-flex items-center gap-3 px-10 py-5 text-sm uppercase tracking-[0.1em]"
         >
-          Agendar consultoría
+          {t.finalCta.cta}
           <span aria-hidden="true">&rarr;</span>
         </a>
       </div>
@@ -115,3 +113,25 @@ import { LIIOT_CALENDLY_URL } from "@/constants/contact";
     }
   }
 </style>
+
+<script>
+  import { initAuroraGradient, type CleanupFn } from "@/scripts/aurora-gradient";
+
+  let cleanup: CleanupFn | null = null;
+
+  function init() {
+    cleanup?.();
+    cleanup = null;
+    const canvas = document.getElementById("final-cta-canvas") as HTMLCanvasElement | null;
+    if (canvas) {
+      cleanup = initAuroraGradient(canvas);
+    }
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("astro:before-swap", () => {
+    cleanup?.();
+    cleanup = null;
+  });
+</script>
