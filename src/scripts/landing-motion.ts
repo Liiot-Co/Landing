@@ -246,6 +246,12 @@ function setupEditorialLogoPieces() {
     { id: "#editorial-piece-team", trigger: "#equipo" },
   ];
 
+  // Scrub ScrollTriggers from the micro-parallax tweens below. Disabled
+  // (without resetting) while their piece is out of the viewport and while
+  // the story wipe is scrubbing (`filosofia-scrub`), so this never keeps
+  // recalculating off-screen or competing with the wipe for frame budget.
+  const parallaxTriggers: ScrollTrigger[] = [];
+
   pieces.forEach(({ id, trigger }) => {
     const el = document.querySelector<HTMLElement>(id);
     if (!el) return;
@@ -269,7 +275,7 @@ function setupEditorialLogoPieces() {
     );
 
     // Micro-parallax editorial sutil a lo largo del scroll de la sección
-    gsap.to(el, {
+    const parallaxTween = gsap.to(el, {
       y: -14,
       ease: "none",
       scrollTrigger: {
@@ -279,6 +285,25 @@ function setupEditorialLogoPieces() {
         scrub: 1.2,
       },
     });
+
+    const st = parallaxTween.scrollTrigger;
+    if (!st) return;
+    parallaxTriggers.push(st);
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) st.enable();
+        else st.disable(false);
+      },
+      { threshold: 0 }
+    );
+    io.observe(el);
+  });
+
+  if (!parallaxTriggers.length) return;
+  window.addEventListener("filosofia-scrub", (e: Event) => {
+    const active = (e as CustomEvent<{ active: boolean }>).detail.active;
+    parallaxTriggers.forEach((st) => (active ? st.disable(false) : st.enable()));
   });
 }
 
