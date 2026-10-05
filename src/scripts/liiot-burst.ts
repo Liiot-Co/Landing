@@ -4,7 +4,8 @@
  * Traduce la técnica "partículas-3" de
  * joshwcomeau.com/blog/whimsical-animations/#particles-3 a nodos DOM:
  * cada partícula es un `<span>` con vars `--angle/--distance/--size` y el
- * keyframe `liiot-fling-away` usa `cos()/sin()` para el cono polar.
+ * keyframe `liiot-fling-away` usa `cos()/sin()` para emitir en 360° (radial,
+ * no cono) con jitter por partícula y color de marca inline.
  *
  * Restricciones de perf (estrictas):
  * - Burst de 8-14 nodos, vida <1s, `animationend → remove()` + fallback
@@ -26,11 +27,12 @@ export interface BurstOptions {
 const MIN_COUNT = 8;
 const MAX_COUNT = 14;
 const MAX_CONCURRENT_PER_WRAPPER = 14;
-/** Cono polar de emisión en grados (especificación ODD: 200-240° + jitter). */
-const CONE_START_DEG = 200;
-const CONE_SPREAD_DEG = 40;
+/** Jitter por partícula en grados, aplicado sobre el ángulo radial (360°/count). */
+const RADIAL_JITTER_DEG = 18;
 /** GC fallback por si `animationend` no dispara (pestaña oculta a mitad, etc). */
 const GC_FALLBACK_MS = 1500;
+/** Paleta de marca Liiot — cada partícula toma un color al azar de aquí. */
+const BRAND_COLORS = ["#5A228B", "#8B45CC", "#FF6A33", "#e2b31c", "#e04b66"];
 
 function isReducedMotion(): boolean {
   return (
@@ -66,7 +68,7 @@ function ensureBurstStyles(): void {
   width: var(--size, 6px);
   height: var(--size, 6px);
   border-radius: 9999px;
-  background: currentColor;
+  background: currentColor; /* fallback; cada partícula fija su color inline */
   pointer-events: none;
   z-index: 5;
   opacity: 0;
@@ -108,13 +110,18 @@ function spawnParticles(wrapper: HTMLElement, count: number): void {
     p.className = "liiot-particle";
     p.setAttribute("aria-hidden", "true");
 
-    const angle = CONE_START_DEG + Math.random() * CONE_SPREAD_DEG;
+    // Emisión radial 360°: base uniforme (i/count) + jitter para que no
+    // se vea como un patrón perfecto de rueda de carro.
+    const angle =
+      (i / count) * 360 + (Math.random() - 0.5) * RADIAL_JITTER_DEG;
     const distance = 44 + Math.random() * 52;
     const size = 4 + Math.random() * 4;
+    const color = BRAND_COLORS[Math.floor(Math.random() * BRAND_COLORS.length)];
 
     p.style.setProperty("--angle", `${angle.toFixed(1)}deg`);
     p.style.setProperty("--distance", `${distance.toFixed(1)}px`);
     p.style.setProperty("--size", `${size.toFixed(1)}px`);
+    p.style.background = color;
     p.style.animationDuration = `${(0.45 + Math.random() * 0.4).toFixed(2)}s`;
     p.style.animationDelay = `${(Math.random() * 0.08).toFixed(2)}s`;
 
