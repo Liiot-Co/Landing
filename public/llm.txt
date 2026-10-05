@@ -1,6 +1,6 @@
 # Liiot
 
-> Liiot es un estudio de ingeniería de software y tecnología con propósito. Desarrollamos herramientas digitales a medida, plataformas web escalables y soluciones de automatización orientadas a impacto real de negocio, colaborando como socios tecnológicos de largo plazo.
+> Liiot es una nueva empresa de tecnología que busca construir un mejor futuro. Desarrollamos herramientas digitales a medida, plataformas web escalables y soluciones de automatización orientadas a impacto real de negocio, colaborando como socios tecnológicos de largo plazo.
 
 Sitio Web: https://www.liiot.app  
 Contacto: hola@liiot.dev  
@@ -8,7 +8,7 @@ Ubicación: Colombia (cobertura global)
 
 ## Filosofía y Propuesta de Valor
 
-- **Propósito ante todo**: "El problema nunca fue la tecnología sino construirla sin mirar a quién la usa." Construimos software pensado en la experiencia de las personas reales que lo operan diariamente.
+- **Tiempo de vuelta**: "Nos mueve que tu equipo vuelva a tener tiempo para lo que importa." Construimos software pensado en las personas reales que lo operan cada día.
 - **Socios, no vendedores de horas**: No facturamos horas vacías ni dejamos proyectos abandonados; co-creamos soluciones con objetivos claros de impacto y negocio.
 - **Entregas ágiles y transparentes**: Iteraciones semanales visibles, sin jerarquías intermedias ni burocracia.
 - **Evolución post-lanzamiento**: El despliegue a producción es el punto de partida; aprendemos del uso real para optimizar, mantener y escalar la herramienta.
@@ -51,6 +51,6 @@ Ubicación: Colombia (cobertura global)
 
 - Sitio Web: https://www.liiot.app
 - Correo Electrónico: hola@liiot.dev
-- Agendar Consultoría: https://calendar.app.google/bEq3dn4x2TZCiVE46
+- Agenda una charla: https://calendar.app.google/bEq3dn4x2TZCiVE46
 - LinkedIn: https://www.linkedin.com/company/liiot
 - Instagram: https://www.instagram.com/liiot

@@ -12,6 +12,7 @@
  * - Compatible con animación GSAP (`#how-header`).
  */
 
+import { LIIOT_CALENDLY_URL } from "@/constants/contact";
 import {
   HeartHandshake,
   Sparkles,
@@ -26,9 +27,9 @@ const STEP_IMAGE_WIDTHS = [480, 800, 1100];
 
 const steps = [
   {
-    title: "Entendemos tu negocio",
+    title: "Escuchamos primero",
     emotion:
-      "Nos sentamos contigo a escuchar sin supuestos para entender qué mueve a tu gente.",
+      "Nos sentamos contigo a entender qué le quita tiempo a tu gente y qué le daría tranquilidad.",
     image:
       "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop",
     theme: "violet",
@@ -37,18 +38,18 @@ const steps = [
     points: [
       {
         icon: HeartHandshake,
-        text: "Escucha honesta, cero tecnicismos vacíos",
+        text: "Hablamos tu idioma, sin tecnicismos",
       },
       {
         icon: Sparkles,
-        text: "Tecnología que nace de las personas, no al revés",
+        text: "Partimos de lo que vive tu equipo cada día",
       },
     ],
   },
   {
     title: "Construimos juntos",
     emotion:
-      "Sin burocracia ni intermediarios, cada avance es tuyo porque lo construimos hombro a hombro.",
+      "Cada semana ves algo funcionando y decides con nosotros el siguiente paso.",
     image:
       "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=1200&auto=format&fit=crop",
     theme: "orange",
@@ -57,18 +58,18 @@ const steps = [
     points: [
       {
         icon: Zap,
-        text: "Avances cada semana, sin esperas largas",
+        text: "Pruebas cada avance con tu equipo real",
       },
       {
         icon: Users,
-        text: "Equipo directo y cercano, sin intermediarios",
+        text: "Decides las prioridades con nosotros",
       },
     ],
   },
   {
     title: "Crecemos juntos",
     emotion:
-      "Lanzar es el inicio, no el final, aprendemos de tu gente para que siga creciendo.",
+      "Seguimos contigo después del lanzamiento para que la herramienta crezca al ritmo de tu negocio.",
     image:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
     theme: "pink",
@@ -77,11 +78,11 @@ const steps = [
     points: [
       {
         icon: TrendingUp,
-        text: "Gente usando y disfrutando lo que construimos",
+        text: "Medimos cuánto tiempo le devuelve a tu equipo",
       },
       {
         icon: Sprout,
-        text: "Una relación que sigue viva después del lanzamiento",
+        text: "Ajustamos según lo que tu gente usa",
       },
     ],
   },
@@ -103,10 +104,10 @@ const steps = [
 
       <div class="max-w-2xl">
         <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          Trabajamos contigo,<br />no para ti
+          Caminamos a tu lado<br />desde el primer día
         </h2>
         <p class="mt-4 max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
-          Cada paso lo damos juntos, construido con la energía de crear contigo.
+          Así se ve trabajar con nosotros, semana a semana.
         </p>
       </div>
     </div>
@@ -176,6 +177,21 @@ const steps = [
           );
         })
       }
+    </div>
+
+    {/* CTA intermedio — el lector ya vio el método y todavía no ha visto un botón */}
+    <div class="flex flex-col items-center gap-6 text-center">
+      <p class="max-w-xl text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+        ¿Te imaginas a tu equipo con más tiempo?
+      </p>
+      <a
+        href={LIIOT_CALENDLY_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-physical btn-physical--violet inline-flex items-center justify-center rounded-xl px-8 py-4 text-sm uppercase tracking-[0.1em]"
+      >
+        Agenda una charla
+      </a>
     </div>
   </div>
 </section>

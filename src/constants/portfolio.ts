@@ -23,25 +23,25 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     title: "Liiot Custom",
     subtitle: "Herramienta a medida · Caso SG-SST",
     description:
-      "Automatizamos la seguridad laboral para que la prevención sea parte de la cultura, no una obligación que nadie cumple.",
+      "Automatizamos la seguridad laboral para que cuidar a cada trabajador sea parte natural del día.",
     image:
       "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
     imageAlt: "Liiot Custom — Herramienta a medida para seguridad laboral",
     themeColor: "violet",
-    ctaText: "Empecemos juntos",
+    ctaText: "Quiero algo así para mi empresa",
     ctaLink: LIIOT_BOOKING_URL,
   },
   {
     slug: "bleepy",
     title: "Bleepy",
-    subtitle: "Plataforma de creadores & empresas · Coming soon",
+    subtitle: "Plataforma de creadores y empresas · Próximamente",
     description:
-      "Unimos marcas y creadores para crear contenido auténtico que conecta, sin depender de publicidad fría.",
+      "Conectamos marcas con creadores que cuentan su historia con voz propia.",
     image:
       "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1400&auto=format&fit=crop",
     imageAlt: "Bleepy — Plataforma de creadores y marcas",
     themeColor: "pink",
-    ctaText: "Unirme a la lista de espera",
+    ctaText: "Cuéntanos si te interesa",
     ctaLink: "#agendar",
   },
 ];

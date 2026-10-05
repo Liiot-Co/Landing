@@ -143,7 +143,22 @@
 
 ---
 
+## Estado de aplicación
+
+**Aplicado en el código** (las imágenes no se tocaron): hero, El reto (escena de empatía), Por qué existimos, Cómo trabajamos con CTA intermedio, Proyectos, Equipo, CTA final, menú, footer, meta description, JSON-LD y `llms.txt`.
+
+Decisiones tomadas a partir de `docs/auditoria-copy.md`:
+- El hero ya dice qué se vende ("software a medida") y habla del lector. Lo de "empresa nueva" pasó a Equipo.
+- El título interactivo solo combina palabras que forman frases correctas: `futuro · tiempo · bienestar · tranquilidad`, con `Construimos/Cuidamos` y `contigo/junto a ti`.
+- Por qué existimos cuenta la motivación y Cómo trabajamos cuenta el método, para no repetir.
+- Un solo verbo para el botón principal: "Agenda una charla". "Quiero algo así para mi empresa" queda solo en el caso SG-SST.
+- Bleepy: "Próximamente" y el botón "Cuéntanos si te interesa", que sí lleva a la sección de contacto.
+- Se añadió "Cada semana así son horas que no vuelven." a El reto (lo que se pierde) y "Imagina tu próxima semana con esas horas de vuelta." al cierre (cómo se ve el éxito).
+
 ## Pendientes para el equipo
-- [ ] Confirmar duración y costo de la charla para el microcopy.
-- [ ] Conseguir una cita y un dato real del cliente SG-SST.
-- [ ] Aprobar la reescritura para aplicarla en los componentes.
+- [ ] Confirmar duración y costo de la charla para el microcopy bajo el botón.
+- [ ] Conseguir una cita y un dato real del cliente SG-SST. Con eso se afirma el resultado en Proyectos.
+- [ ] Bloque de objeciones antes del cierre (costo, plazos, integración con lo existente, por qué una empresa nueva). Necesita respuestas reales.
+- [ ] Validar la escena de El reto con frases reales de clientes.
+- [ ] Imágenes y alt de fotos (aplazado por decisión del equipo).
+- [ ] Páginas de Privacidad y Términos, dominio del correo y redes (no son copy, pero afectan la confianza).

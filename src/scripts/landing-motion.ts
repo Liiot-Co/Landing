@@ -62,7 +62,7 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark",
+    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark",
     { opacity: "1", transform: "translateY(0px)" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
@@ -127,9 +127,8 @@ function setupStory() {
     anticipatePin: 1,
     onEnter: () => {
       reveal("#villain-header");
-      revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
+      revealGroup(reto.querySelectorAll(".js-villain-item"), 0.18);
       reveal("#villain-pivot", 0.3, true);
-      reveal("#story-bridge", 0.5, true);
     },
     onUpdate: (self) => {
       const center = 100 + SKEW / 2 - self.progress * (200 + SKEW);

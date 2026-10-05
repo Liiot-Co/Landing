@@ -1,76 +1,41 @@
 ---
 /**
- * "El Villano → Nuestra filosofía" — wipe cinematográfico (viaje del héroe,
+ * "El reto → Por qué existimos" — wipe cinematográfico (viaje del héroe,
  * etapas 2-3), maquetado como una doble página de revista: kicker + folio de
- * página, tipografía editorial grande y un collage fotográfico interactivo
- * en vez de un simple bloque de texto sobre un fondo animado.
+ * página, tipografía editorial grande y un collage fotográfico interactivo.
  *
- * EL RETO (01, frío, violeta) — notas tachadas como recortes de prensa
- * (`obstacles`) + una foto desaturada de un escritorio genérico ("así no").
- * LA FILOSOFÍA (02, cálida, vívida) responde `obstacles` uno a uno con
- * `resolutions`, mismo número (01↔01, 02↔02, 03↔03) — la relación "esto
- * combatimos → así lo resolvemos" queda explícita por el emparejamiento, no
- * solo implícita en el tono. La filosofía lleva además dos fotos
- * superpuestas del equipo real trabajando, con un sticker de caption, como
- * una página de "quiénes somos" de revista. Las fotos crecen un poco al
- * hover (misma curva `--dt-easing-human` que ya usan las cards de
- * HowWeWork.astro) — el collage responde, no es estático. Sin rotaciones:
- * ni fotos ni texto se inclinan, todo alineado en grilla.
- *
- * El fondo de la filosofía es un mesh gradient: color base sólido +
- * múltiples `radial-gradient()` apiladas en `background-image`, cada una
- * anclada en un punto distinto y apagándose a transparent al 50% (sin
- * blur). Usa las posiciones de la receta `hybrid` de `design-tokens.json`
- * (→ core.morphGradient.hybrid: "firma narrativa completa, toda la paleta
- * a partes iguales — máxima libertad artística", reservada para "hero de
- * marketing y portadas narrativas") con los colores de marca. El scrim
- * radial detrás del texto evita que tanto color le quite legibilidad al
- * quote — ya no depende de un divisor decorativo para cerrar la sección.
+ * EL RETO (01, frío, violeta) — una escena en segunda persona que el lector
+ * reconoce (sin listas ni tachones), la validación de lo que siente y un giro
+ * que pasa la palabra a Liiot: "Ahí empieza nuestro trabajo."
+ * POR QUÉ EXISTIMOS (02, cálida, vívida) — responde con lo que nos mueve:
+ * devolverle tiempo al equipo del lector. Es el contraste emocional del
+ * panel anterior, no una lista de promesas.
  *
  * Desktop (≥1024px, motion permitido): `landing-motion.ts` fija la sección
  * en pantalla (`ScrollTrigger` `pin`) y el scroll mueve un corte diagonal
  * (`clip-path: polygon(...)`, variables `--wipe-top`/`--wipe-bottom`) que
- * "abre" la filosofía sobre el reto — el villano nunca se desplaza, es la
- * cortina la que revela lo que hay detrás. Aplica la regla del brandbook
- * "Tech inicia en violeta, Human resuelve en naranja" (§Motion) llevada a su
- * máxima expresión: el wipe ES la narrativa.
+ * "abre" el segundo panel sobre el primero. Aplica la regla del brandbook
+ * "Tech inicia en violeta, Human resuelve en naranja" (§Motion).
+ *
+ * El fondo del segundo panel es un mesh gradient: color base sólido +
+ * múltiples `radial-gradient()` apiladas (receta `hybrid` de
+ * `design-tokens.json`) con un scrim radial para cuidar la legibilidad.
  *
  * Mobile / `prefers-reduced-motion`: sin pin ni clip-path — los dos paneles
- * caen a flujo normal, apilados verticalmente (collage debajo del texto),
- * con los mismos reveals en cascada de antes (ver `applyReducedMotionStates`
- * y el bloque `mobileStory` en landing-motion.ts).
- *
- * Copy base: vault §1 "Qué no es Liiot" y vault §3 "Por qué existimos",
- * reescrita con voz narrativa/emocional en segunda persona en vez de
- * fragmentos clínicos.
+ * caen a flujo normal, apilados verticalmente, con los mismos reveals.
  */
 import { PHILOSOPHY_TEXT } from "@/lib/philosophy";
 import { unsplashResize } from "@/lib/images";
 
 /*
- * Sujeto = el lector ("pagaste", "te entregaron", "recibiste"), nunca
- * "nosotros" ni una frase sin sujeto — con solo el eyebrow "El reto" arriba,
- * una lista de frases negativas sin dueño explícito se lee, al escanear,
- * como una descripción de Liiot (el tema que la sección acaba de presentar),
- * no de la industria genérica que Liiot vino a cambiar.
+ * Escena en segunda persona: el lector se reconoce antes de que Liiot hable.
+ * Cada párrafo se revela en cascada (`.js-villain-item`).
  */
-const obstacles = [
-  { n: "01", text: "Pagaste por horas y nunca por la confianza que necesitabas." },
-  { n: "02", text: "Te entregaron algo que nadie vuelve a revisar." },
-  { n: "03", text: "Recibiste un producto que nunca sentiste como tuyo." },
+const scene = [
+  "Son las siete de la noche y sigues cuadrando el reporte que solo tú sabes hacer. Tu equipo trabaja duro y aun así las tareas repetidas se llevan las mejores horas de la semana. Tienes ideas para hacer crecer el negocio y casi nunca encuentras el momento de pensarlas.",
+  "Cada semana así son horas que no vuelven.",
+  "Ese cansancio dice mucho de cuánto cuidas lo que construiste.",
 ];
-
-/*
- * Responde a `obstacles` uno a uno, mismo número — la relación "esto
- * combatimos → así lo resolvemos" queda explícita por el emparejamiento
- * 01↔01, 02↔02, 03↔03, no solo implícita en el tono general del párrafo.
- */
-const resolutions = [
-  { n: "01", text: "Solo pagas por lo que de verdad funciona." },
-  { n: "02", text: "Lo que hacemos se queda, y seguimos entendiendo por qué está ahí." },
-  { n: "03", text: "No paramos hasta que lo sientas tuyo de verdad." },
-];
-
 const words = PHILOSOPHY_TEXT.split(" ");
 ---
 
@@ -98,43 +63,33 @@ const words = PHILOSOPHY_TEXT.split(" ");
 
               <div>
                 <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-                  Ya conoces<br /><span class="text-brand-pink" data-annotate="el-reto">esta historia</span>
+                  Sabemos<br /><span class="text-brand-pink" data-annotate="el-reto">cómo se siente</span>
                 </h2>
-                {/* Nombra la pelea ANTES de la lista — sin esto, una lista de frases
-                    negativas se lee, al escanear, como una descripción de Liiot */}
-                <p class="mt-4 text-base font-bold text-muted-foreground sm:text-lg">
-                  Esto es lo que todos hemos vivido y lo que decidimos cambiar:
-                </p>
               </div>
             </div>
 
-            <ul class="mt-8 flex flex-col gap-4 lg:mt-10">
+            <div class="mt-8 flex max-w-xl flex-col gap-5 lg:mt-10">
               {
-                obstacles.map((o) => (
-                  <li class="js-villain-item note-card note-card-reto flex items-baseline gap-3 translate-y-6 opacity-0">
-                    <span class="text-sm font-bold tabular-nums text-brand-pink/70">{o.n}</span>
-                    <p class="text-lg font-bold leading-snug text-foreground/60 line-through decoration-2 decoration-brand-pink/60 sm:text-xl">
-                      {o.text}
-                    </p>
-                  </li>
+                scene.map((text, i) => (
+                  <p
+                    class:list={[
+                      "js-villain-item translate-y-6 opacity-0",
+                      i === 0
+                        ? "text-lg font-medium leading-relaxed text-foreground/85 sm:text-xl"
+                        : "text-lg font-bold leading-snug text-muted-foreground sm:text-xl",
+                    ]}
+                  >
+                    {text}
+                  </p>
                 ))
               }
-            </ul>
+            </div>
 
             <p
               id="villain-pivot"
-              class="mt-10 translate-y-6 text-xl font-bold text-muted-foreground opacity-0 sm:text-2xl lg:mt-12"
+              class="mt-10 translate-y-6 text-2xl font-bold text-accent opacity-0 sm:text-3xl lg:mt-12"
             >
-              No tiene que ser así.
-            </p>
-
-            {/* PUENTE — pregunta en tono de guía/mentor, no de confesión: evita
-                "nosotros" para no sonar a Liiot admitiendo ser el villano. */}
-            <p
-              id="story-bridge"
-              class="mt-4 translate-y-4 text-lg font-bold text-accent opacity-0 sm:text-xl"
-            >
-              ¿Y si existiera otra forma?
+              Ahí empieza nuestro trabajo.
             </p>
           </div>
 
@@ -148,7 +103,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
                 loading="lazy"
               />
             </figure>
-            <span class="story-tag absolute -right-2 top-8 lg:top-10">así no</span>
+            <span class="story-tag absolute -right-2 top-8 lg:top-10">te entendemos</span>
           </div>
         </div>
       </div>
@@ -172,7 +127,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
             <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
               <span class="size-2 rounded-full bg-accent mb-3"></span>
               <span class="section-eyebrow-vertical">
-                Filosofía
+                Por qué existimos
               </span>
               <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
             </div>
@@ -186,7 +141,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
                   words.map((word) => (
                     <span
                       class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0"
-                      data-annotate={word === "problema" ? "por-que-existimos" : undefined}
+                      data-annotate={word === "tiempo" ? "por-que-existimos" : undefined}
                     >
                       {word}
                     </span>
@@ -194,24 +149,9 @@ const words = PHILOSOPHY_TEXT.split(" ");
                 }
               </h3>
 
-              <p class="mt-8 text-base font-bold text-foreground/80 sm:text-lg">
-                Por eso, aquí es distinto:
+              <p class="mt-8 max-w-xl text-base font-medium leading-relaxed text-foreground/90 sm:text-lg">
+                Cada herramienta que hacemos empieza con una pregunta: ¿cuántas horas le va a devolver a tu gente? Si la respuesta no nos convence, seguimos buscando.
               </p>
-
-              <ul class="mt-4 flex max-w-xl flex-col gap-3">
-                {
-                  resolutions.map((r) => (
-                    <li class="flex items-center gap-3">
-                      <span class="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-full bg-foreground/15 text-xs font-bold tabular-nums text-foreground">
-                        {r.n}
-                      </span>
-                      <p class="text-sm font-bold leading-snug text-foreground sm:text-base">
-                        {r.text}
-                      </p>
-                    </li>
-                  ))
-                }
-              </ul>
             </div>
           </div>
 
@@ -233,7 +173,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
                 loading="lazy"
               />
             </figure>
-            <span class="story-sticker absolute -left-2 bottom-[26%] lg:bottom-[30%]">Así construimos</span>
+            <span class="story-sticker absolute -left-2 bottom-[26%] lg:bottom-[30%]">Tu tiempo de vuelta</span>
           </div>
         </div>
       </div>
@@ -372,14 +312,6 @@ const words = PHILOSOPHY_TEXT.split(" ");
     letter-spacing: 0.08em;
     color: var(--muted-foreground);
     opacity: 0.55;
-  }
-
-  /* Notas — cada obstáculo se lee como un recorte de prensa, no una fila de lista */
-  .note-card {
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--foreground) 3%, transparent);
   }
 
   /* Collage fotográfico — fotos superpuestas que se acomodan un poco más al pasar el cursor */
