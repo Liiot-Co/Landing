@@ -22,6 +22,7 @@ Decisión de usuario (2026-10-05): efecto elegido "Línea génesis" entre Línea
 ## Checklist
 - [x] T1 — Eliminar lógica wave/shockwave + anillo (GLSL + excitación asociada), mantener uniforms `uClickPos/uClickTime` reutilizados como semilla génesis. Ruta: delegated. Trigger: preparation (lectura prepara escritura).
 - [x] T2 — Implementar Línea génesis: en `uClickPos` nace una fibra luminosa temporal que fluye con el field (advected), brilla núcleos/halos/polvo a su paso, decae en ~2.5s. Ruta: delegated (mismo writer que T1, un solo writer).
+- [x] T4 — Endurecer línea génesis a recta como haces 1-4 (corrección usuario 2026-10-05: "como las otras, no como ondas"). Eliminar meandro `sin(dist*18...)` y máscara en abanico; usar `linePath` recta por `uClickPos` con la misma jerarquía core/halo/trail. Ruta: delegated. Done en `ce3eab6`.
 - [ ] T3 — Verificación: `bun run build` o `astro build`, revisión visual manual del click, reduced-motion intacto. Ruta: delegated per-action worker.
 
 ## Alcance autorizado
@@ -32,6 +33,7 @@ Decisión de usuario (2026-10-05): efecto elegido "Línea génesis" entre Línea
 ## Criterios de aceptación
 - Click ya no produce anillo/wave expansiva.
 - Click siembra una línea/fibra visible que crece y fluye ~2-3s y luego se disipa.
+- La fibra génesis es RECTA como los haces 1-4 (sin serpenteo/ondas, sin abanico angular).
 - Sin regresión de contraste del texto (`#phil-quote`), sin warnings nuevos de shader, build verde.
 
 ## Checks aplicables
@@ -44,6 +46,7 @@ Decisión de usuario (2026-10-05): efecto elegido "Línea génesis" entre Línea
 
 ## Evidencia
 - `8e2c8c1` feat(filosofia): replace click wave with genesis line (T1+T2, `bun run build` verde)
+- `ce3eab6` feat(filosofia): straighten genesis line to beam language (T4, `bun run build` verde)
 
 ## Siguiente paso
 - Delegar T1+T2 a un writer con el shader actual como contexto.
