@@ -1,7 +1,7 @@
 # Plan de copy · Landing Liiot
 
 **Qué vendemos:** bienestar, futuro y tiempo. El software es el medio.
-**Quién habla:** jóvenes empáticos que entienden la visión del cliente. Ya no "jóvenes serios".
+**Quién habla:** Liiot, una nueva empresa de tecnología que busca construir un mejor futuro y entiende la visión de cada cliente. La edad y el origen del equipo dejan de ser el argumento.
 **A quién le hablamos:** una sola persona (dueño, gerente o líder de área) que pierde horas en procesos que la desgastan y quiere pensar en lo que viene.
 
 ---
@@ -12,7 +12,7 @@
 
 | Problema | Dónde aparece | Por qué frena la conversión |
 |---|---|---|
-| Habla de Liiot antes que del lector | Hero: "Somos una empresa colombiana joven y seria" | El visitante busca su beneficio. "Seria" no es un beneficio y choca con el tono cálido del resto |
+| Habla de Liiot antes que del lector | Hero: "Somos una empresa colombiana joven y seria" | El visitante busca su beneficio. La edad y el origen del equipo no son un beneficio, y "seria" choca con el tono cálido del resto |
 | Frases duales de contraste ("X, no Y") | "Trabajamos contigo, no para ti", "Lanzar es el inicio, no el final", "...parte de la cultura, no una obligación", "Jóvenes, serios y con ganas" | Repetidas suenan a fórmula y a texto generado. Diluyen la idea principal |
 | Abstracciones | "propósito", "confianza", "comunidad de verdad", "la energía de crear contigo" | No se pueden imaginar. Tiempo, horas, tranquilidad y papeleo sí |
 | Beneficios de tiempo y bienestar ausentes | Toda la página | Es justo lo que queremos vender y no aparece casi nunca |
@@ -29,6 +29,7 @@
 5. **Una idea por frase.** Sin pares de contraste salvo cuando la oposición es el mensaje (la frase de filosofía se queda porque es la tesis).
 6. **Estructura PAS sobre el viaje del héroe que ya existe:** Problema (El reto) → Agitación (lo que cuesta en tiempo y desgaste) → Solución (Filosofía + Método) → Prueba (Proyectos + Equipo) → Acción (CTA final).
 7. **Empatía con hechos.** Mostrar que entendemos su día a día describiendo escenas reales del cliente. Decir "somos empáticos" no convence.
+8. **Lo nuevo como ventaja.** Liiot es una empresa nueva y lo cuenta como una forma distinta de hacer tecnología pensada para lo que viene. La identidad la da la visión de futuro, no la edad ni la nacionalidad del equipo.
 
 ### 3. Plan de conversión (CA)
 
@@ -44,7 +45,7 @@
 #### Hero
 - **H1 (interactivo):** se mantiene "Construimos tu futuro contigo". Palabras rotativas nuevas: `futuro · tiempo · bienestar · tranquilidad · equipo · negocio`. Sufijos: `contigo · a tu lado · en equipo · de verdad`.
 - **Cuerpo antes:** "Creamos tecnología que une personas, genera confianza y hace que el día a día funcione mejor. Somos una empresa colombiana joven y seria."
-- **Cuerpo después:** "Hacemos tecnología que le devuelve tiempo a tu equipo para que pueda pensar en lo que viene. Somos jóvenes colombianos que entienden hacia dónde quieres llegar."
+- **Cuerpo después:** "Hacemos tecnología que le devuelve tiempo a tu equipo para que pueda pensar en lo que viene. Liiot es una nueva empresa de tecnología que construye un mejor futuro junto a cada equipo que acompaña."
 - **CTA primario:** "Agenda una charla". **Secundario:** "Mira cómo lo hacemos".
 
 #### El reto
@@ -78,7 +79,7 @@
 
 #### Equipo
 - **H2:** "Nuestro equipo" → "Las personas detrás de Liiot"
-- **Sub:** "Somos tres jóvenes que creen en una tecnología que cuida a quien la usa. Durante todo el proyecto hablarás directamente con nosotros."
+- **Sub:** "Fundamos Liiot para construir una tecnología que cuida a quien la usa. Durante todo el proyecto hablarás directamente con nosotros."
 - **Opcional:** una línea humana por persona ("Lo que más disfruto es...") para reforzar cercanía.
 
 #### CTA final
@@ -87,7 +88,7 @@
 - **Botón:** "Agenda tu charla" + microcopy de fricción (ver punto 3.2).
 
 #### Footer, menú y SEO
-- **Footer:** "Jóvenes, serios y con ganas de construir." → "Jóvenes que creen en una tecnología más humana. Hecho en Colombia."
+- **Footer:** "Jóvenes, serios y con ganas de construir." → "Tecnología para construir un mejor futuro."
 - **Menú:** "Agendar consultoría" → "Agenda una charla".
 - **Meta description:** "Software a medida y automatización en Colombia para que tu equipo recupere tiempo y trabaje con tranquilidad. Agenda una charla con Liiot." (se quita "no vendemos horas sino futuro").
 
