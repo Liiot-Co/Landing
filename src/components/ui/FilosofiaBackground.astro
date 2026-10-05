@@ -90,6 +90,7 @@ const { class: className = "" } = Astro.props;
       uniform float uPointerHover;  // Factor de presencia del cursor [0.0, 1.0]
       uniform vec2 uClickPos[5];    // Orígenes de las 5 fibras génesis (ring buffer JS)
       uniform float uClickTime[5];  // Timestamps de activación por slot (-10 = inactivo)
+      uniform float uGenesisActive; // 1.0 si algún slot activo (<2.8s), 0.0 = skip del loop
       uniform float uMobile;
 
       // Paleta Oficial Liiot Radiante (Brandbook §Color: Deep Cosmic Obsidian, Violeta, Naranja, Rosa, Amarillo)
@@ -153,6 +154,7 @@ const { class: className = "" } = Astro.props;
         float genesisTrail = 0.0;
         float genesisGold = 0.0;
 
+        if (uGenesisActive > 0.5) {
         for (int i = 0; i < 5; i++) {
           vec2 clickPos = uClickPos[i];
           float genesisAge = uTime - uClickTime[i];
@@ -183,6 +185,7 @@ const { class: className = "" } = Astro.props;
             // Campo de excitación local que enciende núcleos, halos, nebulosa y polvo
             genesisGlow += exp(-distToClick * 3.2) * slotFade;
           }
+        }
         }
 
         // Color base Deep Cosmic Obsidian (#07040F) con tinte atmosférico violeta
@@ -446,6 +449,7 @@ const { class: className = "" } = Astro.props;
     const uPointerHoverLoc = gl.getUniformLocation(program, "uPointerHover");
     const uClickPosLoc = gl.getUniformLocation(program, "uClickPos[0]");
     const uClickTimeLoc = gl.getUniformLocation(program, "uClickTime[0]");
+    const uGenesisActiveLoc = gl.getUniformLocation(program, "uGenesisActive");
     const uMobileLoc = gl.getUniformLocation(program, "uMobile");
 
     const vao = gl.createVertexArray();
@@ -460,6 +464,8 @@ const { class: className = "" } = Astro.props;
       if (isReducedMotion) {
         // Limpia fibras génesis fantasma: desactiva los 5 slots y sube el buffer una vez.
         clickT.fill(-10.0);
+        lastClickTime = -10.0;
+        genesisDirty = true;
         renderFrame(0);
       } else {
         requestTick();
@@ -512,11 +518,13 @@ const { class: className = "" } = Astro.props;
     let currentHover = 0.0;
 
     // Ring buffer génesis: hasta 5 fibras simultáneas, el click más viejo se recicla.
+    // P2: posiciones intercaladas preasignadas (sin alloc por frame, sin estado duplicado).
     const MAX_GENESIS = 5;
-    const clickX = new Float32Array(MAX_GENESIS).fill(0.5);
-    const clickY = new Float32Array(MAX_GENESIS).fill(0.5);
+    const clickPosArr = new Float32Array(MAX_GENESIS * 2).fill(0.5);
     const clickT = new Float32Array(MAX_GENESIS).fill(-10.0);
     let clickSlot = 0;
+    let lastClickTime = -10.0; // Timestamp del click más reciente (O(1) para uGenesisActive)
+    let genesisDirty = true; // P2: subir uClickPos/uClickTime solo cuando cambian
     const startTime = performance.now();
 
     const onPointerMove = (e: PointerEvent) => {
@@ -546,9 +554,11 @@ const { class: className = "" } = Astro.props;
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom
       ) {
-        clickX[clickSlot] = (e.clientX - rect.left) / width;
-        clickY[clickSlot] = 1.0 - (e.clientY - rect.top) / height;
+        clickPosArr[clickSlot * 2] = (e.clientX - rect.left) / width;
+        clickPosArr[clickSlot * 2 + 1] = 1.0 - (e.clientY - rect.top) / height;
         clickT[clickSlot] = (performance.now() - startTime) * 0.001;
+        lastClickTime = clickT[clickSlot];
+        genesisDirty = true;
         clickSlot = (clickSlot + 1) % MAX_GENESIS;
       }
     };
@@ -577,17 +587,19 @@ const { class: className = "" } = Astro.props;
       gl.uniform1f(uTimeLoc, elapsed);
       gl.uniform2f(uPointerLoc, currentPointerX, currentPointerY);
       gl.uniform1f(uPointerHoverLoc, currentHover);
-      if (uClickPosLoc) {
-        gl.uniform2fv(uClickPosLoc, [
-          clickX[0], clickY[0],
-          clickX[1], clickY[1],
-          clickX[2], clickY[2],
-          clickX[3], clickY[3],
-          clickX[4], clickY[4],
-        ]);
-      }
-      if (uClickTimeLoc) {
-        gl.uniform1fv(uClickTimeLoc, clickT);
+      // P1: skip global del loop génesis — 1 float barato por frame (O(1), sin scan de slots)
+      const genesisActive =
+        elapsed >= lastClickTime && elapsed - lastClickTime < 2.8 ? 1.0 : 0.0;
+      gl.uniform1f(uGenesisActiveLoc, genesisActive);
+      // P2: uClickPos/uClickTime solo cuando cambian (dirty-flag); uTime/uPointer cada frame.
+      if (genesisDirty) {
+        if (uClickPosLoc) {
+          gl.uniform2fv(uClickPosLoc, clickPosArr);
+        }
+        if (uClickTimeLoc) {
+          gl.uniform1fv(uClickTimeLoc, clickT);
+        }
+        genesisDirty = false;
       }
 
       // 1 solo draw call para todo el background
