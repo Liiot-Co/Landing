@@ -117,4 +117,16 @@ import { t } from "@/i18n";
   .js-team-card:focus-within .team-photo-img {
     filter: grayscale(0) saturate(1.45) contrast(1.18) brightness(1.04);
   }
+
+  /* Perf: suspend card hover while actively scrolling (`html.is-scrolling`,
+     toggled from landing-motion.ts) so transitions don't recompute mid-scroll;
+     resumes 150ms after scrolling stops. */
+  html.is-scrolling .js-team-card {
+    pointer-events: none;
+  }
+
+  html.is-scrolling .team-photo,
+  html.is-scrolling .team-photo-img {
+    transition: none !important;
+  }
 </style>

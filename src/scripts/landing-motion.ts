@@ -239,6 +239,27 @@ function setupFooter() {
   onSectionEnter("#footer-mark", triggerStart.footer, () => reveal("#footer-mark"));
 }
 
+/**
+ * Perf: suspends card-hover transitions while the user is actively
+ * scrolling — toggles `.is-scrolling` on <html> (see `.how-card`,
+ * `.team-photo` CSS rules), removed 150ms after scroll settles. Passive
+ * listener, single reused timeout id, no per-frame work.
+ */
+function setupScrollHoverSuspend() {
+  const root = document.documentElement;
+  let scrollEndTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const onScroll = () => {
+    root.classList.add("is-scrolling");
+    clearTimeout(scrollEndTimer);
+    scrollEndTimer = setTimeout(() => {
+      root.classList.remove("is-scrolling");
+    }, 150);
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+}
+
 function setupEditorialLogoPieces() {
   const pieces = [
     { id: "#editorial-piece-how", trigger: "#como-trabajamos" },
@@ -397,6 +418,7 @@ function init() {
   ScrollTrigger.getAll().forEach((t) => t.kill());
 
   setupSmoothAnchors();
+  setupScrollHoverSuspend();
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     applyReducedMotionStates();
