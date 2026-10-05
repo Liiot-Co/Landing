@@ -1,63 +1,96 @@
 /**
- * LiiotMark SVG morph — each click cycles the logo through brand values:
- * futuro → soluciones → propósito → impacto → comunidad → confianza → logo
+ * LiiotMark SVG morph — each click morphs the 4 isotype pieces
+ * (`.liiot-path`) INDEPENDENTLY into their own geometric figure
+ * (circle/square/triangle/diamond), each with its own brand color.
+ * Cycles: logo → figuras → contraste → logo. Pieces never borrow
+ * another piece's shape or position — each one only interpolates
+ * between its own original `d` and its own figure variants.
  *
- * Uses flubber for path interpolation and GSAP for crossfade.
+ * Uses flubber for per-path interpolation.
  * The component (LiiotMarkAnimated.astro) emits the DOM; this script
  * wires up click handlers on every .liiot-mark on the page.
  */
 import { interpolate } from "flubber";
-import { gsap } from "gsap";
 import { initBoops } from "./liiot-boop";
 import { burst } from "./liiot-burst";
 
 const MORPH_DURATION = 500;
 const LABEL_FADE = 300;
+/** Stagger entre piezas al animar un morph, para que no se vean como una
+ *  sola unidad (especificación ODD: 40-60ms). */
+const PIECE_STAGGER_MS = 50;
 
-interface MorphState {
-  label: string;
-  color: string;
+interface PieceFigure {
+  /** `d` del path de la figura, ya posicionado dentro del viewBox 48x48
+   *  en el área que ocupa esa pieza en el isotipo original. */
   d: string;
+  color: string;
 }
 
-const MORPH_STATES: MorphState[] = [
+interface PieceMorphState {
+  label: string;
+  /** Una entrada por pieza, en el mismo orden que `.liiot-path--1..4`. */
+  pieces: PieceFigure[];
+}
+
+/**
+ * Figuras geométricas por pieza, precalculadas una sola vez (no por frame)
+ * a partir del centro/radio real de cada pieza en el isotipo original:
+ * piezas 1-2 (las barras diagonales largas) → círculo/cuadrado, radio 8;
+ * piezas 3-4 (los ganchos pequeños) → triángulo/rombo, radio 5.
+ */
+const PIECE_MORPH_STATES: PieceMorphState[] = [
   {
-    label: "futuro",
-    color: "#FF6A33",
-    d: "M24,4 L42,36 Q42,44 24,44 Q6,44 6,36 Z",
+    label: "figuras",
+    pieces: [
+      {
+        // piece 1 → círculo
+        d: "M10.04,29.98 C10.04,34.4 13.62,37.98 18.04,37.98 C22.46,37.98 26.04,34.4 26.04,29.98 C26.04,25.56 22.46,21.98 18.04,21.98 C13.62,21.98 10.04,25.56 10.04,29.98 Z",
+        color: "#5A228B",
+      },
+      {
+        // piece 2 → cuadrado
+        d: "M22.21,9.93 L38.21,9.93 L38.21,25.93 L22.21,25.93 Z",
+        color: "#FF6A33",
+      },
+      {
+        // piece 3 → triángulo
+        d: "M30.21,36.81 L34.54,44.31 L25.88,44.31 Z",
+        color: "#e04b66",
+      },
+      {
+        // piece 4 → rombo
+        d: "M18.04,1.11 L23.04,6.11 L18.04,11.11 L13.04,6.11 Z",
+        color: "#e2b31c",
+      },
+    ],
   },
   {
-    label: "soluciones",
-    color: "#8B45CC",
-    d: "M24,4 L40,14 L40,34 L24,44 L8,34 L8,14 Z",
-  },
-  {
-    label: "propósito",
-    color: "#e04b66",
-    d: "M24,40 C14,32 2,24 2,14 C2,6 8,2 14,2 C18,2 22,5 24,9 C26,5 30,2 34,2 C40,2 46,6 46,14 C46,24 34,32 24,40 Z",
-  },
-  {
-    label: "impacto",
-    color: "#e2b31c",
-    d: "M24,2 L29,17 L46,17 L32,27 L37,44 L24,34 L11,44 L16,27 L2,17 L19,17 Z",
-  },
-  {
-    label: "comunidad",
-    color: "#FF6A33",
-    d: "M24,6 C32,6 38,12 38,20 C38,28 32,34 24,34 C16,34 10,28 10,20 C10,12 16,6 24,6 M24,14 C28,14 31,17 31,21 C31,25 28,28 24,28 C20,28 17,25 17,21 C17,17 20,14 24,14",
-  },
-  {
-    label: "confianza",
-    color: "#e04b66",
-    d: "M24,2 L40,10 L40,24 C40,34 32,42 24,46 C16,42 8,34 8,24 L8,10 Z",
+    label: "contraste",
+    pieces: [
+      {
+        // piece 1 → cuadrado
+        d: "M10.04,21.98 L26.04,21.98 L26.04,37.98 L10.04,37.98 Z",
+        color: "#8B45CC",
+      },
+      {
+        // piece 2 → círculo
+        d: "M22.21,17.93 C22.21,22.35 25.79,25.93 30.21,25.93 C34.63,25.93 38.21,22.35 38.21,17.93 C38.21,13.51 34.63,9.93 30.21,9.93 C25.79,9.93 22.21,13.51 22.21,17.93 Z",
+        color: "#e2b31c",
+      },
+      {
+        // piece 3 → rombo
+        d: "M30.21,36.81 L35.21,41.81 L30.21,46.81 L25.21,41.81 Z",
+        color: "#FF6A33",
+      },
+      {
+        // piece 4 → triángulo
+        d: "M18.04,1.11 L22.37,8.61 L13.71,8.61 Z",
+        color: "#e04b66",
+      },
+    ],
   },
 ];
-
-const LOGO_D =
-  "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19" +
-  " M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19" +
-  " M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38" +
-  " M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38";
 
 const prefersReduced =
   typeof window !== "undefined" &&
@@ -140,16 +173,58 @@ function animatePathD(
   requestAnimationFrame(tick);
 }
 
+/**
+ * Anima las 4 piezas EN PARALELO pero con un leve stagger (cada una
+ * interpola su propio `d`, nunca el de otra pieza), y dispara `cb` una
+ * vez que las 4 terminaron. Reduced-motion resuelve sin stagger: como
+ * `animatePathD` llama a `cb` de forma síncrona en ese modo, el contador
+ * de pendientes llega a 0 en la misma vuelta sin necesitar una rama aparte.
+ */
+function animatePieces(
+  paths: SVGPathElement[],
+  fromDs: string[],
+  toFigures: PieceFigure[],
+  fromColors: string[],
+  duration: number,
+  cb: () => void,
+) {
+  let pending = paths.length;
+  const reduced = isReducedMotion();
+
+  paths.forEach((path, i) => {
+    const run = () => {
+      animatePathD(
+        path,
+        fromDs[i],
+        toFigures[i].d,
+        fromColors[i],
+        toFigures[i].color,
+        duration,
+        () => {
+          pending -= 1;
+          if (pending === 0) cb();
+        },
+      );
+    };
+    if (reduced) {
+      run();
+    } else {
+      setTimeout(run, i * PIECE_STAGGER_MS);
+    }
+  });
+}
+
 /** Fixed phase offsets for the4 paths in the helix — they never change,
  *  so the form at any mouse position is deterministic. */
 const HELIX_PHASES = [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5];
 
 function initMark(svg: SVGElement) {
   const originalFill = (svg as HTMLElement).dataset.fill || "#8B45CC";
-  const originalGroup = svg.querySelector<SVGGElement>(".liiot-original")!;
-  const morphPath = svg.querySelector<SVGPathElement>(".liiot-morph-path")!;
   const label = svg.querySelector<SVGTextElement>(".liiot-label")!;
   const paths = Array.from(svg.querySelectorAll<SVGPathElement>(".liiot-path"));
+  /** `d` original de cada pieza, leído del DOM (misma fuente que usan los
+   *  medallones editoriales), para poder volver a él al cerrar el ciclo. */
+  const originalDs = paths.map((p) => p.getAttribute("d") ?? "");
 
   let currentState = -1;
   let isAnimating = false;
@@ -230,17 +305,6 @@ function initMark(svg: SVGElement) {
   svg.addEventListener("mousemove", helixMove);
   svg.addEventListener("mouseleave", helixStop);
 
-  function animateMorph(
-    fromD: string,
-    toD: string,
-    fromColor: string,
-    toColor: string,
-    duration: number,
-    cb?: () => void,
-  ) {
-    animatePathD(morphPath, fromD, toD, fromColor, toColor, duration, cb);
-  }
-
   /** Burst confinado al contenedor del logo al completar cada morph. */
   function burstOnHost() {
     const host = svg.parentElement;
@@ -270,65 +334,54 @@ function initMark(svg: SVGElement) {
     // Kill any active helix before morphing
     helixStop();
     svg.classList.add("is-morphing");
+    hideLabel();
 
-    const nextIdx = (currentState + 1) % MORPH_STATES.length;
-    const next = MORPH_STATES[nextIdx];
+    const nextIdx = (currentState + 1) % PIECE_MORPH_STATES.length;
+    const next = PIECE_MORPH_STATES[nextIdx];
 
-    if (currentState === -1) {
-      // Logo → first morph state
-      gsap.to(originalGroup, {
-        opacity: 0,
-        duration: 0.3,
-        ease: "power2.in",
-        onComplete: () => {
-          originalGroup.style.display = "none";
-          morphPath.style.opacity = "1";
-          animateMorph(LOGO_D, next.d, originalFill, next.color, MORPH_DURATION, () => {
-            showLabel(next.label, next.color);
-            currentState = nextIdx;
-            isAnimating = false;
-            burstOnHost();
-          });
-        },
-      });
-    } else {
-      // Morph state → next morph state
-      const current = MORPH_STATES[currentState];
-      hideLabel();
-      animateMorph(current.d, next.d, current.color, next.color, MORPH_DURATION, () => {
-        showLabel(next.label, next.color);
-        currentState = nextIdx;
-        isAnimating = false;
-        burstOnHost();
+    // Logo → first state: from each piece's own original `d`/fill.
+    // State → next state: from each piece's own current figure/color.
+    const fromDs =
+      currentState === -1
+        ? originalDs
+        : PIECE_MORPH_STATES[currentState].pieces.map((f) => f.d);
+    const fromColors =
+      currentState === -1
+        ? paths.map(() => originalFill)
+        : PIECE_MORPH_STATES[currentState].pieces.map((f) => f.color);
 
-        // After the last state (confianza), auto-return to logo
-        if (nextIdx === MORPH_STATES.length - 1) {
-          setTimeout(returnToLogo, 1200);
-        }
-      });
-    }
+    animatePieces(paths, fromDs, next.pieces, fromColors, MORPH_DURATION, () => {
+      // Representative label color: first piece of the new state.
+      showLabel(next.label, next.pieces[0].color);
+      currentState = nextIdx;
+      isAnimating = false;
+      burstOnHost();
+
+      // After the last state, auto-return to the original logo.
+      if (nextIdx === PIECE_MORPH_STATES.length - 1) {
+        setTimeout(returnToLogo, 1200);
+      }
+    });
   }
 
   function returnToLogo() {
     if (isAnimating || currentState === -1) return;
     isAnimating = true;
-
-    const current = MORPH_STATES[currentState];
     hideLabel();
-    animateMorph(current.d, LOGO_D, current.color, originalFill, MORPH_DURATION, () => {
-      morphPath.style.opacity = "0";
-      originalGroup.style.display = "";
-      gsap.to(originalGroup, {
-        opacity: 1,
-        duration: 0.3,
-        ease: "power2.out",
-        onComplete: () => {
-          currentState = -1;
-          isAnimating = false;
-          svg.classList.remove("is-morphing");
-          burstOnHost();
-        },
-      });
+
+    const current = PIECE_MORPH_STATES[currentState];
+    const fromDs = current.pieces.map((f) => f.d);
+    const fromColors = current.pieces.map((f) => f.color);
+    const toFigures: PieceFigure[] = originalDs.map((d) => ({
+      d,
+      color: originalFill,
+    }));
+
+    animatePieces(paths, fromDs, toFigures, fromColors, MORPH_DURATION, () => {
+      currentState = -1;
+      isAnimating = false;
+      svg.classList.remove("is-morphing");
+      burstOnHost();
     });
   }
 

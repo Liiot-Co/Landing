@@ -3,9 +3,10 @@
  * Isotipo Liiot - variante animada con morph por click.
  *
  * Hover:  cada pieza geometrica se "deconstruye" (scale + translate individual).
- * Click:  el isotipo morph a una forma que representa un valor de marca,
- *         interpolada con flubber. Cicla: logo -> futuro -> software ->
- *         proposito -> impacto -> comunidad -> confianza -> logo.
+ * Click:  las 4 piezas (.liiot-path) morphean POR SEPARADO, cada una a su
+ *         propia figura geometrica (circulo/cuadrado/triangulo/rombo) con su
+ *         propio color de marca, interpoladas con flubber. Cicla: logo ->
+ *         figuras -> contraste -> logo.
  *
  * transform-box: fill-box asegura que transform-origin use el centro
  * de cada path individual, no del viewBox completo.
@@ -26,7 +27,7 @@ const fill =
   viewBox="0 0 48 48"
   role="button"
   tabindex="0"
-  aria-label="Liiot - haz click para explorar nuestros valores"
+  aria-label="Liiot - haz click para explorar sus figuras"
   data-fill={fill}
 >
   <g class="liiot-original">
@@ -51,8 +52,6 @@ const fill =
       d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
     ></path>
   </g>
-
-  <path class="liiot-morph-path" fill={fill} d="" style="opacity:0"></path>
 
   <text
     class="liiot-label"
@@ -85,10 +84,6 @@ const fill =
     transform: translate(0, -15%) scale(0.9);
   }
 
-  .liiot-morph-path {
-    transition: fill 0.4s ease;
-  }
-
   .liiot-label {
     font-family: 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif;
     font-weight: 700;
@@ -114,9 +109,6 @@ const fill =
   @media (prefers-reduced-motion: reduce) {
     .liiot-mark path {
       transition: none;
-    }
-    .liiot-morph-path {
-      transition: fill 0s;
     }
     .liiot-mark:hover .liiot-path--1,
     .liiot-mark:hover .liiot-path--2,
