@@ -17,6 +17,7 @@
 | Abstracciones | "propósito", "confianza", "comunidad de verdad", "la energía de crear contigo" | No se pueden imaginar. Tiempo, horas, tranquilidad y papeleo sí |
 | Beneficios de tiempo y bienestar ausentes | Toda la página | Es justo lo que queremos vender y no aparece casi nunca |
 | CTA genérico y repetido | "Agendar consultoría" ×3, "Empecemos juntos" | "Consultoría" suena a costo y compromiso. No dice qué gana el lector ni cuánto dura |
+| El reto lista "supuestos" tachados | "Pagaste por horas...", "Te entregaron algo...", "Recibiste un producto..." | Le dice al lector lo que vivió en vez de acompañarlo. Se siente como acusación y no como empatía |
 | Dos frases que dicen lo mismo | "No tiene que ser así." + "¿Y si existiera otra forma?" | Redundancia justo en el momento de giro |
 | Sin prueba social | Toda la página | Ningún testimonio ni resultado medible del caso SG-SST |
 
@@ -48,21 +49,34 @@
 - **Cuerpo después:** "Hacemos tecnología que le devuelve tiempo a tu equipo para que pueda pensar en lo que viene. Liiot es una nueva empresa de tecnología que construye un mejor futuro junto a cada equipo que acompaña."
 - **CTA primario:** "Agenda una charla". **Secundario:** "Mira cómo lo hacemos".
 
-#### El reto
-- **Intro:** "Esto es lo que todos hemos vivido y lo que decidimos cambiar:" → "Seguro te suena alguna de estas:"
-- **Obstáculos:**
-  1. "Pasaste meses esperando algo que nadie terminó de entender."
-  2. "Tu equipo sigue haciendo a mano lo que el sistema debía resolver."
-  3. "Recibiste un producto que nunca sentiste como tuyo."
-- **Giro:** queda una sola frase: "Puede ser distinto."
+#### El reto · rediseño completo
+**Cambio de enfoque.** Hoy la sección lista tres "supuestos" tachados y los responde uno a uno. Eso le dice al lector lo que vivió en vez de acompañarlo. La nueva versión describe una escena que él reconoce, valida lo que siente y después muestra que a Liiot la mueve resolver justo eso.
 
-#### Filosofía
-- **Tesis:** se mantiene "El problema nunca fue la tecnología sino construirla sin mirar a quién la usa."
-- **Puente:** "Por eso, aquí es distinto:" → "Así lo resolvemos:"
-- **Respuestas (01↔01, 02↔02, 03↔03):**
-  1. "Cada semana ves un avance real y sabes en qué va tu inversión."
-  2. "Tu equipo recupera las horas que hoy se pierden en tareas repetidas."
-  3. "Nos quedamos a tu lado hasta que lo sientas tuyo."
+**Estructura nueva**
+1. **Escena (empatía):** un párrafo en segunda persona que retrata su día. Sin listas ni tachones.
+2. **Validación:** una frase que reconoce su esfuerzo sin juzgarlo.
+3. **Giro:** una sola frase que pasa la palabra a Liiot.
+4. **Nuestra motivación (contraste):** el panel de filosofía responde con lo que nos mueve, que es resolver ese problema concreto.
+
+**Copy propuesto · Panel 01 (El reto)**
+- **Eyebrow:** "El reto"
+- **H2:** "Sabemos cómo se siente"
+- **Escena:** "Son las siete de la noche y sigues cuadrando el reporte que solo tú sabes hacer. Tu equipo trabaja duro y aun así las tareas repetidas se llevan las mejores horas de la semana. Tienes ideas para hacer crecer el negocio y casi nunca encuentras el momento de pensarlas."
+- **Validación:** "Ese cansancio dice mucho de cuánto cuidas lo que construiste."
+- **Giro:** "Ahí empieza nuestro trabajo."
+
+**Copy propuesto · Panel 02 (Por qué existimos)**
+- **Eyebrow:** "Por qué existimos"
+- **Frase principal (animación palabra por palabra):** "Nos mueve que tu equipo vuelva a tener tiempo para lo que importa."
+- **Desarrollo:** "Escuchamos cómo trabaja tu gente, encontramos lo que le quita horas y lo convertimos en una herramienta que lo resuelve. Nuestro trabajo termina cuando sientes la diferencia en tu semana."
+- **Sticker del collage:** "Así construimos" → "Tu tiempo de vuelta"
+
+**Cambios de diseño que implica**
+- Se eliminan las tarjetas tachadas y la lista de respuestas emparejadas 01↔01. Queda texto corrido con buen tamaño de lectura.
+- La foto fría del escritorio vacío y la etiqueta "así no" se cambian por una foto cálida de una persona trabajando tarde, sin dramatizar. Puede llevar la etiqueta "te entendemos" o ninguna.
+- Se mantiene el wipe diagonal violeta → naranja. Ahora el contraste visual acompaña el paso de "lo que vives" a "lo que nos mueve".
+- La frase "El problema nunca fue la tecnología sino construirla sin mirar a quién la usa." sale de la landing. Habla de la industria y no del lector. Puede quedarse en `llms.txt` como filosofía de marca.
+- Hay que actualizar `src/lib/philosophy.ts`, `OurStory.astro` y el bloque de filosofía en `llms.txt`.
 
 #### Cómo trabajamos
 - **H2:** "Trabajamos contigo, no para ti" → "Caminamos a tu lado desde el primer día"
