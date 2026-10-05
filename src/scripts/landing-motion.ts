@@ -17,7 +17,7 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-// Evita que el pin de setupStory() se re-mida cuando la barra de
+// Evita que el scrub de setupStory() se re-mida cuando la barra de
 // direcciones del navegador móvil aparece/desaparece durante el scroll.
 ScrollTrigger.config({ ignoreMobileResize: true });
 
@@ -103,16 +103,17 @@ function setupHero() {
 /**
  * "El reto" → "Nuestra filosofía" as a cinematic diagonal wipe.
  *
- * The stage pins full-viewport (all breakpoints — `ScrollTrigger.config({
- * ignoreMobileResize: true })` at the top of this file keeps the pin from
- * re-measuring when the mobile address bar hides/shows) and a diagonal
+ * The stage sticks full-viewport via CSS sticky inside its section, which
+ * acts as the scroll track (all breakpoints — `ScrollTrigger.config({
+ * ignoreMobileResize: true })` keeps the scrub from re-measuring when the
+ * mobile address bar hides/shows) and a diagonal
  * clip-path on the philosophy panel sweeps in from the right as the user
  * scrolls, uncovering it over the villain panel beneath. The wipe geometry
  * is a single `center` value (100 → -100, i.e. fully off-screen right →
  * fully covering) offset by a fixed `skew` on each edge, clamped with
  * `Math.min` so the philosophy panel starts at exactly zero width (no
  * pre-scroll peek). Villain content is static (no fade) so re-entering the
- * pin never replays it; the philosophy word-reveal fires once the wipe has
+ * stage never replays it; the philosophy word-reveal fires once the wipe has
  * crossed roughly its midpoint, so the words resolve just as they become
  * legible.
  *
@@ -123,11 +124,21 @@ function setupStory() {
   const stage = document.getElementById("story-stage");
   const reto = document.getElementById("story-reto");
   const filosofia = document.getElementById("por-que-existimos");
-  if (!stage || !reto || !filosofia) return;
+  const track = stage?.parentElement;
+  if (!stage || !reto || !filosofia || !track) return;
 
   stage.classList.add("is-cinematic");
 
   const isMobile = window.innerWidth < 768;
+  // Sticky instead of a GSAP pin: the pin swaps the stage to position:fixed
+  // from JS one frame after the browser has already scrolled, which reads as
+  // a shift when entering/leaving. Sticky is resolved by the compositor, so
+  // the stage stays glued with no handoff. The parent section becomes the
+  // scroll track (viewport + wipe distance) and ScrollTrigger only scrubs.
+  const WIPE_DISTANCE_VH = isMobile ? 55 : 90;
+  track.style.height = `calc(100svh + ${WIPE_DISTANCE_VH}vh)`;
+  stage.style.position = "sticky";
+  stage.style.top = "0";
   const SKEW = isMobile ? 8 : 14;
   let philRevealed = false;
   let scrubActive = false;
@@ -139,13 +150,11 @@ function setupStory() {
   }
 
   ScrollTrigger.create({
-    trigger: stage,
+    trigger: track,
     start: "top top",
-    end: isMobile ? "+=55%" : "+=90%",
+    end: "bottom bottom",
     // Scrub prácticamente sincrónico (0.05/0.08) para eliminar el lag y evitar el snap al scrollear hacia arriba
     scrub: isMobile ? 0.05 : 0.08,
-    pin: true,
-    anticipatePin: 0,
     fastScrollEnd: true,
     preventOverlaps: true,
     onLeaveBack: () => {
@@ -378,7 +387,7 @@ function setupLogoConsolidation() {
 /**
  * Smooth-scrolls in-page `#anchor` links via GSAP's ScrollToPlugin instead
  * of the native `scroll-behavior: smooth` (disabled in global.css — it
- * fights ScrollTrigger's pin in setupStory(), producing a visible jump when
+ * fought the story scroll track in setupStory(), producing a visible jump when
  * entering the cinematic mode). ScrollToPlugin drives the same scroll
  * position ScrollTrigger reads, so the two cooperate instead of racing.
  * `offsetY` mirrors the site's `scroll-padding-top` (fixed nav clearance) by
