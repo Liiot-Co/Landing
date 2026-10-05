@@ -1,0 +1,645 @@
+---
+/**
+ * FilosofiaBackground.astro
+ * Fondo dinámico procedural de alto rendimiento con cinemática de Flow Field (campo vectorial).
+ * Atmósfera: largas exposiciones de luz, auroras profundas y ribbons de energía reactivos en flujo laminar.
+ * 
+ * Cinemática Field Flow:
+ * - Campo vectorial libre de divergencia (curl noise analítico) que transporta suavemente las fibras.
+ * - Haces de microfibras paralelas que se entrelazan y bifurcan según las corrientes del fluido.
+ * - Vórtice interactivo: el cursor inyecta velocidad y deformación angular fluida en el campo.
+ * - Impulso longitudinal: paquetes de energía que viajan a lo largo de las líneas de corriente.
+ * - Línea génesis: el click siembra una fibra luminosa temporal (~2.8s) que nace en
+ *   uClickPos y se alarga serpenteando con el flujo (un solo haz temporal, sin anillo).
+ * - Pausa en visibilidad y compatibilidad estricta con prefers-reduced-motion.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<div
+  class:list={[
+    "filosofia-webgl-wrapper pointer-events-none absolute inset-0 overflow-hidden select-none",
+    className,
+  ]}
+  aria-hidden="true"
+>
+  <canvas
+    id="filosofia-glsl-canvas"
+    class="absolute inset-0 h-full w-full block"
+  ></canvas>
+  {/* Scrim sutil para garantizar contraste editorial en el área del texto */}
+  <div
+    class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_35%_50%,rgba(8,8,13,0.5)_0%,rgba(8,8,13,0.15)_55%,transparent_80%)]"
+  ></div>
+</div>
+
+<script>
+  function initFilosofiaShader() {
+    const canvas = document.getElementById("filosofia-glsl-canvas") as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    // Obtener contexto WebGL2 optimizado
+    const gl = canvas.getContext("webgl2", {
+      alpha: false,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      powerPreference: "high-performance",
+      preserveDrawingBuffer: false,
+    });
+
+    if (!gl) {
+      console.warn("WebGL2 no disponible; aplicando fallback visual estático.");
+      const wrapper = canvas.parentElement;
+      if (wrapper) {
+        wrapper.style.backgroundColor = "#08080d";
+        wrapper.style.backgroundImage =
+          "radial-gradient(ellipse at 15% 15%, rgba(255, 106, 51, 0.12) 0%, transparent 50%), " +
+          "radial-gradient(ellipse at 85% 65%, rgba(90, 34, 139, 0.22) 0%, transparent 60%), " +
+          "radial-gradient(ellipse at 25% 85%, rgba(56, 17, 84, 0.28) 0%, transparent 65%)";
+      }
+      return;
+    }
+
+    // 1. Vertex Shader: Fullscreen Triangle mínimo sin buffers
+    const vsSource = `#version 300 es
+      precision highp float;
+      out vec2 vUv;
+      void main() {
+        float x = -1.0 + float((gl_VertexID & 1) << 2);
+        float y = -1.0 + float((gl_VertexID & 2) << 1);
+        vUv = vec2(x * 0.5 + 0.5, y * 0.5 + 0.5);
+        gl_Position = vec4(x, y, 0.0, 1.0);
+      }
+    `;
+
+    // 2. Fragment Shader: Flow Field incompresible con microfibras y dinámica de vórtices
+    const fsSource = `#version 300 es
+      precision highp float;
+      in vec2 vUv;
+      out vec4 fragColor;
+
+      uniform vec2 uResolution;
+      uniform float uTime;
+      uniform vec2 uPointer;        // Coordenadas UV [0.0, 1.0]
+      uniform float uPointerHover;  // Factor de presencia del cursor [0.0, 1.0]
+      uniform vec2 uClickPos;       // Punto de origen del último tap/click
+      uniform float uClickTime;     // Timestamp de activación
+      uniform float uMobile;
+
+      // Paleta Oficial Liiot Radiante (Brandbook §Color: Deep Cosmic Obsidian, Violeta, Naranja, Rosa, Amarillo)
+      const vec3 cBg = vec3(0.027, 0.016, 0.059);          // #07040F Deep Cosmic Obsidian
+      const vec3 cPurpleDeep = vec3(0.240, 0.065, 0.380);   // Morado atmosférico luminoso
+      const vec3 cPrimary = vec3(0.520, 0.190, 0.820);      // #5A228B Violeta radiante
+      const vec3 cPrimaryHigh = vec3(0.740, 0.380, 1.000);  // #8B45CC Violeta High ultrabrillante
+      const vec3 cAccent = vec3(1.000, 0.460, 0.180);       // #FF6A33 Naranja vívido
+      const vec3 cAccentLight = vec3(1.000, 0.680, 0.420);  // #FF8A5C Naranja incandescente
+      const vec3 cBrandPink = vec3(1.000, 0.360, 0.540);    // #e04b66 Rosa Liiot brillante
+      const vec3 cBrandYellow = vec3(1.000, 0.840, 0.220);  // #e2b31c Amarillo dorado luminoso
+
+      // Campo vectorial incompresible (Curl de potencial escalar)
+      vec2 getFlowField(vec2 p, float time) {
+        float a1 = p.x * 2.1 + p.y * 1.5 + time * 0.6;
+        float b1 = p.x * 1.4 - p.y * 1.9 + time * 0.45;
+        float a2 = p.x * 3.6 - p.y * 2.8 - time * 0.7;
+
+        // Derivadas espaciales analíticas para curl rotacional
+        float d_dy = 1.5 * cos(a1) * cos(b1) + 1.9 * sin(a1) * sin(b1) - 1.4 * cos(a2);
+        float d_dx = 2.1 * cos(a1) * cos(b1) - 1.4 * sin(a1) * sin(b1) + 1.8 * cos(a2);
+
+        return vec2(-d_dy, d_dx) * 0.055;
+      }
+
+      void main() {
+        vec2 uv = gl_FragCoord.xy / uResolution.xy;
+        float aspect = uResolution.x / uResolution.y;
+        vec2 aspectVec = vec2(aspect, 1.0);
+
+        // Velocidad ultralenta para estética de corriente continua y pausada
+        float t = uTime * 0.048;
+
+        // ═══════════════════════════════════════════════════════════════
+        // VÓRTICE E INTERACCIÓN DINÁMICA DEL CURSOR EN EL FLOW FIELD
+        // ═══════════════════════════════════════════════════════════════
+        vec2 deltaPtr = (uv - uPointer) * aspectVec;
+        float distToPtr = length(deltaPtr);
+
+        // Perturbación rotacional / vórtice inyectado en el fluido
+        vec2 vortex = vec2(-deltaPtr.y, deltaPtr.x) / (distToPtr * distToPtr * 8.0 + 0.15);
+        vortex *= exp(-distToPtr * 3.8) * uPointerHover * 0.12;
+
+        // Vector total de advección del Flow Field en esta posición
+        vec2 field1 = getFlowField(uv * 2.4, t) + vortex;
+        vec2 field2 = getFlowField(uv * 4.2 + vec2(1.8, 3.2), t * 1.25) * 0.5 + vortex * 0.5;
+
+        // ═══════════════════════════════════════════════════════════════
+        // LÍNEA GÉNESIS: el click siembra una fibra luminosa temporal (~2.8s)
+        // que nace en uClickPos y se alarga serpenteando con el flujo.
+        // ═══════════════════════════════════════════════════════════════
+        // Geometría de fibra advectada (una sola línea en abanico, NO anillo completo)
+        vec2 deltaClick = (uv - uClickPos) * aspectVec;
+        float distToClick = length(deltaClick);
+        float genesisAge = uTime - uClickTime;
+        float genesisFade = 0.0;
+        float genesisGlow = 0.0;
+        float genesisCore = 0.0;
+        float genesisHalo = 0.0;
+
+        if (genesisAge >= 0.0 && genesisAge < 2.8) {
+          genesisFade = 1.0 - smoothstep(0.0, 2.8, genesisAge);
+          float genesisFront = genesisAge * 0.55;
+
+          // Dirección semilla fija + meandro advectado por el flujo local
+          float flowPhase = (field1.x + field2.x) * 14.0 + (field1.y + field2.y) * 10.0;
+          float seedAng = 0.6;
+          float meander = sin(distToClick * 18.0 - genesisAge * 6.0 + flowPhase);
+          float ang = atan(deltaClick.y, deltaClick.x);
+          float angDiff = abs(atan(sin(ang - seedAng), cos(ang - seedAng)));
+
+          // Máscara angular estrecha: solo un abanico crece desde el punto de click
+          float angMask = exp(-angDiff * angDiff / 0.18);
+
+          // Envolvente longitudinal: la fibra nace en el click y se alarga hasta el frente
+          float genesisLen = max(genesisFront * 0.5, 0.03);
+          float longDelta = (distToClick - genesisFront * 0.5) / genesisLen;
+          float longEnv = exp(-longDelta * longDelta);
+          float grown = smoothstep(genesisFront + 0.02, genesisFront - 0.05, distToClick);
+
+          // Distancia a la fibra ideal (arco desde el rayo semilla, con serpenteo)
+          float fiberDist = abs(angDiff * distToClick - meander * 0.035);
+          genesisCore = smoothstep(0.012, 0.0, fiberDist) * angMask * longEnv * grown;
+          genesisHalo = smoothstep(0.08, 0.0, fiberDist) * angMask * longEnv * grown;
+
+          // Campo de excitación local que enciende núcleos, halos, nebulosa y polvo
+          genesisGlow = exp(-distToClick * 3.2) * genesisFade;
+        }
+
+        // Coordenadas deformadas por el flujo vectorial
+        vec2 flowUv = uv + field1 + field2;
+
+        // Color base Deep Cosmic Obsidian (#07040F) con tinte atmosférico violeta
+        vec3 color = cBg + cPurpleDeep * (0.10 * (1.0 - uv.y) + 0.05 * uv.x);
+
+        // ═══════════════════════════════════════════════════════════════
+        // HAZ 1: Superior Izquierda (Arteria gruesa + microfilamentos Liiot)
+        // ═══════════════════════════════════════════════════════════════
+        float linePath1 = flowUv.y + 0.46 * flowUv.x - 0.93;
+        float d1_master = abs(linePath1);
+        float d1_pink = abs(linePath1 + 0.022 * sin(flowUv.x * 8.5 + t * 1.5));
+        float d1_yellow = abs(linePath1 - 0.016 * cos(flowUv.x * 7.2 - t * 1.1));
+        float d1_ribbon = abs(linePath1 + 0.038 * sin(flowUv.x * 5.0 + t * 0.8));
+
+        float m1 = smoothstep(0.74, 0.05, uv.x) * smoothstep(0.30, 0.95, uv.y);
+
+        // Jerarquía de grosores calibrada con alta luminiscencia
+        float core1_master = smoothstep(0.014, 0.0, d1_master) * 1.05 * m1; // Arteria gruesa radiante
+        float halo1_master = smoothstep(0.110, 0.0, d1_master) * 0.65 * m1;
+        float trail1_master = smoothstep(0.280, 0.0, d1_master) * 0.25 * m1;
+
+        float core1_pink = smoothstep(0.0022, 0.0, d1_pink) * 1.10 * m1;     // Filamento fino rosa
+        float core1_yellow = smoothstep(0.0018, 0.0, d1_yellow) * 1.15 * m1; // Microfibra capilar amarilla
+        float core1_ribbon = smoothstep(0.0055, 0.0, d1_ribbon) * 0.85 * m1; // Cinta violeta intermedia
+        float halo1_ribbon = smoothstep(0.065, 0.0, d1_ribbon) * 0.45 * m1;
+
+        float energy1 = sin(flowUv.x * 7.5 - t * 1.8 + field1.x * 12.0);
+        vec3 grad1_master = mix(cAccent, cPrimary, clamp(flowUv.x * 1.8 + energy1 * 0.3, 0.0, 1.0));
+        color += grad1_master * (core1_master * 1.45 + halo1_master) + cPurpleDeep * trail1_master;
+        color += cBrandPink * core1_pink * 1.40;
+        color += cBrandYellow * core1_yellow * 1.35;
+        color += cPrimaryHigh * (core1_ribbon * 1.25 + halo1_ribbon * 0.55);
+
+        // ═══════════════════════════════════════════════════════════════
+        // HAZ 2: Diagonal Centro-Bajo (Cinta media rosa + filamento dorado)
+        // ═══════════════════════════════════════════════════════════════
+        float linePath2 = flowUv.y + 0.26 * flowUv.x - 0.54 + 0.03 * sin(flowUv.x * 4.5 - t * 0.9);
+        float d2_mid = abs(linePath2);
+        float d2_gold = abs(linePath2 - 0.02 * cos(flowUv.x * 7.0 + t * 1.3));
+
+        float m2 = smoothstep(0.25, 0.88, uv.x) * smoothstep(0.15, 0.65, uv.y);
+        float core2_mid = smoothstep(0.005, 0.0, d2_mid) * 0.85 * m2;
+        float halo2_mid = smoothstep(0.065, 0.0, d2_mid) * 0.45 * m2;
+        float core2_gold = smoothstep(0.002, 0.0, d2_gold) * 1.10 * m2;
+
+        vec3 grad2 = mix(cBrandPink, cPrimaryHigh, clamp(flowUv.x * 1.2, 0.0, 1.0));
+        color += grad2 * (core2_mid * 1.25 + halo2_mid * 0.55);
+        color += cBrandYellow * core2_gold * 1.30;
+
+        // ═══════════════════════════════════════════════════════════════
+        // HAZ 3: Vertical Derecha (Detrás de fotografías: master + microfibras)
+        // ═══════════════════════════════════════════════════════════════
+        float linePath3 = flowUv.x - (0.76 + 0.045 * sin(flowUv.y * 4.2 + t * 0.8));
+        float d3_master = abs(linePath3);
+        float d3_gold = abs(linePath3 + 0.022 * cos(flowUv.y * 6.8 - t * 1.4));
+        float d3_pink = abs(linePath3 - 0.020 * sin(flowUv.y * 8.2 + t * 1.1));
+        float d3_ribbon = abs(linePath3 + 0.045 * sin(flowUv.y * 3.6 - t * 0.6));
+
+        float m3 = smoothstep(0.46, 0.90, uv.x);
+
+        float core3_master = smoothstep(0.009, 0.0, d3_master) * 1.15 * m3; // Grosor medio-alto
+        float halo3_master = smoothstep(0.085, 0.0, d3_master) * 0.60 * m3;
+        float trail3_master = smoothstep(0.240, 0.0, d3_master) * 0.22 * m3;
+
+        float core3_gold = smoothstep(0.0025, 0.0, d3_gold) * 1.20 * m3;    // Fina dorada
+        float core3_pink = smoothstep(0.0020, 0.0, d3_pink) * 1.15 * m3;    // Fina rosa
+        float core3_ribbon = smoothstep(0.005, 0.0, d3_ribbon) * 0.80 * m3; // Cinta violeta
+        float halo3_ribbon = smoothstep(0.06, 0.0, d3_ribbon) * 0.40 * m3;
+
+        float energy3 = sin(flowUv.y * 6.0 + t * 1.5 + field1.y * 10.0);
+        vec3 grad3_master = mix(cPrimary, cAccent, clamp(0.4 + 0.5 * energy3, 0.0, 1.0));
+        grad3_master = mix(grad3_master, cAccentLight, core3_master * 0.45);
+
+        color += grad3_master * (core3_master * 1.40 + halo3_master) + cPurpleDeep * trail3_master;
+        color += cBrandYellow * core3_gold * 1.35;
+        color += cBrandPink * core3_pink * 1.30;
+        color += cPrimaryHigh * (core3_ribbon * 1.20 + halo3_ribbon * 0.45);
+
+        // ═══════════════════════════════════════════════════════════════
+        // HAZ 4: Inferior Horizontal (Gran arteria amplia + microfibras)
+        // ═══════════════════════════════════════════════════════════════
+        float linePath4 = flowUv.y - (0.11 + 0.15 * flowUv.x + 0.03 * sin(flowUv.x * 4.8 + t * 0.7));
+        float d4_master = abs(linePath4);
+        float d4_pink = abs(linePath4 - 0.024 * sin(flowUv.x * 6.8 - t * 1.3));
+        float d4_hair = abs(linePath4 + 0.016 * cos(flowUv.x * 9.2 + t * 1.6));
+        float d4_gold = abs(linePath4 - 0.040 * sin(flowUv.x * 5.2 - t * 0.9));
+
+        float m4 = smoothstep(0.48, 0.06, uv.y);
+
+        float core4_master = smoothstep(0.016, 0.0, d4_master) * 1.25 * m4; // Arteria más ancha
+        float halo4_master = smoothstep(0.120, 0.0, d4_master) * 0.70 * m4;
+        float trail4_master = smoothstep(0.300, 0.0, d4_master) * 0.28 * m4;
+
+        float core4_pink = smoothstep(0.005, 0.0, d4_pink) * 0.85 * m4;     // Grosor intermedio rosa
+        float core4_hair = smoothstep(0.002, 0.0, d4_hair) * 1.25 * m4;     // Filamento capilar luminoso
+        float core4_gold = smoothstep(0.0022, 0.0, d4_gold) * 1.15 * m4;   // Filamento dorado
+
+        float energy4 = cos(flowUv.x * 5.5 - t * 1.6 + field2.x * 8.0);
+        vec3 grad4 = mix(cPrimary, cAccent, clamp(flowUv.x * 1.3 + energy4 * 0.25, 0.0, 1.0));
+        grad4 = mix(grad4, cBrandYellow, clamp(flowUv.x * 0.9, 0.0, 0.4));
+
+        color += grad4 * (core4_master * 1.45 + halo4_master) + cPurpleDeep * trail4_master;
+        color += cBrandPink * core4_pink * 1.30;
+        color += cAccentLight * core4_hair * 1.40;
+        color += cBrandYellow * core4_gold * 1.25;
+
+        // ═══════════════════════════════════════════════════════════════
+        // HAZ 5: Ribete complementario en Desktop (Arco superior-derecho)
+        // ═══════════════════════════════════════════════════════════════
+        float core5_total = 0.0;
+        if (uMobile < 0.5) {
+          float linePath5 = flowUv.x - (0.88 - 0.18 * flowUv.y + 0.03 * sin(flowUv.y * 5.0 - t * 0.5));
+          float d5_mid = abs(linePath5);
+          float d5_hair = abs(linePath5 - 0.018 * cos(flowUv.y * 7.5 + t * 1.1));
+
+          float m5 = smoothstep(0.62, 0.95, uv.x) * smoothstep(0.35, 0.85, uv.y);
+
+          float core5_mid = smoothstep(0.0045, 0.0, d5_mid) * 0.85 * m5;
+          float halo5_mid = smoothstep(0.060, 0.0, d5_mid) * 0.40 * m5;
+          float core5_hair = smoothstep(0.0018, 0.0, d5_hair) * 1.00 * m5;
+
+          core5_total = core5_mid + core5_hair;
+          color += mix(cPrimaryHigh, cBrandPink, 0.65) * (core5_mid * 1.20 + halo5_mid * 0.45);
+          color += cBrandYellow * core5_hair * 1.20;
+        }
+
+        // Suma de núcleos para respuesta física conjunta
+        float allCores = core1_master + core1_pink + core1_yellow +
+                         core2_mid + core2_gold +
+                         core3_master + core3_gold + core3_pink +
+                         core4_master + core4_pink + core4_hair +
+                         core5_total;
+
+        float allHalos = halo1_master + halo1_ribbon + halo2_mid +
+                         halo3_master + halo3_ribbon +
+                         halo4_master;
+
+        // ═══════════════════════════════════════════════════════════════
+        // RESONANCIA Y AURA CON EL CURSOR
+        // ═══════════════════════════════════════════════════════════════
+        float pointerAura = exp(-distToPtr * 5.0) * uPointerHover;
+        vec3 auraColor = mix(cPrimaryHigh, cAccentLight, 0.45);
+        color += auraColor * (pointerAura * 0.22);
+
+        // Resplandor en las líneas cuando la corriente es perturbada por el puntero
+        float proximity = exp(-distToPtr * distToPtr * 10.0) * uPointerHover;
+        color += cAccentLight * (allCores * proximity * 0.85);
+
+        // ═══════════════════════════════════════════════════════════════
+        // EXCITACIÓN Y RESPLANDOR DE LA LÍNEA GÉNESIS
+        // ═══════════════════════════════════════════════════════════════
+        // La fibra génesis excita núcleos y halos a su paso, sin anillo
+        color += cAccentLight * allCores * (genesisGlow * 2.5);
+        color += mix(cBrandYellow, cBrandPink, 0.5) * allCores * (genesisGlow * 1.6);
+        color += mix(cPrimaryHigh, cAccent, 0.45) * allHalos * (genesisGlow * 0.95);
+
+        // 6º haz temporal: core fino + halo de la línea génesis
+        vec3 genesisTint = mix(mix(cAccentLight, cBrandYellow, 0.45), cPrimaryHigh, 0.30);
+        color += genesisTint * (genesisCore * 1.35 + genesisHalo * 0.55) * genesisFade;
+
+        // ═══════════════════════════════════════════════════════════════
+        // NEBULOSA CROMÁTICA PROCEDURAL LIIOT (Flujo gaseoso en advección)
+        // ═══════════════════════════════════════════════════════════════
+        // Densidad de gas en el campo de flujo (bajas frecuencias orgánicas)
+        float nebGas1 = sin(flowUv.x * 2.8 + flowUv.y * 1.9 + t * 0.5) * 
+                        cos(flowUv.x * 2.1 - flowUv.y * 3.0 - t * 0.35);
+        float nebGas2 = sin(flowUv.x * 5.2 - flowUv.y * 3.8 - t * 0.6 + nebGas1 * 1.8);
+        float nebField = clamp(0.5 + 0.5 * (nebGas1 * 0.65 + nebGas2 * 0.35), 0.0, 1.0);
+
+        // Mapeo cromático de la nebulosa con la paleta de Liiot
+        vec3 nebColorA = mix(cPrimary, cBrandPink, clamp(flowUv.y * 1.2 + nebGas1 * 0.3, 0.0, 1.0));
+        vec3 nebColorB = mix(cAccent, cBrandYellow, clamp(flowUv.x * 1.1 + nebGas2 * 0.3, 0.0, 1.0));
+        vec3 nebCloudColor = mix(nebColorA, nebColorB, nebField);
+
+        // Velo gaseoso difuso de la nebulosa (más luminoso y vivo)
+        float nebMist = pow(nebField, 1.8) * 0.16;
+        nebMist += (nebField * 0.24) * genesisGlow;
+        color += nebCloudColor * nebMist;
+
+        // ═══════════════════════════════════════════════════════════════
+        // ESPACIO EDITORIAL LIMPIO PARA TEXTO (Preserva contraste en #phil-quote)
+        // ═══════════════════════════════════════════════════════════════
+        vec2 textCenter = vec2(0.36, 0.52);
+        float distToText = length((uv - textCenter) * vec2(1.0, 1.3));
+        float textClearScrim = smoothstep(0.12, 0.55, distToText);
+        color = mix(cBg, color, clamp(textClearScrim * 1.15 + 0.20, 0.0, 1.0));
+
+        // Soft-clamp tonal calibrado para colores radiantes de alta luminancia
+        color = color / (1.0 + color * 0.18);
+
+        // ═══════════════════════════════════════════════════════════════
+        // GRANO CROMÁTICO DE POLVO CÓSMICO (NEBULA STARDUST EN LIIOT)
+        // ═══════════════════════════════════════════════════════════════
+        // Coordenadas del polvo cósmico que se desplazan orgánicamente con el flujo vectorial
+        vec2 nebGrainCoord = (flowUv * uResolution.xy * 0.40) + vec2(t * 14.0, -t * 9.0);
+        vec2 staticGrainCoord = gl_FragCoord.xy + vec2(uTime * 0.08);
+
+        // Partículas discretas de polvo cósmico
+        float dust1 = fract(sin(dot(nebGrainCoord, vec2(12.9898, 78.233))) * 43758.5453);
+        float dust2 = fract(sin(dot(nebGrainCoord + vec2(3.17, 7.81), vec2(39.346, 11.135))) * 28461.183);
+        float dust3 = fract(sin(dot(nebGrainCoord + vec2(8.43, 2.59), vec2(73.156, 52.459))) * 51934.721);
+
+        // Grano analógico base
+        float gBase = fract(sin(dot(staticGrainCoord, vec2(12.9898, 78.233))) * 43758.5453);
+
+        // Asignación cromática de las motas de polvo estelar según la paleta Liiot
+        vec3 stardustColor = mix(cPrimaryHigh, cBrandPink, dust1);
+        stardustColor = mix(stardustColor, cAccentLight, step(0.55, dust2));
+        stardustColor = mix(stardustColor, cBrandYellow, step(0.82, dust3));
+
+        // El polvo estelar se concentra y centellea intensamente
+        float stardustIntensity = pow(dust1, 3.2) * 0.16 * (0.35 + 0.65 * nebField);
+
+        // Excitación y centelleo al paso de la línea génesis
+        stardustIntensity += (dust2 * 0.22) * genesisGlow;
+
+        // Mezcla de polvo cósmico cromático Liiot + micro-grano analógico de fondo
+        color += stardustColor * stardustIntensity;
+        color += (gBase - 0.5) * (0.018 + genesisGlow * 0.024);
+
+        fragColor = vec4(color, 1.0);
+      }
+    `;
+
+    function createShader(glCtx: WebGL2RenderingContext, type: number, source: string): WebGLShader | null {
+      const shader = glCtx.createShader(type);
+      if (!shader) return null;
+      glCtx.shaderSource(shader, source);
+      glCtx.compileShader(shader);
+      if (!glCtx.getShaderParameter(shader, glCtx.COMPILE_STATUS)) {
+        console.error("Error compilando shader:", glCtx.getShaderInfoLog(shader));
+        glCtx.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+    const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    if (!vs || !fs) return;
+
+    const program = gl.createProgram();
+    if (!program) return;
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error("Error vinculando programa WebGL2:", gl.getProgramInfoLog(program));
+      return;
+    }
+
+    gl.useProgram(program);
+
+    // Uniform locations
+    const uResLoc = gl.getUniformLocation(program, "uResolution");
+    const uTimeLoc = gl.getUniformLocation(program, "uTime");
+    const uPointerLoc = gl.getUniformLocation(program, "uPointer");
+    const uPointerHoverLoc = gl.getUniformLocation(program, "uPointerHover");
+    const uClickPosLoc = gl.getUniformLocation(program, "uClickPos");
+    const uClickTimeLoc = gl.getUniformLocation(program, "uClickTime");
+    const uMobileLoc = gl.getUniformLocation(program, "uMobile");
+
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    // Reduced motion
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let isReducedMotion = reducedMotionQuery.matches;
+
+    reducedMotionQuery.addEventListener("change", (e) => {
+      isReducedMotion = e.matches;
+      if (isReducedMotion) {
+        renderFrame(0);
+      } else {
+        requestTick();
+      }
+    });
+
+    let width = 0;
+    let height = 0;
+    let isMobile = false;
+
+    function resize() {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      width = Math.max(1, Math.floor(rect.width));
+      height = Math.max(1, Math.floor(rect.height));
+
+      isMobile = window.innerWidth <= 768;
+      const maxDpr = isMobile ? 1.0 : 1.25;
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+
+      const renderW = Math.floor(width * dpr);
+      const renderH = Math.floor(height * dpr);
+
+      if (canvas.width !== renderW || canvas.height !== renderH) {
+        canvas.width = renderW;
+        canvas.height = renderH;
+        gl.viewport(0, 0, renderW, renderH);
+        gl.uniform2f(uResLoc, renderW, renderH);
+        gl.uniform1f(uMobileLoc, isMobile ? 1.0 : 0.0);
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+      if (isReducedMotion) {
+        renderFrame(0);
+      }
+    });
+    resizeObserver.observe(canvas);
+    resize();
+
+    // ═══════════════════════════════════════════════════════════════
+    // SEGUIMIENTO PRECISO DEL PUNTERO Y CLICKS
+    // ═══════════════════════════════════════════════════════════════
+    let targetPointerX = 0.5;
+    let targetPointerY = 0.5;
+    let currentPointerX = 0.5;
+    let currentPointerY = 0.5;
+    let targetHover = 0.0;
+    let currentHover = 0.0;
+
+    let lastClickX = 0.5;
+    let lastClickY = 0.5;
+    let lastClickTime = -10.0;
+    const startTime = performance.now();
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!canvas || width === 0 || height === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      const isInside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if (isInside) {
+        targetHover = 1.0;
+        targetPointerX = (e.clientX - rect.left) / width;
+        targetPointerY = 1.0 - (e.clientY - rect.top) / height; // Espacio UV de OpenGL
+      } else {
+        targetHover = 0.0;
+      }
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (!canvas || width === 0 || height === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      if (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      ) {
+        lastClickX = (e.clientX - rect.left) / width;
+        lastClickY = 1.0 - (e.clientY - rect.top) / height;
+        lastClickTime = (performance.now() - startTime) * 0.001;
+      }
+    };
+
+    const onPointerLeave = () => {
+      targetHover = 0.0;
+    };
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    document.addEventListener("pointerleave", onPointerLeave, { passive: true });
+
+    // Render loop con lerping
+    let rafId = 0;
+    let isVisible = true;
+
+    function renderFrame(now: number) {
+      if (!gl || gl.isContextLost()) return;
+
+      // Suavizado elástico del puntero y hover
+      currentPointerX += (targetPointerX - currentPointerX) * 0.08;
+      currentPointerY += (targetPointerY - currentPointerY) * 0.08;
+      currentHover += (targetHover - currentHover) * 0.06;
+
+      const elapsed = (now - startTime) * 0.001;
+      gl.uniform1f(uTimeLoc, elapsed);
+      gl.uniform2f(uPointerLoc, currentPointerX, currentPointerY);
+      gl.uniform1f(uPointerHoverLoc, currentHover);
+      gl.uniform2f(uClickPosLoc, lastClickX, lastClickY);
+      gl.uniform1f(uClickTimeLoc, lastClickTime);
+
+      // 1 solo draw call para todo el background
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    function tick(now: number) {
+      if (isReducedMotion || !isVisible || document.hidden) {
+        rafId = 0;
+        return;
+      }
+      renderFrame(now);
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function requestTick() {
+      if (!rafId && !isReducedMotion && isVisible && !document.hidden) {
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = 0;
+        }
+      } else {
+        requestTick();
+      }
+    });
+
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isVisible = entry ? entry.isIntersecting : true;
+        if (isVisible) {
+          requestTick();
+        } else if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = 0;
+        }
+      },
+      { threshold: 0.05 }
+    );
+    intersectionObserver.observe(canvas);
+
+    renderFrame(performance.now());
+    if (!isReducedMotion) {
+      requestTick();
+    }
+
+    const cleanup = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("pointerleave", onPointerLeave);
+
+      if (gl) {
+        gl.deleteProgram(program);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+        if (vao) gl.deleteVertexArray(vao);
+      }
+    };
+
+    window.addEventListener("pagehide", cleanup, { once: true });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFilosofiaShader, { once: true });
+  } else {
+    initFilosofiaShader();
+  }
+</script>
