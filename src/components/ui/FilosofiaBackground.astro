@@ -113,7 +113,7 @@ const { class: className = "" } = Astro.props;
         float d_dy = 1.5 * cos(a1) * cos(b1) + 1.9 * sin(a1) * sin(b1) - 1.4 * cos(a2);
         float d_dx = 2.1 * cos(a1) * cos(b1) - 1.4 * sin(a1) * sin(b1) + 1.8 * cos(a2);
 
-        return vec2(-d_dy, d_dx) * 0.055;
+        return vec2(-d_dy, d_dx) * 0.075;
       }
 
       void main() {
@@ -121,8 +121,8 @@ const { class: className = "" } = Astro.props;
         float aspect = uResolution.x / uResolution.y;
         vec2 aspectVec = vec2(aspect, 1.0);
 
-        // Velocidad ultralenta para estética de corriente continua y pausada
-        float t = uTime * 0.048;
+        // Corriente continua con movimiento visible (antes 0.048, se percibía estática)
+        float t = uTime * 0.10;
 
         // ═══════════════════════════════════════════════════════════════
         // VÓRTICE E INTERACCIÓN DINÁMICA DEL CURSOR EN EL FLOW FIELD
