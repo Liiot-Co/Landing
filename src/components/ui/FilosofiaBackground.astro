@@ -9,8 +9,9 @@
  * - Haces de microfibras paralelas que se entrelazan y bifurcan según las corrientes del fluido.
  * - Vórtice interactivo: el cursor inyecta velocidad y deformación angular fluida en el campo.
  * - Impulso longitudinal: paquetes de energía que viajan a lo largo de las líneas de corriente.
- * - Línea génesis: el click siembra una fibra recta temporal (~2.8s) que nace en
- *   uClickPos y se alarga como los haces 1-4 (un solo haz temporal, sin anillo ni meandro).
+ * - Línea génesis: cada click siembra una fibra recta temporal (~2.8s) que nace en
+ *   su slot de uClickPos y se alarga como los haces 1-4 (máximo 5 haces
+ *   simultáneos en ring buffer, sin anillo ni meandro).
  * - Pausa en visibilidad y compatibilidad estricta con prefers-reduced-motion.
  */
 interface Props {
@@ -87,8 +88,8 @@ const { class: className = "" } = Astro.props;
       uniform float uTime;
       uniform vec2 uPointer;        // Coordenadas UV [0.0, 1.0]
       uniform float uPointerHover;  // Factor de presencia del cursor [0.0, 1.0]
-      uniform vec2 uClickPos;       // Punto de origen del último tap/click
-      uniform float uClickTime;     // Timestamp de activación
+      uniform vec2 uClickPos[5];    // Orígenes de las 5 fibras génesis (ring buffer JS)
+      uniform float uClickTime[5];  // Timestamps de activación por slot (-10 = inactivo)
       uniform float uMobile;
 
       // Paleta Oficial Liiot Radiante (Brandbook §Color: Deep Cosmic Obsidian, Violeta, Naranja, Rosa, Amarillo)
@@ -140,13 +141,11 @@ const { class: className = "" } = Astro.props;
         vec2 flowUv = uv + field1 + field2;
 
         // ═══════════════════════════════════════════════════════════════
-        // LÍNEA GÉNESIS: fibra recta temporal, mismo lenguaje que HAZ 1-4, sin meandro.
+        // LÍNEA GÉNESIS ×5: hasta 5 fibras rectas simultáneas (ring buffer en JS),
+        // mismo lenguaje que HAZ 1-4, sin meandro. Ventana de 2.8s por slot.
         // ═══════════════════════════════════════════════════════════════
-        // Recta advectada por el flujo que pasa por uClickPos (largo finito
+        // Recta advectada por el flujo que pasa por uClickPos[i] (largo finito
         // por envolvente longitudinal, NO anillo ni abanico angular)
-        vec2 deltaClick = (uv - uClickPos) * aspectVec;
-        float distToClick = length(deltaClick);
-        float genesisAge = uTime - uClickTime;
         float genesisFade = 0.0;
         float genesisGlow = 0.0;
         float genesisCore = 0.0;
@@ -154,29 +153,36 @@ const { class: className = "" } = Astro.props;
         float genesisTrail = 0.0;
         float genesisGold = 0.0;
 
-        if (genesisAge >= 0.0 && genesisAge < 2.8) {
-          genesisFade = 1.0 - smoothstep(0.0, 2.8, genesisAge);
-          float genesisFront = genesisAge * 0.55;
+        for (int i = 0; i < 5; i++) {
+          vec2 clickPos = uClickPos[i];
+          float genesisAge = uTime - uClickTime[i];
+          if (genesisAge >= 0.0 && genesisAge < 2.8) {
+            float slotFade = 1.0 - smoothstep(0.0, 2.8, genesisAge);
+            genesisFade = max(genesisFade, slotFade);
+            float genesisFront = genesisAge * 0.55;
 
-          // Recta por uClickPos con la pendiente de HAZ 2 (0.26, el más representativo); sin sin en el master.
-          float GEN_SLOPE = 0.26;
-          float genLinePath = (flowUv.y - uClickPos.y) + GEN_SLOPE * (flowUv.x - uClickPos.x);
-          float dGen = abs(genLinePath);
+            // Recta por el click con la pendiente de HAZ 2 (0.26, el más representativo); sin sin en el master.
+            float GEN_SLOPE = 0.26;
+            float genLinePath = (flowUv.y - clickPos.y) + GEN_SLOPE * (flowUv.x - clickPos.x);
+            float dGen = abs(genLinePath);
 
-          // Envolvente longitudinal: la fibra nace en el click y se alarga hasta el frente
-          float genesisLen = max(genesisFront * 0.5, 0.03);
-          float longDelta = (distToClick - genesisFront * 0.5) / genesisLen;
-          float longEnv = exp(-longDelta * longDelta);
-          float grown = smoothstep(genesisFront + 0.02, genesisFront - 0.05, distToClick);
+            // Envolvente longitudinal: la fibra nace en el click y se alarga hasta el frente
+            vec2 deltaClick = (uv - clickPos) * aspectVec;
+            float distToClick = length(deltaClick);
+            float genesisLen = max(genesisFront * 0.5, 0.03);
+            float longDelta = (distToClick - genesisFront * 0.5) / genesisLen;
+            float longEnv = exp(-longDelta * longDelta);
+            float grown = smoothstep(genesisFront + 0.02, genesisFront - 0.05, distToClick);
 
-          // Jerarquía de grosores del mismo orden que los haces (core/halo/trail)
-          genesisCore = smoothstep(0.006, 0.0, dGen) * longEnv * grown;
-          genesisHalo = smoothstep(0.07, 0.0, dGen) * longEnv * grown;
-          genesisTrail = smoothstep(0.26, 0.0, dGen) * longEnv * grown;
-          genesisGold = smoothstep(0.002, 0.0, abs(dGen - 0.008)) * longEnv * grown;
+            // Jerarquía de grosores del mismo orden que los haces (core/halo/trail)
+            genesisCore += smoothstep(0.006, 0.0, dGen) * longEnv * grown;
+            genesisHalo += smoothstep(0.07, 0.0, dGen) * longEnv * grown;
+            genesisTrail += smoothstep(0.26, 0.0, dGen) * longEnv * grown;
+            genesisGold += smoothstep(0.002, 0.0, abs(dGen - 0.008)) * longEnv * grown;
 
-          // Campo de excitación local que enciende núcleos, halos, nebulosa y polvo
-          genesisGlow = exp(-distToClick * 3.2) * genesisFade;
+            // Campo de excitación local que enciende núcleos, halos, nebulosa y polvo
+            genesisGlow += exp(-distToClick * 3.2) * slotFade;
+          }
         }
 
         // Color base Deep Cosmic Obsidian (#07040F) con tinte atmosférico violeta
@@ -438,8 +444,8 @@ const { class: className = "" } = Astro.props;
     const uTimeLoc = gl.getUniformLocation(program, "uTime");
     const uPointerLoc = gl.getUniformLocation(program, "uPointer");
     const uPointerHoverLoc = gl.getUniformLocation(program, "uPointerHover");
-    const uClickPosLoc = gl.getUniformLocation(program, "uClickPos");
-    const uClickTimeLoc = gl.getUniformLocation(program, "uClickTime");
+    const uClickPosLoc = gl.getUniformLocation(program, "uClickPos[0]");
+    const uClickTimeLoc = gl.getUniformLocation(program, "uClickTime[0]");
     const uMobileLoc = gl.getUniformLocation(program, "uMobile");
 
     const vao = gl.createVertexArray();
@@ -452,6 +458,8 @@ const { class: className = "" } = Astro.props;
     reducedMotionQuery.addEventListener("change", (e) => {
       isReducedMotion = e.matches;
       if (isReducedMotion) {
+        // Limpia fibras génesis fantasma: desactiva los 5 slots y sube el buffer una vez.
+        clickT.fill(-10.0);
         renderFrame(0);
       } else {
         requestTick();
@@ -503,9 +511,12 @@ const { class: className = "" } = Astro.props;
     let targetHover = 0.0;
     let currentHover = 0.0;
 
-    let lastClickX = 0.5;
-    let lastClickY = 0.5;
-    let lastClickTime = -10.0;
+    // Ring buffer génesis: hasta 5 fibras simultáneas, el click más viejo se recicla.
+    const MAX_GENESIS = 5;
+    const clickX = new Float32Array(MAX_GENESIS).fill(0.5);
+    const clickY = new Float32Array(MAX_GENESIS).fill(0.5);
+    const clickT = new Float32Array(MAX_GENESIS).fill(-10.0);
+    let clickSlot = 0;
     const startTime = performance.now();
 
     const onPointerMove = (e: PointerEvent) => {
@@ -535,9 +546,10 @@ const { class: className = "" } = Astro.props;
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom
       ) {
-        lastClickX = (e.clientX - rect.left) / width;
-        lastClickY = 1.0 - (e.clientY - rect.top) / height;
-        lastClickTime = (performance.now() - startTime) * 0.001;
+        clickX[clickSlot] = (e.clientX - rect.left) / width;
+        clickY[clickSlot] = 1.0 - (e.clientY - rect.top) / height;
+        clickT[clickSlot] = (performance.now() - startTime) * 0.001;
+        clickSlot = (clickSlot + 1) % MAX_GENESIS;
       }
     };
 
@@ -565,8 +577,18 @@ const { class: className = "" } = Astro.props;
       gl.uniform1f(uTimeLoc, elapsed);
       gl.uniform2f(uPointerLoc, currentPointerX, currentPointerY);
       gl.uniform1f(uPointerHoverLoc, currentHover);
-      gl.uniform2f(uClickPosLoc, lastClickX, lastClickY);
-      gl.uniform1f(uClickTimeLoc, lastClickTime);
+      if (uClickPosLoc) {
+        gl.uniform2fv(uClickPosLoc, [
+          clickX[0], clickY[0],
+          clickX[1], clickY[1],
+          clickX[2], clickY[2],
+          clickX[3], clickY[3],
+          clickX[4], clickY[4],
+        ]);
+      }
+      if (uClickTimeLoc) {
+        gl.uniform1fv(uClickTimeLoc, clickT);
+      }
 
       // 1 solo draw call para todo el background
       gl.drawArrays(gl.TRIANGLES, 0, 3);
