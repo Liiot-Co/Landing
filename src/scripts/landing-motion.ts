@@ -111,8 +111,8 @@ function setupHero() {
  * is a single `center` value (100 → -100, i.e. fully off-screen right →
  * fully covering) offset by a fixed `skew` on each edge, clamped with
  * `Math.min` so the philosophy panel starts at exactly zero width (no
- * pre-scroll peek). Villain content plays its entrance stagger once, right
- * as the pin engages; the philosophy word-reveal fires once the wipe has
+ * pre-scroll peek). Villain content is static (no fade) so re-entering the
+ * pin never replays it; the philosophy word-reveal fires once the wipe has
  * crossed roughly its midpoint, so the words resolve just as they become
  * legible.
  *
@@ -148,12 +148,6 @@ function setupStory() {
     anticipatePin: 0,
     fastScrollEnd: true,
     preventOverlaps: true,
-    onEnter: () => {
-      reveal("#villain-header");
-      revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
-      reveal("#villain-pivot", 0.3, true);
-      reveal("#story-bridge", 0.5, true);
-    },
     onLeaveBack: () => {
       // Ocultar capa de filosofía al salir hacia arriba para liberar GPU
       filosofia.style.visibility = "hidden";
