@@ -8,6 +8,8 @@
  */
 import { interpolate } from "flubber";
 import { gsap } from "gsap";
+import { initBoops } from "./liiot-boop";
+import { burst } from "./liiot-burst";
 
 const MORPH_DURATION = 500;
 const LABEL_FADE = 300;
@@ -78,6 +80,66 @@ function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+/** Chequeo en vivo (el usuario puede togglear la preferencia en sesión). */
+function isReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true
+  );
+}
+
+/**
+ * Anima el atributo `d` de un path entre dos formas con flubber,
+ * interpolando el fill en paralelo. Parametrizado por path + estados para
+ * reutilizarlo tanto en el logo completo como en las piezas editoriales
+ * (medallones de headings y fondo de HowWeWork).
+ */
+function animatePathD(
+  path: SVGPathElement,
+  fromD: string,
+  toD: string,
+  fromColor: string,
+  toColor: string,
+  duration: number,
+  cb?: () => void,
+) {
+  if (isReducedMotion()) {
+    path.setAttribute("d", toD);
+    path.style.fill = toColor;
+    cb?.();
+    return;
+  }
+
+  let interpolator: ((t: number) => string) | null = null;
+  try {
+    interpolator = interpolate(fromD, toD, { maxSegmentLength: 2 });
+  } catch {
+    interpolator = null;
+  }
+
+  const start = performance.now();
+  path.setAttribute("d", fromD);
+  path.style.fill = fromColor;
+
+  function tick(now: number) {
+    const elapsed = now - start;
+    const raw = Math.min(elapsed / duration, 1);
+    const t = easeInOutCubic(raw);
+
+    if (interpolator) {
+      path.setAttribute("d", interpolator(t));
+    }
+    path.style.fill = lerpColor(fromColor, toColor, t);
+
+    if (raw < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      cb?.();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
 /** Fixed phase offsets for the4 paths in the helix — they never change,
  *  so the form at any mouse position is deterministic. */
 const HELIX_PHASES = [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5];
@@ -91,7 +153,6 @@ function initMark(svg: SVGElement) {
 
   let currentState = -1;
   let isAnimating = false;
-  let currentInterpolator: ((t: number) => string) | null = null;
 
   // ── DNA helix mouse-tracking ──
   let helixRaf: number | null = null;
@@ -128,6 +189,11 @@ function initMark(svg: SVGElement) {
 
   function helixStart(e: MouseEvent) {
     if (prefersReduced || isAnimating || currentState !== -1) return;
+    // Hélice DNA solo en Navbar: el logo de Footer y los medallones usan
+    // boop (gsap) en su lugar. Dos escritores sobre el mismo nodo/trigger
+    // pelearían por el transform en cada mousemove, así que se elige uno
+    // por instancia: header → hélice, resto → boop.
+    if (!svg.closest("header")) return;
     mx = e.clientX;
     my = e.clientY;
     helixActive = true;
@@ -172,34 +238,13 @@ function initMark(svg: SVGElement) {
     duration: number,
     cb?: () => void,
   ) {
-    if (prefersReduced) {
-      morphPath.setAttribute("d", toD);
-      morphPath.style.fill = toColor;
-      cb?.();
-      return;
-    }
+    animatePathD(morphPath, fromD, toD, fromColor, toColor, duration, cb);
+  }
 
-    const start = performance.now();
-    morphPath.setAttribute("d", fromD);
-    morphPath.style.fill = fromColor;
-
-    function tick(now: number) {
-      const elapsed = now - start;
-      const raw = Math.min(elapsed / duration, 1);
-      const t = easeInOutCubic(raw);
-
-      if (currentInterpolator) {
-        morphPath.setAttribute("d", currentInterpolator(t));
-      }
-      morphPath.style.fill = lerpColor(fromColor, toColor, t);
-
-      if (raw < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        cb?.();
-      }
-    }
-    requestAnimationFrame(tick);
+  /** Burst confinado al contenedor del logo al completar cada morph. */
+  function burstOnHost() {
+    const host = svg.parentElement;
+    if (host) burst(host);
   }
 
   function showLabel(text: string, color: string) {
@@ -231,10 +276,6 @@ function initMark(svg: SVGElement) {
 
     if (currentState === -1) {
       // Logo → first morph state
-      currentInterpolator = interpolate(LOGO_D, next.d, {
-        maxSegmentLength: 2,
-      });
-
       gsap.to(originalGroup, {
         opacity: 0,
         duration: 0.3,
@@ -246,21 +287,19 @@ function initMark(svg: SVGElement) {
             showLabel(next.label, next.color);
             currentState = nextIdx;
             isAnimating = false;
+            burstOnHost();
           });
         },
       });
     } else {
       // Morph state → next morph state
       const current = MORPH_STATES[currentState];
-      currentInterpolator = interpolate(current.d, next.d, {
-        maxSegmentLength: 2,
-      });
-
       hideLabel();
       animateMorph(current.d, next.d, current.color, next.color, MORPH_DURATION, () => {
         showLabel(next.label, next.color);
         currentState = nextIdx;
         isAnimating = false;
+        burstOnHost();
 
         // After the last state (confianza), auto-return to logo
         if (nextIdx === MORPH_STATES.length - 1) {
@@ -275,10 +314,6 @@ function initMark(svg: SVGElement) {
     isAnimating = true;
 
     const current = MORPH_STATES[currentState];
-    currentInterpolator = interpolate(current.d, LOGO_D, {
-      maxSegmentLength: 2,
-    });
-
     hideLabel();
     animateMorph(current.d, LOGO_D, current.color, originalFill, MORPH_DURATION, () => {
       morphPath.style.opacity = "0";
@@ -291,6 +326,7 @@ function initMark(svg: SVGElement) {
           currentState = -1;
           isAnimating = false;
           svg.classList.remove("is-morphing");
+          burstOnHost();
         },
       });
     });
@@ -309,12 +345,105 @@ export function initLiiotMarks() {
   document.querySelectorAll<SVGElement>(".liiot-mark").forEach(initMark);
 }
 
+// ── L3: morph en piezas editoriales (medallones de headings + fondo) ──
+
+interface TinyState {
+  color: string;
+  d: string;
+}
+
+/**
+ * Set pequeño de 4 formas derivadas de las piezas 1-4 del isotipo, cada una
+ * con su color propio (morph MULTICOLOR por decisión de producto). Se usan
+ * los mismos `d` del fondo de HowWeWork para que flubber interpole entre
+ * piezas hermanas.
+ */
+const TINY_STATES: TinyState[] = [
+  {
+    color: "#8B45CC",
+    d: "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19",
+  },
+  {
+    color: "#FF6A33",
+    d: "M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19",
+  },
+  {
+    color: "#e04b66",
+    d: "M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38",
+  },
+  {
+    color: "#e2b31c",
+    d: "M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38",
+  },
+];
+
+/**
+ * Click en una pieza editorial cicla formas tiny (multicolor) + burst.
+ * Solo anima el atributo `d`: el parallax del fondo escribe únicamente
+ * `style.transform` en el contenedor, así no hay pelea de escritores.
+ * Las piezas siguen `aria-hidden` y no son focusables (mouse-only).
+ */
+function initEditorialPiece(el: HTMLElement) {
+  if (el.dataset.morphWired === "true") return;
+  el.dataset.morphWired = "true";
+
+  const paths = Array.from(el.querySelectorAll<SVGPathElement>("path"));
+  if (paths.length === 0) return;
+
+  const originalDs = paths.map((p) => p.getAttribute("d") ?? "");
+  const baseColor = el.dataset.color || "#FFFFFF";
+  let idx = -1;
+  let busy = false;
+
+  el.addEventListener("click", () => {
+    if (busy) return;
+    const nextIdx = (idx + 1) % TINY_STATES.length;
+    const next = TINY_STATES[nextIdx];
+    const fromColor = idx === -1 ? baseColor : TINY_STATES[idx].color;
+
+    if (isReducedMotion()) {
+      paths.forEach((p) => {
+        p.setAttribute("d", next.d);
+        p.style.fill = next.color;
+      });
+      idx = nextIdx;
+      return;
+    }
+
+    busy = true;
+    let pending = paths.length;
+    paths.forEach((p, i) => {
+      const fromD = idx === -1 ? originalDs[i] : TINY_STATES[idx].d;
+      animatePathD(p, fromD, next.d, fromColor, next.color, MORPH_DURATION, () => {
+        pending -= 1;
+        if (pending === 0) {
+          idx = nextIdx;
+          busy = false;
+          burst(el);
+        }
+      });
+    });
+  });
+}
+
+export function initEditorialMorphs(scope: ParentNode = document) {
+  scope.querySelectorAll<HTMLElement>(".js-morph-piece").forEach(initEditorialPiece);
+}
+
 // Auto-init on page load (Astro)
+function initLiiotInteractions() {
+  initLiiotMarks();
+  initEditorialMorphs();
+  initBoops(document, ".js-boop", (_el, i) => ({
+    rotation: i % 2 === 0 ? 6 : -6,
+  }));
+}
+
 if (typeof document !== "undefined") {
-  document.addEventListener("astro:page-load", initLiiotMarks);
+  document.addEventListener("astro:page-load", initLiiotInteractions);
   if (document.readyState === "complete" || document.readyState === "interactive") {
-    initLiiotMarks();
+    initLiiotInteractions();
   } else {
-    document.addEventListener("DOMContentLoaded", initLiiotMarks);
+    document.addEventListener("DOMContentLoaded", initLiiotInteractions);
   }
 }
