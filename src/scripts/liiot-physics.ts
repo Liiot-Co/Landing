@@ -10,12 +10,17 @@
  *   otra pieza del isotipo: pasa por las figuras de marca y, al terminar el
  *   ciclo, vuelve a su propia forma. Las figuras solo ciclan entre figuras.
  *
+ * Secuencia de entrada: primero se muestra el logo ARMADO al centro (las 4
+ * piezas comparten el mismo origen visual) y, tras ~1.4s, se libera la
+ * física y las figuras llueven sobre él para desarmarlo.
+ *
  * Rendimiento:
  * - Matter se carga con import dinámico solo cuando el patio está cerca de la pantalla.
  * - Sin canvas: cada bloque es un SVG movido con `transform`.
  * - Los cuerpos duermen al quedar quietos y el loop se detiene hasta la próxima interacción.
  * - El loop también se pausa fuera de pantalla y con la pestaña oculta.
- * - `prefers-reduced-motion`: se calcula el montón ya apilado y no hay loop ni interacción.
+ * - `prefers-reduced-motion`: queda solo el logo armado estático, sin loop
+ *   ni interacción.
  *
  * Sugerencia: cuando los bloques se asientan por primera vez, una mano arrastra uno
  * de ellos (con la misma física que un arrastre real) para mostrar que se pueden
@@ -146,6 +151,11 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
   let last = 0;
   let visible = false;
   let started = false;
+  /** `true` cuando los cuerpos actuales ya son dinámicos (logo liberado). */
+  let released = false;
+  /** `true` cuando el usuario ya vio el logo armado (los resize liberan rápido). */
+  let assemblyShown = false;
+  let releaseTimer = 0;
   let width = 0;
   let height = 0;
   let size = 0;
@@ -225,29 +235,83 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     engine = Engine.create({ enableSleeping: true, gravity: { x: 0, y: 1.5, scale: 0.001 } });
 
     const t = 200;
+    // Piso + paredes laterales. Sin techo: las figuras esperan ARRIBA del
+    // patio y llueven sobre el logo al liberarlo; la gravedad las devuelve
+    // si un impulso las saca por arriba.
     Composite.add(engine.world, [
       Bodies.rectangle(width / 2, height + t / 2, width + t * 2, t, { isStatic: true, friction: 0.6 }),
       Bodies.rectangle(-t / 2, height / 2, t, height * 4, { isStatic: true }),
       Bodies.rectangle(width + t / 2, height / 2, t, height * 4, { isStatic: true }),
-      Bodies.rectangle(width / 2, -t / 2, width + t * 2, t, { isStatic: true }),
     ]);
 
-    // Parrilla de salida: evita que los bloques nazcan encimados.
-    const cols = width < 520 ? 4 : 5;
-    const rows = Math.ceil(blocks.length / cols);
-    const bodies = blocks.map((block, i) => {
-      const c = i % cols;
-      const r = Math.floor(i / cols);
-      const slot = width / (cols + 1);
+    // Estado inicial: el logo ARMADO al centro (las 4 piezas comparten el
+    // mismo origen visual, así forman el isotipo) y las 6 figuras en espera
+    // arriba, fuera de vista. Todo nace congelado (`isStatic`) para que lo
+    // primero que se vea sea el logo completo; `releaseAssembled` lo libera.
+    // Con `reduced-motion` queda solo el logo armado estático, sin figuras.
+    const assemblyX = width / 2 - size / 2;
+    const assemblyY = Math.max(8, height * 0.22 - size / 2);
+    const bodies: Matter.Body[] = [];
+    blocks.forEach((block, i) => {
+      if (i < PIECE_COUNT) {
+        // Se crea y luego se realinea por centroide: el render pinta cada
+        // SVG en `body.position - centroid`, así que igualar ese origen en
+        // las 4 piezas arma el logo.
+        const body = makeBody(block, width / 2, assemblyY + size / 2);
+        Body.setPosition(body, {
+          x: assemblyX + block.centroid[0],
+          y: assemblyY + block.centroid[1],
+        });
+        Body.setAngle(body, 0);
+        Body.setStatic(body, true);
+        bodies.push(body);
+        return;
+      }
+      if (reduced) {
+        // Sin movimiento: solo el logo armado, las figuras se ocultan.
+        block.el.style.display = "none";
+        block.body = null;
+        return;
+      }
+      const j = i - FIGURE_START;
+      const slot = width / (SHAPES.length - FIGURE_START + 1);
+      // En espera arriba, fuera de vista e invisibles hasta la liberación.
+      block.el.style.display = "";
+      block.el.style.opacity = "0";
       const body = makeBody(
         block,
-        slot * (c + 1) + (Math.random() - 0.5) * slot * 0.3,
-        size * 0.4 + (rows - 1 - r) * size * 0.62 + Math.random() * size * 0.1,
+        slot * (j + 1) + (Math.random() - 0.5) * slot * 0.3,
+        -size * 0.6 - j * size * 0.55,
       );
       Body.setAngle(body, (Math.random() - 0.5) * 1.2);
-      return body;
+      Body.setStatic(body, true);
+      bodies.push(body);
     });
     Composite.add(engine.world, bodies);
+    released = false;
+  }
+
+  /** Libera el logo armado: las figuras llueven y las piezas se dispersan. */
+  function releaseAssembled() {
+    if (!engine || released || disposed) return;
+    released = true;
+    const firstTime = !assemblyShown;
+    assemblyShown = true;
+    blocks.forEach((block, i) => {
+      const body = block.body;
+      if (!body) return;
+      if (i >= PIECE_COUNT) block.el.style.opacity = "";
+      Body.setStatic(body, false);
+      Sleeping.set(body, false);
+      if (firstTime && i < PIECE_COUNT) {
+        // Pequeño impulso lateral para garantizar que el logo se desarma
+        // aunque las figuras no lo golpeen de lleno.
+        const dir = i % 2 === 0 ? -1 : 1;
+        Body.setVelocity(body, { x: dir * (0.8 + Math.random()), y: -1 - Math.random() });
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.15);
+      }
+    });
+    run();
   }
 
   function render() {
@@ -276,7 +340,7 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
   }
 
   function run() {
-    if (raf || reduced || !started || !visible || document.hidden || disposed) return;
+    if (raf || reduced || !started || !released || !visible || document.hidden || disposed) return;
     last = 0;
     raf = requestAnimationFrame(tick);
   }
@@ -286,19 +350,16 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     raf = 0;
   }
 
-  function settleNow() {
-    for (let i = 0; i < 420; i++) Engine.update(engine!, 1000 / 60);
-    render();
-  }
-
-  /** Deja caer los bloques: con reduced-motion se calcula el montón y se pinta una vez. */
+  /** Muestra el logo armado primero; la física se libera con retardo. */
   function start() {
     if (started) return;
     started = true;
     yard.classList.add("is-ready");
-    if (reduced) return settleNow();
     render();
-    run();
+    // Con `reduced-motion` no hay loop ni interacción: queda el logo armado.
+    if (reduced) return;
+    clearTimeout(releaseTimer);
+    releaseTimer = window.setTimeout(releaseAssembled, assemblyShown ? 200 : 1400);
   }
 
   /* ── Sugerencia: una mano arrastra un bloque ───────────────────────── */
@@ -538,11 +599,12 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
       lastWidth = width;
       stop();
       abortHint();
+      clearTimeout(releaseTimer);
       build();
       if (!started) return;
-      if (reduced) return settleNow();
       render();
-      run();
+      if (reduced) return;
+      releaseTimer = window.setTimeout(releaseAssembled, assemblyShown ? 200 : 1400);
     }, 200);
   });
   ro.observe(yard);
@@ -551,6 +613,7 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     disposed = true;
     stop();
     abortHint();
+    clearTimeout(releaseTimer);
     hand.remove();
     clearTimeout(resizeTimer);
     io.disconnect();
