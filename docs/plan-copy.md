@@ -34,7 +34,7 @@
 
 ### 3. Plan de conversión (CA)
 
-1. **Un solo CTA primario con el mismo verbo en toda la página:** "Agenda una charla". Cambia "consultoría" (suena a factura) por "charla" (suena a conversación).
+1. **Un solo CTA primario con el mismo texto en toda la página:** "Cuéntanos tu reto". Cambia "consultoría" (suena a factura) por una invitación a contar su situación, que conecta con la sección El reto.
 2. **Microcopy que quita fricción debajo del botón:** duración y costo de la llamada, por ejemplo "30 minutos · sin costo". ⚠️ Confirmar con el equipo antes de publicarlo.
 3. **CTA intermedio después de "Cómo trabajamos".** Hoy entre el hero y el final no hay botón visible salvo en el carrusel.
 4. **Prueba social:** una cita corta del cliente SG-SST y un dato concreto, por ejemplo "X horas al mes que el equipo ya no gasta en reportes". ⚠️ Necesitamos el dato real.
@@ -47,7 +47,7 @@
 - **H1 (interactivo):** se mantiene "Construimos tu futuro contigo". Palabras rotativas nuevas: `futuro · tiempo · bienestar · tranquilidad · equipo · negocio`. Sufijos: `contigo · a tu lado · en equipo · de verdad`.
 - **Cuerpo antes:** "Creamos tecnología que une personas, genera confianza y hace que el día a día funcione mejor. Somos una empresa colombiana joven y seria."
 - **Cuerpo después:** "Hacemos tecnología que le devuelve tiempo a tu equipo para que pueda pensar en lo que viene. Liiot es una nueva empresa de tecnología que construye un mejor futuro junto a cada equipo que acompaña."
-- **CTA primario:** "Agenda una charla". **Secundario:** "Mira cómo lo hacemos".
+- **CTA primario:** "Cuéntanos tu reto". **Secundario:** "Mira cómo trabajamos" (lleva a Cómo trabajamos).
 
 #### El reto · rediseño completo
 **Cambio de enfoque.** Hoy la sección lista tres "supuestos" tachados y los responde uno a uno. Eso le dice al lector lo que vivió en vez de acompañarlo. La nueva versión describe una escena que él reconoce, valida lo que siente y después muestra que a Liiot la mueve resolver justo eso.
@@ -84,7 +84,7 @@
 - **Paso 1 · Escuchamos primero:** "Nos sentamos contigo a entender qué le quita tiempo a tu gente y qué le daría tranquilidad." Puntos: "Hablamos tu idioma sin tecnicismos" · "Partimos de lo que vive tu equipo cada día".
 - **Paso 2 · Construimos juntos:** "Cada semana ves algo funcionando y decides con nosotros el siguiente paso." Puntos: "Avances visibles cada semana" · "Hablas directo con quien construye".
 - **Paso 3 · Crecemos juntos:** "Seguimos contigo después del lanzamiento para que la herramienta crezca al ritmo de tu negocio." Puntos: "Medimos cuánto tiempo le devuelve a tu equipo" · "Ajustamos según lo que tu gente usa".
-- **Nuevo CTA intermedio:** "¿Te imaginas a tu equipo con más tiempo? Agenda una charla"
+- **Nuevo CTA intermedio:** "¿Te imaginas a tu equipo con más tiempo? Cuéntanos tu reto"
 
 #### Proyectos
 - **Sub:** "Proyectos que cuidan personas y crean comunidad de verdad." → "Equipos que hoy trabajan con más tiempo y más tranquilidad."
@@ -98,13 +98,13 @@
 
 #### CTA final
 - **H2:** "Crezcamos juntos" → "Recupera tiempo para lo que importa"
-- **Sub:** "Cuéntanos qué te quita tiempo en tu operación y en una charla te mostramos por dónde empezar."
-- **Botón:** "Agenda tu charla" + microcopy de fricción (ver punto 3.2).
+- **Sub:** "Cuéntanos qué te quita tiempo en tu operación y te mostramos por dónde empezar."
+- **Botón:** "Cuéntanos tu reto" + microcopy de fricción (ver punto 3.2).
 
 #### Footer, menú y SEO
 - **Footer:** "Jóvenes, serios y con ganas de construir." → "Tecnología para construir un mejor futuro."
-- **Menú:** "Agendar consultoría" → "Agenda una charla".
-- **Meta description:** "Software a medida y automatización en Colombia para que tu equipo recupere tiempo y trabaje con tranquilidad. Agenda una charla con Liiot." (se quita "no vendemos horas sino futuro").
+- **Menú:** "Agendar consultoría" → "Cuéntanos tu reto".
+- **Meta description:** "Software a medida y automatización en Colombia para que tu equipo recupere tiempo y trabaje con tranquilidad. Cuéntanos tu reto con Liiot." (se quita "no vendemos horas sino futuro").
 
 ---
 
@@ -148,9 +148,9 @@
 **Aplicado en el código** (las imágenes y el hero no se tocaron): El reto (escena de empatía), Por qué existimos, Cómo trabajamos con CTA intermedio, Proyectos, Equipo, CTA final, menú, footer, meta description, JSON-LD y `llms.txt`.
 
 Decisiones tomadas a partir de `docs/auditoria-copy.md`:
-- El hero se queda como estaba por ser simple y claro. Solo se quitó "Somos una empresa colombiana joven y seria." Lo de "empresa nueva" vive en Equipo.
+- El hero se queda como estaba por ser simple y claro. Solo cambian los botones ("Cuéntanos tu reto" y "Mira cómo trabajamos") y se quitó "Somos una empresa colombiana joven y seria." Lo de "empresa nueva" vive en Equipo.
 - Por qué existimos cuenta la motivación y Cómo trabajamos cuenta el método, para no repetir.
-- Un solo verbo para el botón principal: "Agenda una charla". "Quiero algo así para mi empresa" queda solo en el caso SG-SST.
+- Un solo verbo para el botón principal: "Cuéntanos tu reto". "Quiero algo así para mi empresa" queda solo en el caso SG-SST.
 - Bleepy: "Próximamente" y el botón "Cuéntanos si te interesa", que sí lleva a la sección de contacto.
 - Se añadió "Cada semana así son horas que no vuelven." a El reto (lo que se pierde) y "Imagina tu próxima semana con esas horas de vuelta." al cierre (cómo se ve el éxito).
 
