@@ -13,7 +13,7 @@ export const IMAGES = {
      * vertical (~30% del ancho), así que `x` decide qué parte de la foto aparece:
      * 0% = borde izquierdo, 50% = centro, 100% = borde derecho.
      */
-    focus: { mobile: "50% 30%", desktop: "50% 40%" },
+    focus: { mobile: "80% 35%", desktop: "50% 40%" },
   },
   story: {
     reto: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=700&auto=format&fit=crop",
