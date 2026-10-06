@@ -8,6 +8,7 @@ import Portfolio from "@/components/Portfolio.astro";
 import Team from "@/components/Team.astro";
 import FinalCTA from "@/components/FinalCTA.astro";
 import Footer from "@/components/Footer.astro";
+import SectionFade from "@/components/ui/SectionFade.astro";
 ---
 
 <Layout>
@@ -18,7 +19,21 @@ import Footer from "@/components/Footer.astro";
     <HowWeWork />
     <Portfolio />
     <Team />
-    <FinalCTA />
+
+    {/* Atmósfera unificada: Final CTA y Footer comparten el mismo canvas procedural WebGL2 */}
+    <div class="relative overflow-hidden bg-[#280948]">
+      {/* Canvas WebGL2 a pantalla completa para todo el cierre de página */}
+      <canvas
+        id="final-cta-canvas"
+        class="absolute inset-0 size-full block pointer-events-none"
+        aria-hidden="true"
+      ></canvas>
+
+      {/* Fade superior suave desde Equipo */}
+      <SectionFade position="top" color="surface-secondary" height="h-32 sm:h-52 lg:h-64" zIndex="z-[2]" />
+
+      <FinalCTA />
+      <Footer />
+    </div>
   </main>
-  <Footer />
 </Layout>

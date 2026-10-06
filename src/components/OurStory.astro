@@ -1,42 +1,28 @@
 ---
 /**
  * "El reto → Por qué existimos" — wipe cinematográfico (viaje del héroe,
- * etapas 2-3), maquetado como una doble página de revista: kicker + folio de
- * página, tipografía editorial grande y un collage fotográfico interactivo.
+ * etapas 2-3), maquetado como una doble página de revista: folio de página,
+ * tipografía editorial grande y un collage fotográfico interactivo.
  *
  * EL RETO (01, frío, violeta) — una escena en segunda persona que el lector
  * reconoce (sin listas ni tachones), la validación de lo que siente y un giro
  * que pasa la palabra a Liiot: "Ahí empieza nuestro trabajo."
  * POR QUÉ EXISTIMOS (02, cálida, vívida) — responde con lo que nos mueve:
  * devolverle tiempo al equipo del lector. Es el contraste emocional del
- * panel anterior, no una lista de promesas.
+ * panel anterior, no una lista de promesas. El fondo es procedural WebGL2.
  *
- * Desktop (≥1024px, motion permitido): `landing-motion.ts` fija la sección
- * en pantalla (`ScrollTrigger` `pin`) y el scroll mueve un corte diagonal
- * (`clip-path: polygon(...)`, variables `--wipe-top`/`--wipe-bottom`) que
- * "abre" el segundo panel sobre el primero. Aplica la regla del brandbook
- * "Tech inicia en violeta, Human resuelve en naranja" (§Motion).
- *
- * El fondo del segundo panel es un mesh gradient: color base sólido +
- * múltiples `radial-gradient()` apiladas (receta `hybrid` de
- * `design-tokens.json`) con un scrim radial para cuidar la legibilidad.
- *
- * Mobile / `prefers-reduced-motion`: sin pin ni clip-path — los dos paneles
- * caen a flujo normal, apilados verticalmente, con los mismos reveals.
+ * Todo el texto vive en `src/i18n/locales/es.json` (`story.reto`,
+ * `story.filosofia`).
  */
-import { PHILOSOPHY_TEXT } from "@/lib/philosophy";
 import { unsplashResize } from "@/lib/images";
+import FilosofiaBackground from "@/components/ui/FilosofiaBackground.astro";
+import { IMAGES } from "@/constants/images";
+import { t } from "@/i18n";
 
-/*
- * Escena en segunda persona: el lector se reconoce antes de que Liiot hable.
- * Cada párrafo se revela en cascada (`.js-villain-item`).
- */
-const scene = [
-  "Son las siete de la noche y sigues cuadrando el reporte que solo tú sabes hacer. Tu equipo trabaja duro y aun así las tareas repetidas se llevan las mejores horas de la semana. Tienes ideas para hacer crecer el negocio y casi nunca encuentras el momento de pensarlas.",
-  "Cada semana así son horas que no vuelven.",
-  "Ese cansancio dice mucho de cuánto cuidas lo que construiste.",
-];
-const words = PHILOSOPHY_TEXT.split(" ");
+const reto = t.story.reto;
+const filosofia = t.story.filosofia;
+const scene = reto.scene;
+const words = filosofia.quote.split(" ");
 ---
 
 <section id="el-reto" class="relative bg-background">
@@ -44,36 +30,26 @@ const words = PHILOSOPHY_TEXT.split(" ");
     {/* PANEL 1 — El reto: la fricción que el visitante ya conoce */}
     <div
       id="story-reto"
-      class="story-layer story-layer--reto relative z-[1] flex items-center overflow-hidden bg-background py-24 lg:py-16"
+      class="story-layer story-layer--reto relative z-[1] flex items-center overflow-hidden bg-background pt-24 pb-14 sm:pt-28 sm:pb-20 lg:py-16 scroll-mt-20"
     >
-      <span class="story-folio absolute right-4 top-4 lg:right-8 lg:top-8" aria-hidden="true">01</span>
+      <span class="story-folio absolute right-4 top-20 sm:top-24 lg:right-8 lg:top-8" aria-hidden="true">{reto.folio}</span>
 
       <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
           <div>
-            <div id="villain-header" class="flex items-start gap-4 sm:gap-6 max-w-3xl translate-y-6 opacity-0">
-              {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
-              <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
-                <span class="size-2 rounded-full bg-brand-pink mb-3"></span>
-                <span class="section-eyebrow-vertical">
-                  El reto
-                </span>
-                <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
-              </div>
-
-              <div>
-                <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-                  Sabemos<br /><span class="text-brand-pink" data-annotate="el-reto">cómo se siente</span>
-                </h2>
-              </div>
+            <div id="villain-header" class="max-w-3xl">
+              <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+                {reto.title}<br /><span class="text-brand-pink" data-annotate="el-reto">{reto.highlight}</span>
+              </h2>
             </div>
 
+            {/* Escena en segunda persona: el lector se reconoce antes de que Liiot hable */}
             <div class="mt-8 flex max-w-xl flex-col gap-5 lg:mt-10">
               {
                 scene.map((text, i) => (
                   <p
                     class:list={[
-                      "js-villain-item translate-y-6 opacity-0",
+                      "js-villain-item",
                       i === 0
                         ? "text-lg font-medium leading-relaxed text-foreground/85 sm:text-xl"
                         : "text-lg font-bold leading-snug text-muted-foreground sm:text-xl",
@@ -87,9 +63,9 @@ const words = PHILOSOPHY_TEXT.split(" ");
 
             <p
               id="villain-pivot"
-              class="mt-10 translate-y-6 text-2xl font-bold text-accent opacity-0 sm:text-3xl lg:mt-12"
+              class="mt-10 text-2xl font-bold text-accent sm:text-3xl lg:mt-12"
             >
-              Ahí empieza nuestro trabajo.
+              {reto.pivot}
             </p>
           </div>
 
@@ -97,83 +73,81 @@ const words = PHILOSOPHY_TEXT.split(" ");
           <div class="story-collage relative mx-auto mt-4 aspect-[4/5] w-full max-w-[220px] lg:mx-0 lg:mt-0 lg:max-w-none">
             <figure class="story-photo story-photo--cold absolute inset-3 overflow-hidden rounded-2xl">
               <img
-                src={unsplashResize("https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=700&auto=format&fit=crop", 460, 70)}
-                alt="Un escritorio vacío y genérico, sin nadie detrás"
+                src={unsplashResize(IMAGES.story.reto, 460, 70)}
+                alt={reto.imageAlt}
                 class="h-full w-full object-cover grayscale"
                 loading="lazy"
               />
             </figure>
-            <span class="story-tag absolute -right-2 top-8 lg:top-10">te entendemos</span>
+            <span class="story-tag absolute -right-2 top-8 lg:top-10">{reto.imageTag}</span>
           </div>
         </div>
       </div>
     </div>
 
     {/* PANEL 2 — La filosofía: Liiot responde como guía, no como protagonista.
-        Recortada con un clip-path diagonal que el scroll abre sobre el panel 1. */}
+        Atmósfera cinematográfica con fondo procedural WebGL2 + GLSL */}
     <div
       id="por-que-existimos"
-      class="story-layer story-layer--filosofia relative z-[2] flex items-center overflow-hidden bg-surface-elevated py-24 lg:py-16"
+      class="story-layer story-layer--filosofia relative z-[2] flex items-center overflow-hidden bg-[#08080d] pt-24 pb-14 sm:pt-28 sm:pb-20 lg:py-0 min-h-[100svh] scroll-mt-20"
     >
-      <div id="story-mesh" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
-      <div id="story-mesh-scrim" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
+      <FilosofiaBackground />
 
-      <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <span class="story-folio absolute right-4 top-4 lg:right-8 lg:top-8" aria-hidden="true">02</span>
+      <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <span class="story-folio absolute right-4 top-20 sm:top-24 lg:right-8 lg:top-8" aria-hidden="true">{filosofia.folio}</span>
 
-        <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
-          <div class="flex items-start gap-4 sm:gap-6">
-            {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
-            <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
-              <span class="size-2 rounded-full bg-accent mb-3"></span>
-              <span class="section-eyebrow-vertical">
-                Por qué existimos
-              </span>
-              <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
-            </div>
+        <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-[52%_48%] lg:gap-14 w-full">
+          <div>
+            <h2
+              id="phil-quote"
+              class="headline-editorial text-2xl sm:text-4xl lg:text-5xl xl:text-6xl text-foreground font-bold tracking-tight leading-[1.12] sm:leading-[1.08] max-w-2xl"
+            >
+              {
+                words.map((word) => (
+                  <span
+                    class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0"
+                    data-annotate={word === "tiempo" ? "por-que-existimos" : undefined}
+                  >
+                    {word}
+                  </span>
+                ))
+              }
+            </h2>
 
-            <div>
-              <h3
-                id="phil-quote"
-                class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl"
-              >
-                {
-                  words.map((word) => (
-                    <span
-                      class="js-phil-word mr-[0.25em] inline-block translate-y-8 scale-95 opacity-0"
-                      data-annotate={word === "tiempo" ? "por-que-existimos" : undefined}
-                    >
-                      {word}
-                    </span>
-                  ))
-                }
-              </h3>
-
-              <p class="mt-8 max-w-xl text-base font-medium leading-relaxed text-foreground/90 sm:text-lg">
-                Cada herramienta que hacemos empieza con una pregunta: ¿cuántas horas le va a devolver a tu gente? Si la respuesta no nos convence, seguimos buscando.
-              </p>
-            </div>
+            <p class="mt-8 max-w-xl text-base font-medium leading-relaxed text-foreground/85 sm:text-lg">
+              {filosofia.subtitle}
+            </p>
           </div>
 
-          {/* Collage — dos fotos superpuestas del equipo real, tech + human en un mismo cuadro */}
-          <div class="story-collage relative mx-auto mt-4 aspect-[4/5] w-full max-w-[260px] lg:mx-0 lg:mt-0 lg:max-w-none">
-            <figure class="story-photo story-photo--a absolute left-0 top-0 w-[72%] overflow-hidden rounded-2xl">
+          {/* Composición fotográfica: imagen vertical principal + secundaria horizontal abajo a la derecha + CTA */}
+          <div class="story-collage relative mx-auto mt-4 aspect-[4/5] w-full max-w-[280px] sm:max-w-[340px] lg:mx-0 lg:mt-0 lg:max-w-none">
+            {/* Imagen vertical principal con border-radius grande */}
+            <figure class="story-photo story-photo--a absolute left-0 top-0 w-[74%] overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
               <img
-                src={unsplashResize("https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop", 520, 70)}
-                alt="El equipo de Liiot revisando código juntos, señalando la pantalla"
+                src={unsplashResize(IMAGES.story.filosofiaA, 640, 75)}
+                alt={filosofia.imageAlt1}
                 class="h-full w-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
             </figure>
-            <figure class="story-photo story-photo--b absolute bottom-0 right-0 w-[58%] overflow-hidden rounded-2xl">
+            {/* Segunda imagen horizontal más pequeña superpuesta abajo a la derecha */}
+            <figure class="story-photo story-photo--b absolute bottom-2 right-0 w-[60%] overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
               <img
-                src={unsplashResize("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop", 520, 70)}
-                alt="Personas del equipo riendo mientras trabajan juntas"
+                src={unsplashResize(IMAGES.story.filosofiaB, 560, 75)}
+                alt={filosofia.imageAlt2}
                 class="h-full w-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
             </figure>
-            <span class="story-sticker absolute -left-2 bottom-[26%] lg:bottom-[30%]">Tu tiempo de vuelta</span>
+            {/* Pequeño CTA sobre la imagen */}
+            <a
+              href="#como-trabajamos"
+              class="story-sticker absolute left-2 sm:left-4 bottom-[24%] lg:bottom-[28%] inline-flex items-center gap-1.5 transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              {filosofia.stickerCta}
+            </a>
           </div>
         </div>
       </div>
@@ -207,6 +181,7 @@ const words = PHILOSOPHY_TEXT.split(" ");
   .story-stage.is-cinematic {
     height: 100vh;
     height: 100dvh;
+    height: 100svh;
     overflow: hidden;
   }
 
@@ -222,11 +197,15 @@ const words = PHILOSOPHY_TEXT.split(" ");
     --wipe-top: 100%;
     --wipe-bottom: 100%;
     clip-path: polygon(
-      var(--wipe-top) 0%,
+      var(--wipe-top, 100%) 0%,
       100% 0%,
       100% 100%,
-      var(--wipe-bottom) 100%
+      var(--wipe-bottom, 100%) 100%
     );
+    will-change: clip-path, transform;
+    contain: layout paint;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
   }
 
   /*
@@ -244,7 +223,10 @@ const words = PHILOSOPHY_TEXT.split(" ");
 
     .story-stage.is-cinematic .story-layer {
       align-items: flex-start;
-      padding-top: 4.5rem;
+      padding-top: max(5.5rem, calc(env(safe-area-inset-top, 0px) + 5.25rem));
+      padding-bottom: max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
   }
 
@@ -257,50 +239,9 @@ const words = PHILOSOPHY_TEXT.split(" ");
     }
   }
 
-  /*
-   * Mesh gradient — color base sólido + 7 radiales apiladas ancladas en
-   * distintos puntos, cada una apagándose a transparent al 50%. Colores de
-   * marca (violeta, violeta alto, naranja, naranja claro, amarillo, rosa)
-   * en vez de tonos genéricos.
-   */
-  #story-mesh {
-    background-color: var(--primary);
-    background-image:
-      radial-gradient(at 85% 82%, var(--accent) 0px, transparent 50%),
-      radial-gradient(at 92% 8%, var(--brand-pink) 0px, transparent 50%),
-      radial-gradient(at 96% 5%, var(--primary-high) 0px, transparent 50%),
-      radial-gradient(at 88% 24%, var(--brand-yellow) 0px, transparent 50%),
-      radial-gradient(at 61% 51%, var(--accent-light) 0px, transparent 50%),
-      radial-gradient(at 90% 96%, var(--primary-high) 0px, transparent 50%),
-      radial-gradient(at 1% 78%, var(--primary) 0px, transparent 50%);
-    background-repeat: no-repeat;
-    animation: story-mesh-drift 18s ease-in-out infinite alternate;
-  }
-
-  /* Cada capa deriva un poco distinto — "nubes de color" independientes, no un barrido único */
-  @keyframes story-mesh-drift {
-    0% {
-      background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
-    }
-    100% {
-      background-position: 4% 6%, -4% 4%, 3% -5%, -3% -4%, -5% 3%, 5% -3%, -3% 5%;
-    }
-  }
-
-  /* Oscurece el centro (donde vive el texto) sin apagar el color en los bordes */
-  #story-mesh-scrim {
-    background: radial-gradient(
-      ellipse at 50% 50%,
-      rgba(7, 4, 15, 0.55) 0%,
-      rgba(7, 4, 15, 0.15) 45%,
-      transparent 75%
-    );
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #story-mesh {
-      animation: none;
-    }
+  /* Filosofía: atmósfera profunda con fondo casi negro */
+  .story-layer--filosofia {
+    background-color: #08080d;
   }
 
   /* Folio de página — detalle editorial, como el número de página de una revista */
@@ -314,13 +255,23 @@ const words = PHILOSOPHY_TEXT.split(" ");
     opacity: 0.55;
   }
 
-  /* Collage fotográfico — fotos superpuestas que se acomodan un poco más al pasar el cursor */
+  /* Notas — cada obstáculo se lee como un recorte de prensa, no una fila de lista */
+  .note-card {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--foreground) 3%, transparent);
+  }
+
+  /* Collage fotográfico — fotos superpuestas con profundidad de campo interactiva */
   .story-collage {
     isolation: isolate;
+    perspective: 1200px;
   }
 
   .story-photo {
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 500ms ease;
+    will-change: transform;
   }
 
   .story-photo--a {
@@ -337,10 +288,18 @@ const words = PHILOSOPHY_TEXT.split(" ");
     aspect-ratio: 3 / 4;
   }
 
-  .story-collage:hover .story-photo--a,
-  .story-collage:hover .story-photo--b,
+  .story-collage:hover .story-photo--a {
+    transform: translateZ(10px) rotate(-1deg) scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  }
+
+  .story-collage:hover .story-photo--b {
+    transform: translateZ(25px) rotate(1.5deg) scale(1.04);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
+  }
+
   .story-collage:hover .story-photo--cold {
-    transform: scale(1.015);
+    transform: scale(1.02);
   }
 
   /* Sticker de caption sobre el collage — el detalle "de revista", plano, sin sombra ni borde */

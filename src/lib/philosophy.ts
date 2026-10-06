@@ -1,7 +1,7 @@
+import { t } from "@/i18n";
+
 /**
- * Copy para la sección "Por qué existimos" (word-reveal).
- * Habla de la motivación de Liiot en términos del lector: su tiempo.
- * La palabra "tiempo" lleva la anotación del trazo narrativo (StoryPath).
+ * Copy para la sección "Por qué existimos" (word-reveal). Fuente: vault §3.
+ * Centralizado en src/i18n/locales/es.json
  */
-export const PHILOSOPHY_TEXT =
-  "Nos mueve que tu equipo vuelva a tener tiempo para lo que importa.";
+export const PHILOSOPHY_TEXT = t.story.filosofia.quote;

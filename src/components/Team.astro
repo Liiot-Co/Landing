@@ -3,33 +3,45 @@
  * "Somos tres" — humaniza al equipo. Fuente: vault §6.
  */
 import { Linkedin } from "lucide-astro";
-import { TEAM_MEMBERS } from "@/constants/team";
+import { TEAM_MEMBERS, PHOTO_WIDTHS } from "@/constants/team";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
-
-const PHOTO_WIDTHS = [400, 700];
+import SectionFade from "@/components/ui/SectionFade.astro";
+import { t } from "@/i18n";
 ---
 
-<section id="equipo" class="relative overflow-hidden bg-surface-secondary py-28 lg:py-36">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div id="team-header" class="mb-16 flex items-start gap-4 sm:gap-6 max-w-2xl translate-y-6 opacity-0 lg:mb-20">
-      {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
-      <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
-        <span class="size-2 rounded-full bg-primary-high mb-3"></span>
-        <span class="section-eyebrow-vertical">
-          El equipo
-        </span>
-        <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
-      </div>
-
-      <div>
+<section id="equipo" class="relative overflow-hidden bg-surface-secondary pt-20 pb-16 sm:py-20 lg:py-32 scroll-mt-24">
+  {/* Fade suave superior para disolver el salto desde proyectos */}
+  <SectionFade position="top" color="background" height="h-28 sm:h-44" zIndex="z-[2]" />
+  <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end lg:mb-18">
+      <div id="team-header" class="max-w-2xl">
         <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          Las personas detrás de <span data-annotate="equipo">Liiot</span>
+          {t.team.titlePrefix} <span data-annotate="equipo">{t.team.titleHighlight}</span>
         </h2>
         <p class="mt-6 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
-          Liiot es una empresa nueva y por eso cada proyecto lo llevan sus
-          fundadores de principio a fin. Durante todo el trabajo hablarás
-          directamente con nosotros.
+          {t.team.subtitle}
         </p>
+      </div>
+
+      {/* Pieza decorativa editorial (Curvas de Liiot) a nivel del headline en espacio vacío */}
+      <div
+        id="editorial-piece-team"
+        class="js-boop js-morph-piece hidden sm:flex flex-col items-center justify-end select-none pointer-events-auto cursor-pointer pb-2"
+        aria-hidden="true"
+        data-color="#FFFFFF"
+      >
+        <div class="relative size-20 sm:size-24 lg:size-28 opacity-80 transition-transform duration-500 will-change-transform">
+          <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_2px_12px_rgba(255,255,255,0.12)]">
+            <path
+              d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
+              fill="#FFFFFF"
+            />
+            <path
+              d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
+              fill="#FFFFFF"
+            />
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -40,7 +52,7 @@ const PHOTO_WIDTHS = [400, 700];
             href={member.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            class="js-team-card group block translate-y-6 opacity-0"
+            class="js-team-card group block"
           >
             <div class="media-duotone media-duotone-reveal team-photo relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
               <img
@@ -56,7 +68,7 @@ const PHOTO_WIDTHS = [400, 700];
                 aria-hidden="true"
               >
                 <span class="size-1.5 animate-pulse rounded-full bg-destructive"></span>
-                Live
+                {t.team.liveBadge}
               </span>
             </div>
 
@@ -104,5 +116,17 @@ const PHOTO_WIDTHS = [400, 700];
   .js-team-card:hover .team-photo-img,
   .js-team-card:focus-within .team-photo-img {
     filter: grayscale(0) saturate(1.45) contrast(1.18) brightness(1.04);
+  }
+
+  /* Perf: suspend card hover while actively scrolling (`html.is-scrolling`,
+     toggled from landing-motion.ts) so transitions don't recompute mid-scroll;
+     resumes 150ms after scrolling stops. */
+  html.is-scrolling .js-team-card {
+    pointer-events: none;
+  }
+
+  html.is-scrolling .team-photo,
+  html.is-scrolling .team-photo-img {
+    transition: none !important;
   }
 </style>
