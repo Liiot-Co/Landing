@@ -22,8 +22,7 @@ const { title, description, image, canonical, noindex } = Astro.props;
     <link rel="icon" type="image/svg+xml" href={IMAGES.seo.favicon} />
     <meta name="generator" content={Astro.generator} />
 
-    {/* Preconnect a los orígenes externos críticos (fuente + imagen LCP del Hero) */}
-    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    {/* Preconnect al origen externo crítico restante (imagen LCP del Hero) */}
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
 
     {/* Precarga de la imagen LCP del Hero, con las mismas variantes que consume <img> ahí */}
@@ -36,19 +35,16 @@ const { title, description, image, canonical, noindex } = Astro.props;
       fetchpriority="high"
     />
 
-    {/* Fuente cargada de forma no bloqueante (preload + swap a stylesheet on-load) para no retrasar el first paint */}
+    {/* Fuentes auto-hospedadas en `public/fonts`: preload solo de Satoshi
+        (la principal); Open Sans es fallback y se pide solo si hace falta */}
     <link
       rel="preload"
-      as="style"
-      href="https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'"
+      as="font"
+      type="font/woff2"
+      href="/fonts/satoshi-variable.woff2"
+      crossorigin
+      fetchpriority="high"
     />
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap"
-      />
-    </noscript>
     <SEO
       title={title}
       description={description}

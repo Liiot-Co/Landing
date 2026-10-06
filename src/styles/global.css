@@ -1,10 +1,30 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* Variables auto-hospedadas en `public/fonts` (subset latino): un solo
+   archivo por familia en vez de los estáticos de CDN; misma URL y TTL que
+   el resto del sitio. Open Sans es la secundaria real (antes Inter, que
+   nunca se cargaba): solo se descarga si Satoshi falla. */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi-variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: url('/fonts/open-sans-variable.woff2') format('woff2');
+  font-weight: 300 800;
+  font-display: swap;
+  font-style: normal;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Satoshi', 'Open Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 html,
