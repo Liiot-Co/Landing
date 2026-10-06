@@ -4,7 +4,7 @@
  * el equipo fundador en media luna alrededor del texto: los nodos se reparten sobre
  * un arco cuyo centro está del lado del texto, así la curva "abraza" la lectura.
  *
- * Coordenadas en un lienzo de 100×152 unidades (mismo viewBox del SVG del arco),
+ * Coordenadas en un lienzo de 100×158 unidades (mismo viewBox del SVG del arco),
  * así los nodos y el trazo escalan igual en cualquier ancho. El
  * `translate(-50%, -50%)` vive en `.team-node`; la animación de entrada
  * (`.js-team-card`, GSAP) va en el enlace interior para que no se pisen los
@@ -17,11 +17,11 @@ import SectionFade from "@/components/ui/SectionFade.astro";
 import { t } from "@/i18n";
 
 const W = 100;
-const H = 152;
-const CX = 2; // centro del arco, pegado al lado del texto
-const CY = H / 2;
-const RADIUS = 62;
-const SPAN_DEG = 104; // apertura total de la media luna entre el primer y el último nodo
+const H = 158;
+const CX = 4; // centro del arco, pegado al lado del texto
+const CY = 73; // deja sitio arriba al primer nodo y abajo al último con su nombre
+const RADIUS = 66;
+const SPAN_DEG = 110; // apertura total de la media luna entre el primer y el último nodo
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
 const nodes = TEAM_MEMBERS.map((member, i) => {
@@ -70,18 +70,18 @@ const arcPath = (r: number, halfSpan: number) => {
 
       {/* Derecha: equipo en media luna abierta hacia el texto */}
       <div
-        class="team-arc relative mx-auto aspect-[100/152] w-full max-w-[320px] sm:max-w-[380px]"
+        class="team-arc relative mx-auto aspect-[100/158] w-full max-w-[360px] sm:max-w-[440px]"
         role="group"
         aria-label={t.team.orbitAria}
       >
         <svg class="pointer-events-none absolute inset-0 size-full overflow-visible" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
-          <path d={arcPath(RADIUS + 10, 60)} fill="none" stroke="currentColor" stroke-width="0.25" stroke-dasharray="1.2 2.4" opacity="0.7" />
-          <path d={arcPath(RADIUS, 56)} fill="none" stroke="currentColor" stroke-width="0.35" opacity="0.6" />
+          <path d={arcPath(RADIUS + 10, 62)} fill="none" stroke="currentColor" stroke-width="0.25" stroke-dasharray="1.2 2.4" opacity="0.7" />
+          <path d={arcPath(RADIUS, 58)} fill="none" stroke="currentColor" stroke-width="0.35" opacity="0.6" />
         </svg>
 
         {
           nodes.map(({ member, x, y }) => (
-            <div class="team-node absolute w-[26%]" style={`left:${x}%;top:${y}%`}>
+            <div class="team-node absolute w-[34%]" style={`left:${x}%;top:${y}%`}>
               <a
                 href={member.linkedin}
                 target="_blank"
@@ -92,14 +92,14 @@ const arcPath = (r: number, halfSpan: number) => {
                   <img
                     src={unsplashResize(member.photo, 400, 70)}
                     srcset={unsplashSrcSet(member.photo, PHOTO_WIDTHS, 70)}
-                    sizes="(min-width: 1024px) 100px, 26vw"
+                    sizes="(min-width: 1024px) 150px, 34vw"
                     alt={member.photoAlt}
                     class="team-photo-img h-full w-full object-cover"
                     loading="lazy"
                   />
                 </div>
-                <div class="-mx-3 mt-2.5 sm:-mx-6 sm:mt-3.5">
-                  <p class="text-[11px] font-bold leading-tight tracking-tight text-foreground sm:text-base">
+                <div class="-mx-4 mt-2.5 sm:-mx-8 sm:mt-3.5">
+                  <p class="text-xs font-bold leading-tight tracking-tight text-foreground sm:text-lg">
                     {member.name}
                   </p>
                   <p class="mt-1 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-accent sm:text-xs">

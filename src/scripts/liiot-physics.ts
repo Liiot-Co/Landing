@@ -17,9 +17,17 @@
  * - El loop también se pausa fuera de pantalla y con la pestaña oculta.
  * - `prefers-reduced-motion`: se calcula el montón ya apilado y no hay loop ni interacción.
  *
+ * Sugerencia: cuando los bloques se asientan por primera vez, una mano arrastra uno
+ * de ellos (con la misma física que un arrastre real) para mostrar que se pueden
+ * mover; se cancela en cuanto la persona toca algo.
+ *
+ * Chispas: cada cambio de figura emite chispas en el mismo instante, desde el bloque.
+ *
  * Touch: solo la silueta de cada bloque captura el dedo (`touch-action: none`).
  * Tocar el espacio vacío sigue haciendo scroll en la página.
  */
+
+import { burst } from "./liiot-burst";
 
 export type CleanupFn = () => void;
 
@@ -158,6 +166,23 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
   });
   const blockByEl = new Map<Element, Block>(blocks.map((b) => [b.el, b]));
 
+  /** Mano de la sugerencia de arrastre (lucide "hand"). */
+  const hand = document.createElement("div");
+  hand.className = "logo-hand";
+  hand.setAttribute("aria-hidden", "true");
+  hand.innerHTML =
+    '<svg viewBox="0 0 24 24" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/>' +
+    '<path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/>' +
+    '<path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>';
+  yard.appendChild(hand);
+
+  let hintPlayed = false;
+  let hintActive = false;
+  let hintRaf = 0;
+  let hintTimer = 0;
+  let hintDrag: Matter.Constraint | null = null;
+
   const drags = new Map<
     number,
     { constraint: Matter.Constraint; block: Block; x0: number; y0: number; t0: number }
@@ -235,7 +260,7 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
   }
 
   function allAsleep() {
-    return drags.size === 0 && blocks.every((b) => !b.body || b.body.isSleeping);
+    return drags.size === 0 && !hintActive && blocks.every((b) => !b.body || b.body.isSleeping);
   }
 
   function tick(now: number) {
@@ -244,7 +269,10 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     last = now;
     Engine.update(engine!, dt);
     render();
-    if (allAsleep()) stop();
+    if (allAsleep()) {
+      stop();
+      scheduleHint();
+    }
   }
 
   function run() {
@@ -271,6 +299,93 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     if (reduced) return settleNow();
     render();
     run();
+  }
+
+  /* ── Sugerencia: una mano arrastra un bloque ───────────────────────── */
+  function abortHint() {
+    clearTimeout(hintTimer);
+    cancelAnimationFrame(hintRaf);
+    hintRaf = 0;
+    if (hintDrag && engine) Composite.remove(engine.world, hintDrag);
+    hintDrag = null;
+    hintActive = false;
+    hand.style.opacity = "0";
+  }
+
+  function scheduleHint() {
+    if (hintPlayed || reduced || hintActive) return;
+    clearTimeout(hintTimer);
+    hintTimer = window.setTimeout(playHint, 700);
+  }
+
+  function playHint() {
+    if (hintPlayed || reduced || !engine || !visible || document.hidden || drags.size) return;
+    const block = blocks[5] ?? blocks[blocks.length - 1];
+    const body = block?.body;
+    if (!body) return;
+    hintPlayed = true;
+    hintActive = true;
+
+    const x0 = body.position.x;
+    const y0 = body.position.y;
+    const dir = x0 > width / 2 ? -1 : 1;
+    const dx = dir * Math.min(width * 0.16, 130);
+    const dy = -Math.min(height * 0.6, 120);
+    const IN = 450;
+    const PRESS = 250;
+    const MOVE = 1100;
+    const HOLD = 150;
+    const OUT = 350;
+    const moveAt = IN + PRESS;
+    const releaseAt = moveAt + MOVE + HOLD;
+    const endAt = releaseAt + OUT;
+    const t0 = performance.now();
+
+    function frame(now: number) {
+      const t = now - t0;
+      let px = x0;
+      let py = y0;
+      if (t >= moveAt) {
+        const k = Math.min(1, (t - moveAt) / MOVE);
+        const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        px = x0 + dx * e;
+        py = y0 + dy * e;
+      }
+      // Punto de agarre de la mano ≈ (26, 19) dentro de su caja de 56px.
+      hand.style.transform = `translate3d(${(px - 26).toFixed(1)}px, ${(py - 19).toFixed(1)}px, 0) scale(${t >= IN && t < releaseAt ? 0.9 : 1})`;
+      hand.style.opacity =
+        t < IN ? String(t / IN) : t > releaseAt ? String(Math.max(0, 1 - (t - releaseAt) / OUT)) : "1";
+
+      if (t >= IN && !hintDrag && t < releaseAt && engine && body) {
+        Sleeping.set(body, false);
+        hintDrag = Constraint.create({
+          pointA: { x: x0, y: y0 },
+          bodyB: body,
+          pointB: { x: x0 - body.position.x, y: y0 - body.position.y },
+          stiffness: 0.16,
+          damping: 0.12,
+          length: 0,
+        });
+        Composite.add(engine.world, hintDrag);
+      }
+      if (hintDrag) hintDrag.pointA = { x: px, y: py };
+      if (t >= releaseAt && hintDrag && engine) {
+        Composite.remove(engine.world, hintDrag);
+        hintDrag = null;
+      }
+
+      run();
+      if (t >= endAt) {
+        hintActive = false;
+        hintRaf = 0;
+        hand.style.opacity = "0";
+        return;
+      }
+      hintRaf = requestAnimationFrame(frame);
+    }
+
+    hand.style.transform = `translate3d(${x0 - 26}px, ${y0 - 19}px, 0)`;
+    hintRaf = requestAnimationFrame(frame);
   }
 
   /* ── Doble clic / doble toque: siguiente figura y color ─────────────── */
@@ -306,6 +421,9 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     Body.setAngularVelocity(body, angularVelocity + (Math.random() - 0.5) * 0.2);
     Composite.add(engine.world, body);
 
+    // Chispas en el mismo instante del cambio de figura, desde el propio bloque.
+    burst(yard, { count: 8, origin: { x: position.x, y: position.y } });
+
     block.path.animate(
       [{ transform: "scale(1.35)" }, { transform: "scale(0.92)", offset: 0.6 }, { transform: "scale(1)" }],
       { duration: 320, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" },
@@ -323,6 +441,8 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     const el = e.currentTarget as SVGSVGElement;
     const block = blockByEl.get(el);
     if (!block?.body || reduced || !engine) return;
+    abortHint();
+    hintPlayed = true;
     el.setPointerCapture(e.pointerId);
     const [x, y] = toLocal(e);
     Sleeping.set(block.body, false);
@@ -417,6 +537,7 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
       if (Math.abs(width - lastWidth) < 2) return;
       lastWidth = width;
       stop();
+      abortHint();
       build();
       if (!started) return;
       if (reduced) return settleNow();
@@ -429,6 +550,8 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
   return () => {
     disposed = true;
     stop();
+    abortHint();
+    hand.remove();
     clearTimeout(resizeTimer);
     io.disconnect();
     ro.disconnect();

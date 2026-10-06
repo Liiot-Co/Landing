@@ -22,11 +22,13 @@
 export interface BurstOptions {
   /** Nodos del burst. Default: aleatorio 8-14. Siempre capado a 14. */
   count?: number;
+  /** Punto de emisión en px relativo al wrapper. Default: el centro del wrapper. */
+  origin?: { x: number; y: number };
 }
 
 const MIN_COUNT = 8;
 const MAX_COUNT = 14;
-const MAX_CONCURRENT_PER_WRAPPER = 14;
+const MAX_CONCURRENT_PER_WRAPPER = 28;
 /** Jitter por partícula en grados, aplicado sobre el ángulo radial (360°/count). */
 const RADIAL_JITTER_DEG = 18;
 /** GC fallback por si `animationend` no dispara (pestaña oculta a mitad, etc). */
@@ -99,7 +101,11 @@ function ensureBurstStyles(): void {
   stylesInjected = true;
 }
 
-function spawnParticles(wrapper: HTMLElement, count: number): void {
+function spawnParticles(
+  wrapper: HTMLElement,
+  count: number,
+  origin?: { x: number; y: number },
+): void {
   ensureBurstStyles();
   if (window.getComputedStyle(wrapper).position === "static") {
     wrapper.style.position = "relative";
@@ -118,6 +124,10 @@ function spawnParticles(wrapper: HTMLElement, count: number): void {
     const size = 4 + Math.random() * 4;
     const color = BRAND_COLORS[Math.floor(Math.random() * BRAND_COLORS.length)];
 
+    if (origin) {
+      p.style.left = `${origin.x.toFixed(1)}px`;
+      p.style.top = `${origin.y.toFixed(1)}px`;
+    }
     p.style.setProperty("--angle", `${angle.toFixed(1)}deg`);
     p.style.setProperty("--distance", `${distance.toFixed(1)}px`);
     p.style.setProperty("--size", `${size.toFixed(1)}px`);
@@ -156,13 +166,13 @@ export function burst(
   if (concurrent + count > MAX_CONCURRENT_PER_WRAPPER) return;
 
   if (typeof IntersectionObserver === "undefined") {
-    spawnParticles(wrapper, count);
+    spawnParticles(wrapper, count, options.origin);
     return;
   }
 
   const io = new IntersectionObserver((entries, obs) => {
     obs.disconnect();
-    if (entries[0]?.isIntersecting) spawnParticles(wrapper, count);
+    if (entries[0]?.isIntersecting) spawnParticles(wrapper, count, options.origin);
   });
   io.observe(wrapper);
 }
