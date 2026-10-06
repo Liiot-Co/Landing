@@ -12,17 +12,21 @@
 import MorphGradient from "@/components/ui/MorphGradient.astro";
 import SectionFade from "@/components/ui/SectionFade.astro";
 import { LIIOT_CALENDLY_URL } from "@/constants/contact";
-import { HERO_IMAGE, HERO_IMAGE_WIDTHS, HERO_IMAGE_FALLBACK } from "@/constants/hero";
+import { HERO_IMAGE, HERO_IMAGE_WIDTHS, HERO_IMAGE_FALLBACK, HERO_FOCUS } from "@/constants/hero";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 import { t } from "@/i18n";
 ---
 
 <section
   id="hero"
-  class="relative flex h-screen min-h-[580px] sm:min-h-[680px] items-end overflow-hidden bg-background"
+  class="relative flex h-svh min-h-[580px] sm:h-screen sm:min-h-[680px] items-end overflow-hidden bg-background"
 >
   {/* Fondo — la foto se ve completa; con skeleton shimmer loader y LQIP para LCP óptimo */}
-  <div id="hero-bg" class="absolute inset-0 bg-[#07040F] overflow-hidden">
+  <div
+    id="hero-bg"
+    class="absolute inset-0 bg-[#07040F] overflow-hidden"
+    style={`--hero-focus-mobile:${HERO_FOCUS.mobile};--hero-focus-desktop:${HERO_FOCUS.desktop}`}
+  >
     {/* Skeleton / Shimmer loader de alta velocidad mientras descarga la foto */}
     <div
       id="hero-image-skeleton"
@@ -35,7 +39,7 @@ import { t } from "@/i18n";
       src={unsplashResize(HERO_IMAGE, 64, 25)}
       alt=""
       aria-hidden="true"
-      class="absolute inset-0 h-full w-full object-cover filter blur-xl scale-110 pointer-events-none opacity-60"
+      class="hero-focus-img absolute inset-0 h-full w-full object-cover filter blur-xl scale-110 pointer-events-none opacity-60"
     />
 
     {/* Imagen LCP principal de alta resolución con carga progresiva y revelado suave */}
@@ -45,7 +49,7 @@ import { t } from "@/i18n";
       srcset={unsplashSrcSet(HERO_IMAGE, HERO_IMAGE_WIDTHS, 65)}
       sizes="100vw"
       alt={t.hero.imageAlt}
-      class="hero-bg-img absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 ease-out"
+      class="hero-bg-img hero-focus-img absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 ease-out"
       loading="eager"
       fetchpriority="high"
       decoding="sync"
@@ -184,6 +188,18 @@ import { t } from "@/i18n";
   /* Perpetual fullscreen zoom removed — the hero image now relies solely on
      its one-time opacity fade-in (see `.hero-bg-img` utility classes above)
      instead of an infinite GPU-composited scale animation. */
+
+  /* Punto focal de la foto: en celular el recorte vertical muestra solo una franja,
+     así que `--hero-focus-mobile` decide qué parte de la foto queda a la vista. */
+  .hero-focus-img {
+    object-position: var(--hero-focus-mobile, 50% 30%);
+  }
+
+  @media (min-width: 768px) {
+    .hero-focus-img {
+      object-position: var(--hero-focus-desktop, 50% 40%);
+    }
+  }
 
   /* Gradiente radial integrado con elegancia: matices vibrantes sutiles y armónicos */
   .hero-radial-gradient {

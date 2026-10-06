@@ -179,9 +179,11 @@ const words = filosofia.quote.split(" ");
    * pin (con fallback a `100vh` para navegadores sin soporte).
    */
   .story-stage.is-cinematic {
+    /* `lvh` = alto con la barra del navegador oculta: al hacer scroll la barra se
+       esconde y el viewport crece, así que un escenario en `svh` dejaba una franja
+       sin cubrir abajo. El contenido se alinea arriba y nunca queda bajo la barra. */
     height: 100vh;
-    height: 100dvh;
-    height: 100svh;
+    height: 100lvh;
     overflow: hidden;
   }
 
@@ -217,16 +219,31 @@ const words = filosofia.quote.split(" ");
    * que un recorte por overflow afecte el final de la lista, no el titular.
    */
   @media (max-width: 1023.98px) {
-    .story-stage.is-cinematic .story-collage {
-      display: none;
-    }
-
     .story-stage.is-cinematic .story-layer {
       align-items: flex-start;
       padding-top: max(5.5rem, calc(env(safe-area-inset-top, 0px) + 5.25rem));
-      padding-bottom: max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem));
+      padding-bottom: max(5rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem));
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+    }
+
+    /* Centrado "seguro": si el contenido cabe se centra en la pantalla; si no cabe,
+       se alinea arriba y el recorte afecta el final y no el titular. */
+    .story-stage.is-cinematic .story-layer > .container {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    /* El collage solo se muestra en el panel de filosofía y cuando la pantalla es lo
+       bastante alta para que quepa junto al texto. */
+    .story-stage.is-cinematic #story-reto .story-collage {
+      display: none;
+    }
+
+    @media (max-height: 779.98px) {
+      .story-stage.is-cinematic .story-collage {
+        display: none;
+      }
     }
   }
 

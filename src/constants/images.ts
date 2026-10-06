@@ -8,6 +8,12 @@ export const IMAGES = {
     main: "https://images.unsplash.com/photo-1524014629655-e08df4da8213?q=80&w=1169&auto=format&fit=crop",
     fallback: "https://images.unsplash.com/photo-1521669246297-b04a27e36f07?w=1200&q=70",
     widths: [640, 1024, 1536, 1920],
+    /**
+     * Punto focal de la foto (`object-position`). En celular se ve solo una franja
+     * vertical (~30% del ancho), así que `x` decide qué parte de la foto aparece:
+     * 0% = borde izquierdo, 50% = centro, 100% = borde derecho.
+     */
+    focus: { mobile: "50% 30%", desktop: "50% 40%" },
   },
   story: {
     reto: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=700&auto=format&fit=crop",
@@ -39,5 +45,6 @@ export const IMAGES = {
 
 // Backwards-compatible named exports
 export const HERO_IMAGE = IMAGES.hero.main;
+export const HERO_FOCUS = IMAGES.hero.focus;
 export const HERO_IMAGE_WIDTHS = IMAGES.hero.widths;
 export const HERO_IMAGE_FALLBACK = IMAGES.hero.fallback;

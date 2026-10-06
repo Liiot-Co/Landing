@@ -136,7 +136,7 @@ function setupStory() {
   // the stage stays glued with no handoff. The parent section becomes the
   // scroll track (viewport + wipe distance) and ScrollTrigger only scrubs.
   const WIPE_DISTANCE_VH = isMobile ? 55 : 90;
-  track.style.height = `calc(100svh + ${WIPE_DISTANCE_VH}vh)`;
+  track.style.height = `calc(100lvh + ${WIPE_DISTANCE_VH}svh)`;
   stage.style.position = "sticky";
   stage.style.top = "0";
   const SKEW = isMobile ? 8 : 14;
