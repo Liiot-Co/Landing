@@ -118,6 +118,21 @@ function burstAfterPaint(host: HTMLElement) {
   requestAnimationFrame(() => burst(host));
 }
 
+/**
+ * Chispas sincronizadas con el morph: salen desde la pieza que acaba de terminar
+ * su transformación, en ese mismo frame (ya con la forma final pintada).
+ */
+function burstAtPiece(host: HTMLElement, path: SVGPathElement, count = 3) {
+  requestAnimationFrame(() => {
+    const h = host.getBoundingClientRect();
+    const r = path.getBoundingClientRect();
+    burst(host, {
+      count,
+      origin: { x: r.left + r.width / 2 - h.left, y: r.top + r.height / 2 - h.top },
+    });
+  });
+}
+
 function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
@@ -196,6 +211,7 @@ function animatePieces(
   fromColors: string[],
   duration: number,
   cb: () => void,
+  onPiece?: (index: number) => void,
 ) {
   let pending = paths.length;
   const reduced = isReducedMotion();
@@ -210,6 +226,7 @@ function animatePieces(
         toFigures[i].color,
         duration,
         () => {
+          onPiece?.(i);
           pending -= 1;
           if (pending === 0) cb();
         },
@@ -314,10 +331,10 @@ function initMark(svg: SVGElement) {
   svg.addEventListener("mousemove", helixMove);
   svg.addEventListener("mouseleave", helixStop);
 
-  /** Burst confinado al contenedor del logo. Solo se llama cuando el morph ya terminó. */
-  function burstOnHost() {
+  /** Chispas de la pieza `i`, emitidas justo cuando esa pieza termina su morph. */
+  function sparkPiece(i: number) {
     const host = svg.parentElement;
-    if (host) burstAfterPaint(host);
+    if (host) burstAtPiece(host, paths[i]);
   }
 
   function showLabel(text: string, color: string) {
@@ -359,18 +376,25 @@ function initMark(svg: SVGElement) {
         ? paths.map(() => originalFill)
         : PIECE_MORPH_STATES[currentState].pieces.map((f) => f.color);
 
-    animatePieces(paths, fromDs, next.pieces, fromColors, MORPH_DURATION, () => {
-      // Representative label color: first piece of the new state.
-      showLabel(next.label, next.pieces[0].color);
-      currentState = nextIdx;
-      isAnimating = false;
-      burstOnHost();
+    animatePieces(
+      paths,
+      fromDs,
+      next.pieces,
+      fromColors,
+      MORPH_DURATION,
+      () => {
+        // Representative label color: first piece of the new state.
+        showLabel(next.label, next.pieces[0].color);
+        currentState = nextIdx;
+        isAnimating = false;
 
-      // After the last state, auto-return to the original logo.
-      if (nextIdx === PIECE_MORPH_STATES.length - 1) {
-        setTimeout(returnToLogo, 1200);
-      }
-    });
+        // After the last state, auto-return to the original logo.
+        if (nextIdx === PIECE_MORPH_STATES.length - 1) {
+          setTimeout(returnToLogo, 1200);
+        }
+      },
+      sparkPiece,
+    );
   }
 
   function returnToLogo() {
@@ -386,12 +410,19 @@ function initMark(svg: SVGElement) {
       color: originalFill,
     }));
 
-    animatePieces(paths, fromDs, toFigures, fromColors, MORPH_DURATION, () => {
-      currentState = -1;
-      isAnimating = false;
-      svg.classList.remove("is-morphing");
-      burstOnHost();
-    });
+    animatePieces(
+      paths,
+      fromDs,
+      toFigures,
+      fromColors,
+      MORPH_DURATION,
+      () => {
+        currentState = -1;
+        isAnimating = false;
+        svg.classList.remove("is-morphing");
+      },
+      sparkPiece,
+    );
   }
 
   svg.addEventListener("click", morph);
