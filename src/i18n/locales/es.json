@@ -40,7 +40,7 @@
         "path": "#proyectos"
       },
       {
-        "name": "Equipo",
+        "name": "Misión y visión",
         "path": "#equipo"
       },
       {
@@ -109,7 +109,7 @@
       "title": "Sabemos",
       "highlight": "cómo se siente",
       "pivot": "Ahí empieza nuestro trabajo.",
-      "imageAlt": "Un escritorio vacío y genérico, sin nadie detrás",
+      "imageAlt": "Un escritorio vacío sin nadie detrás",
       "imageTag": "te entendemos",
       "scene": [
         "Son las siete de la noche y sigues cuadrando el reporte que solo tú sabes hacer. Tu equipo trabaja duro y aun así las tareas repetidas se llevan las mejores horas de la semana. Tienes ideas para hacer crecer el negocio y casi nunca encuentras el momento de pensarlas.",
@@ -121,7 +121,7 @@
       "folio": "02",
       "quote": "Nos mueve que tu equipo vuelva a tener tiempo para lo que importa.",
       "subtitle": "Cada herramienta que hacemos empieza con una pregunta: ¿cuántas horas le va a devolver a tu gente? Si la respuesta no nos convence, seguimos buscando.",
-      "imageAlt1": "El equipo de Liiot revisando código juntos, señalando la pantalla",
+      "imageAlt1": "El equipo de Liiot revisando código juntos frente a una pantalla",
       "imageAlt2": "Personas del equipo riendo mientras trabajan juntas",
       "stickerCta": "Tu tiempo de vuelta"
     }
@@ -129,19 +129,19 @@
   "howWeWork": {
     "titleLine1": "Caminamos a tu lado",
     "titleLine2": "desde el primer día",
-    "subtitle": "Así se ve trabajar con nosotros, semana a semana.",
+    "subtitle": "Así se ve trabajar con nosotros cada semana.",
     "steps": [
       {
         "id": "understand",
         "title": "Escuchamos primero",
-        "emotion": "Nos sentamos contigo a entender qué le quita tiempo a tu gente y qué le daría tranquilidad.",
+        "emotion": "Nos sentamos contigo a entender qué le quita tiempo a tu gente.",
         "theme": "violet",
         "textColor": "light",
         "rotation": "-2deg",
         "points": [
           {
             "icon": "HeartHandshake",
-            "text": "Hablamos tu idioma, sin tecnicismos"
+            "text": "Entendemos el idioma de tu negocio"
           },
           {
             "icon": "Sparkles",
@@ -218,10 +218,15 @@
     }
   },
   "team": {
-    "titlePrefix": "Las personas detrás de",
-    "titleHighlight": "Liiot",
-    "subtitle": "Liiot es una empresa nueva y por eso cada proyecto lo llevan sus fundadores de principio a fin. Durante todo el trabajo hablarás directamente con nosotros.",
-    "liveBadge": "Live",
+    "mission": {
+      "title": "Misión",
+      "text": "Convertimos la tecnología en una fuerza que potencia a las personas. Transformamos la complejidad técnica en soluciones simples y elegantes que siguen el ritmo de cada equipo, para que las organizaciones liberen todo su potencial y quienes las integran trabajen con más tiempo, energía y propósito."
+    },
+    "vision": {
+      "title": "Visión",
+      "text": "Para 2032, seremos la empresa latinoamericana que lidera la tecnología del bienestar. Desde Colombia, acompañaremos a miles de equipos en la región con herramientas que elevan la manera de trabajar y demuestran que una empresa puede crecer mientras sus personas florecen."
+    },
+    "orbitAria": "Equipo fundador de Liiot",
     "members": {
       "dana": {
         "name": "Dana Sofia Sánchez",

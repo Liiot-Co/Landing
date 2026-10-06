@@ -91,10 +91,11 @@
 - **Liiot Custom:** "Automatizamos la seguridad laboral para que cuidar a cada trabajador sea parte natural del día." CTA: "Quiero algo así para mi empresa".
 - **Bleepy:** "Conectamos marcas con creadores que cuentan su historia con voz propia." CTA se mantiene.
 
-#### Equipo
-- **H2:** "Nuestro equipo" → "Las personas detrás de Liiot"
-- **Sub:** "Fundamos Liiot para construir una tecnología que cuida a quien la usa. Durante todo el proyecto hablarás directamente con nosotros."
-- **Opcional:** una línea humana por persona ("Lo que más disfruto es...") para reforzar cercanía.
+#### Misión y visión (antes "Equipo")
+- La sección ya no lleva el título "Las personas detrás de Liiot". A la izquierda van la misión y la visión de la empresa (ambos títulos en blanco para no saturar la lectura) y a la derecha el equipo fundador en media luna abierta hacia el texto.
+- **Misión:** "Convertimos la tecnología en una fuerza que potencia a las personas…"
+- **Visión:** "Para 2032, seremos la empresa latinoamericana que lidera la tecnología del bienestar…"
+- El menú muestra "Misión y visión" y apunta a la misma sección.
 
 #### CTA final
 - **H2:** "Crezcamos juntos" → "Recupera tiempo para lo que importa"

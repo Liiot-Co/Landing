@@ -75,7 +75,7 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio, #editorial-piece-team",
+    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio",
     { opacity: "1", transform: "none" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
@@ -136,7 +136,7 @@ function setupStory() {
   // the stage stays glued with no handoff. The parent section becomes the
   // scroll track (viewport + wipe distance) and ScrollTrigger only scrubs.
   const WIPE_DISTANCE_VH = isMobile ? 55 : 90;
-  track.style.height = `calc(100svh + ${WIPE_DISTANCE_VH}vh)`;
+  track.style.height = `calc(100lvh + ${WIPE_DISTANCE_VH}svh)`;
   stage.style.position = "sticky";
   stage.style.top = "0";
   const SKEW = isMobile ? 8 : 14;
@@ -267,7 +267,6 @@ function setupEditorialLogoPieces() {
   const pieces = [
     { id: "#editorial-piece-how", trigger: "#como-trabajamos" },
     { id: "#editorial-piece-portfolio", trigger: "#proyectos" },
-    { id: "#editorial-piece-team", trigger: "#equipo" },
   ];
 
   // Scrub ScrollTriggers from the micro-parallax tweens below. Disabled

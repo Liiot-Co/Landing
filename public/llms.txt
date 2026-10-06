@@ -9,9 +9,9 @@ Ubicación: Colombia (cobertura global)
 ## Filosofía y Propuesta de Valor
 
 - **Tiempo de vuelta**: "Nos mueve que tu equipo vuelva a tener tiempo para lo que importa." Construimos software pensado en las personas reales que lo operan cada día.
-- **Socios, no vendedores de horas**: No facturamos horas vacías ni dejamos proyectos abandonados; co-creamos soluciones con objetivos claros de impacto y negocio.
-- **Entregas ágiles y transparentes**: Iteraciones semanales visibles, sin jerarquías intermedias ni burocracia.
-- **Evolución post-lanzamiento**: El despliegue a producción es el punto de partida; aprendemos del uso real para optimizar, mantener y escalar la herramienta.
+- **Socios que construyen contigo**: Co-creamos soluciones con objetivos claros de impacto y de negocio y acompañamos cada proyecto hasta que funciona.
+- **Entregas ágiles y transparentes**: Iteraciones semanales visibles con acceso directo al equipo que construye.
+- **Evolución post-lanzamiento**: El lanzamiento es el punto de partida. Aprendemos del uso real para optimizar, mantener y escalar la herramienta.
 
 ## Servicios Principales
 
@@ -27,13 +27,18 @@ Ubicación: Colombia (cobertura global)
   - *Impacto*: Convierte la prevención de riesgos y la recolección de evidencias en una dinámica fluida, eliminando el papeleo inútil y la fricción burocrática.
 - [Bleepy](https://www.liiot.app/#proyectos):
   - *Descripción*: Plataforma colaborativa que conecta directamente a marcas y empresas con creadores de contenido auténticos.
-  - *Impacto*: Facilita acuerdos comerciales y campañas orgánicas sin depender de la publicidad tradicional o agencias intermediarias lentas.
+  - *Impacto*: Facilita acuerdos comerciales y campañas orgánicas directamente entre marcas y creadores.
 
 ## Metodología de Trabajo
 
 1. **Entendemos tu negocio**: Diagnóstico sincero y escucha activa para comprender a fondo los dolores reales y a los usuarios.
 2. **Construimos juntos**: Avances tangibles cada semana, prototipado rápido y feedback continuo.
 3. **Crecemos juntos**: Medición de adopción, soporte técnico y acompañamiento continuo post-lanzamiento.
+
+## Misión y Visión
+
+- **Misión**: Convertimos la tecnología en una fuerza que potencia a las personas. Transformamos la complejidad técnica en soluciones simples y elegantes que siguen el ritmo de cada equipo, para que las organizaciones liberen todo su potencial y quienes las integran trabajen con más tiempo, energía y propósito.
+- **Visión**: Para 2032, seremos la empresa latinoamericana que lidera la tecnología del bienestar. Desde Colombia, acompañaremos a miles de equipos en la región con herramientas que elevan la manera de trabajar y demuestran que una empresa puede crecer mientras sus personas florecen.
 
 ## Equipo Fundador y Liderazgo
 

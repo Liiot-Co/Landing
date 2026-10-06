@@ -137,7 +137,7 @@ const steps = t.howWeWork.steps.map((step, index) => ({
     <div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end lg:mb-14">
       <div id="how-header" class="max-w-2xl">
         <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          {t.howWeWork.titleLine1}<br />{t.howWeWork.titleLine2}
+          {t.howWeWork.titleLine1}<br class="hidden sm:block" />{" "}{t.howWeWork.titleLine2}
         </h2>
         <p class="mt-4 max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
           {t.howWeWork.subtitle}
