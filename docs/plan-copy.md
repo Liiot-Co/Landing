@@ -145,11 +145,10 @@
 
 ## Estado de aplicación
 
-**Aplicado en el código** (las imágenes no se tocaron): hero, El reto (escena de empatía), Por qué existimos, Cómo trabajamos con CTA intermedio, Proyectos, Equipo, CTA final, menú, footer, meta description, JSON-LD y `llms.txt`.
+**Aplicado en el código** (las imágenes y el hero no se tocaron): El reto (escena de empatía), Por qué existimos, Cómo trabajamos con CTA intermedio, Proyectos, Equipo, CTA final, menú, footer, meta description, JSON-LD y `llms.txt`.
 
 Decisiones tomadas a partir de `docs/auditoria-copy.md`:
-- El hero ya dice qué se vende ("software a medida") y habla del lector. Lo de "empresa nueva" pasó a Equipo.
-- El título interactivo solo combina palabras que forman frases correctas: `futuro · tiempo · bienestar · tranquilidad`, con `Construimos/Cuidamos` y `contigo/junto a ti`.
+- El hero se queda como estaba por ser simple y claro. Solo se quitó "Somos una empresa colombiana joven y seria." Lo de "empresa nueva" vive en Equipo.
 - Por qué existimos cuenta la motivación y Cómo trabajamos cuenta el método, para no repetir.
 - Un solo verbo para el botón principal: "Agenda una charla". "Quiero algo así para mi empresa" queda solo en el caso SG-SST.
 - Bleepy: "Próximamente" y el botón "Cuéntanos si te interesa", que sí lleva a la sección de contacto.
