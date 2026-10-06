@@ -1,0 +1,279 @@
+{
+  "seo": {
+    "defaultTitle": "Liiot | Construimos tu futuro contigo",
+    "defaultDescription": "Software a medida y automatización en Colombia para que tu equipo recupere tiempo y trabaje con tranquilidad.",
+    "ogImageAlt": "Liiot — Construimos tu futuro contigo",
+    "schema": {
+      "organizationDescription": "Nueva empresa de tecnología que construye un mejor futuro. Creamos software a medida, productos digitales escalables y soluciones de automatización de procesos.",
+      "websiteDescription": "Software a medida para que tu equipo recupere tiempo y trabaje con tranquilidad.",
+      "services": {
+        "customSoftware": {
+          "name": "Liiot Custom - Software a Medida",
+          "description": "Desarrollo de sistemas a medida y automatizaciones operativas (ej. caso SG-SST) para que los equipos dejen el papeleo atrás."
+        },
+        "digitalProducts": {
+          "name": "Lanzamiento de Plataformas y Productos Digitales (Bleepy)",
+          "description": "Desarrollo de plataformas modernas que conectan audiencias, marcas y creadores de contenido sin fricción publicitaria."
+        },
+        "consulting": {
+          "name": "Consultoría Tecnológica & Arquitectura",
+          "description": "Acompañamiento técnico directo con fundadores e ingenieros seniors para definir la estrategia y arquitectura digital adecuada."
+        }
+      }
+    }
+  },
+  "navbar": {
+    "brandAria": "Liiot — Inicio",
+    "menuToggleAria": "Abrir menú",
+    "consultingCta": "Planeamos juntos",
+    "links": [
+      {
+        "name": "Por qué existimos",
+        "path": "#por-que-existimos"
+      },
+      {
+        "name": "Cómo trabajamos",
+        "path": "#como-trabajamos"
+      },
+      {
+        "name": "Proyectos",
+        "path": "#proyectos"
+      },
+      {
+        "name": "Equipo",
+        "path": "#equipo"
+      },
+      {
+        "name": "Planeamos juntos",
+        "path": "#agendar"
+      }
+    ]
+  },
+  "hero": {
+    "imageAlt": "Dos mujeres saltando en la calle con energía creativa",
+    "aria": {
+      "toggleAction": "Alternar acción (click)",
+      "toggleActionTitle": "Haz click para alternar",
+      "toggleKeyword": "Alternar palabra clave (click)",
+      "toggleKeywordTitle": "Haz click para alternar palabra",
+      "toggleSuffix": "Alternar cierre (click)",
+      "toggleSuffixTitle": "Haz click para alternar",
+      "scrollDown": "Desplazarse a la siguiente sección"
+    },
+    "connector": "tu",
+    "prefixes": [
+      "Construimos",
+      "Diseñamos",
+      "Creamos",
+      "Impulsamos"
+    ],
+    "keywords": [
+      {
+        "text": "futuro",
+        "color": "var(--accent)"
+      },
+      {
+        "text": "negocio",
+        "color": "var(--primary-high)"
+      },
+      {
+        "text": "equipo",
+        "color": "var(--brand-pink)"
+      },
+      {
+        "text": "gente",
+        "color": "var(--brand-yellow)"
+      },
+      {
+        "text": "confianza",
+        "color": "var(--accent)"
+      },
+      {
+        "text": "propósito",
+        "color": "var(--brand-pink)"
+      }
+    ],
+    "suffixes": [
+      "contigo",
+      "a tu lado",
+      "en equipo",
+      "de verdad"
+    ],
+    "body": "Creamos tecnología que une personas, genera confianza y hace que el día a día funcione mejor.",
+    "mainCTA": "Planeamos juntos",
+    "secondCTA": "Conócenos"
+  },
+  "story": {
+    "reto": {
+      "folio": "01",
+      "title": "Sabemos",
+      "highlight": "cómo se siente",
+      "pivot": "Ahí empieza nuestro trabajo.",
+      "imageAlt": "Un escritorio vacío y genérico, sin nadie detrás",
+      "imageTag": "te entendemos",
+      "scene": [
+        "Son las siete de la noche y sigues cuadrando el reporte que solo tú sabes hacer. Tu equipo trabaja duro y aun así las tareas repetidas se llevan las mejores horas de la semana. Tienes ideas para hacer crecer el negocio y casi nunca encuentras el momento de pensarlas.",
+        "Cada semana así son horas que no vuelven.",
+        "Ese cansancio dice mucho de cuánto cuidas lo que construiste."
+      ]
+    },
+    "filosofia": {
+      "folio": "02",
+      "quote": "Nos mueve que tu equipo vuelva a tener tiempo para lo que importa.",
+      "subtitle": "Cada herramienta que hacemos empieza con una pregunta: ¿cuántas horas le va a devolver a tu gente? Si la respuesta no nos convence, seguimos buscando.",
+      "imageAlt1": "El equipo de Liiot revisando código juntos, señalando la pantalla",
+      "imageAlt2": "Personas del equipo riendo mientras trabajan juntas",
+      "stickerCta": "Tu tiempo de vuelta"
+    }
+  },
+  "howWeWork": {
+    "titleLine1": "Caminamos a tu lado",
+    "titleLine2": "desde el primer día",
+    "subtitle": "Así se ve trabajar con nosotros, semana a semana.",
+    "steps": [
+      {
+        "id": "understand",
+        "title": "Escuchamos primero",
+        "emotion": "Nos sentamos contigo a entender qué le quita tiempo a tu gente y qué le daría tranquilidad.",
+        "theme": "violet",
+        "textColor": "light",
+        "rotation": "-2deg",
+        "points": [
+          {
+            "icon": "HeartHandshake",
+            "text": "Hablamos tu idioma, sin tecnicismos"
+          },
+          {
+            "icon": "Sparkles",
+            "text": "Partimos de lo que vive tu equipo cada día"
+          }
+        ]
+      },
+      {
+        "id": "build",
+        "title": "Construimos juntos",
+        "emotion": "Cada semana ves algo funcionando y decides con nosotros el siguiente paso.",
+        "theme": "orange",
+        "textColor": "dark",
+        "rotation": "2deg",
+        "points": [
+          {
+            "icon": "Zap",
+            "text": "Pruebas cada avance con tu equipo real"
+          },
+          {
+            "icon": "Users",
+            "text": "Decides las prioridades con nosotros"
+          }
+        ]
+      },
+      {
+        "id": "grow",
+        "title": "Crecemos juntos",
+        "emotion": "Seguimos contigo después del lanzamiento para que la herramienta crezca al ritmo de tu negocio.",
+        "theme": "pink",
+        "textColor": "light",
+        "rotation": "-2deg",
+        "points": [
+          {
+            "icon": "TrendingUp",
+            "text": "Medimos cuánto tiempo le devuelve a tu equipo"
+          },
+          {
+            "icon": "Sprout",
+            "text": "Ajustamos según lo que tu gente usa"
+          }
+        ]
+      }
+    ],
+    "cta": {
+      "text": "¿Te imaginas a tu equipo con más tiempo?",
+      "button": "Planeamos juntos"
+    }
+  },
+  "portfolio": {
+    "title": "Qué hemos logrado",
+    "subtitle": "Lo que hemos construido para que los equipos dejen el papeleo atrás.",
+    "aria": {
+      "prev": "Proyecto anterior",
+      "next": "Siguiente proyecto",
+      "region": "Carrusel Qué hemos logrado",
+      "goToSlide": "Ir al slide"
+    },
+    "projects": {
+      "liiot-custom": {
+        "title": "Liiot Custom",
+        "subtitle": "Herramienta a medida · Caso SG-SST",
+        "description": "Automatizamos la seguridad laboral para que cuidar a cada trabajador sea parte natural del día.",
+        "imageAlt": "Liiot Custom — Herramienta a medida para seguridad laboral",
+        "ctaText": "Quiero algo así para mi empresa"
+      },
+      "bleepy": {
+        "title": "Bleepy",
+        "subtitle": "Plataforma de creadores y empresas · Próximamente",
+        "description": "Conectamos marcas con creadores que cuentan su historia con voz propia.",
+        "imageAlt": "Bleepy — Plataforma de creadores y marcas",
+        "ctaText": "Cuéntanos si te interesa"
+      }
+    }
+  },
+  "team": {
+    "titlePrefix": "Las personas detrás de",
+    "titleHighlight": "Liiot",
+    "subtitle": "Liiot es una empresa nueva y por eso cada proyecto lo llevan sus fundadores de principio a fin. Durante todo el trabajo hablarás directamente con nosotros.",
+    "liveBadge": "Live",
+    "members": {
+      "dana": {
+        "name": "Dana Sofia Sánchez",
+        "role": "CEO",
+        "photoAlt": "Retrato de Dana Sofia Sánchez"
+      },
+      "david": {
+        "name": "David Ocaño",
+        "role": "CCO",
+        "photoAlt": "Retrato de David Ocaño"
+      },
+      "jean": {
+        "name": "Jean Pierre Ortiz",
+        "role": "CTO",
+        "photoAlt": "Retrato de Jean Pierre Ortiz"
+      }
+    }
+  },
+  "finalCta": {
+    "titleHighlight": "Empieza a recuperar",
+    "titleSuffix": "las horas de tu equipo",
+    "subtitle": "Imagina tu próxima semana con esas horas de vuelta. Cuéntanos qué te quita tiempo y te mostramos por dónde empezar.",
+    "cta": "Planeamos juntos"
+  },
+  "footer": {
+    "contactHeading": "Contacto",
+    "socialHeading": "Redes",
+    "legalHeading": "Legal",
+    "aria": {
+      "linkedin": "Liiot en LinkedIn",
+      "instagram": "Liiot en Instagram"
+    },
+    "legal": {
+      "privacy": "Privacidad",
+      "terms": "Términos"
+    },
+    "tagline": "Software a medida para que tu equipo recupere sus horas.",
+    "copyright": "© {year} Liiot. Todos los derechos reservados.",
+    "backToTop": "Volver arriba ↑"
+  },
+  "notFound": {
+    "metaTitle": "Página no encontrada — Liiot",
+    "metaDescription": "Esta página se perdió en el camino. Ayúdanos a armar de nuevo el isotipo de Liiot y vuelve al inicio.",
+    "homeAria": "Liiot — Volver al inicio",
+    "pieceAria": "Colocar pieza {id} de {total}",
+    "piecePlacedAria": "Pieza {id} colocada",
+    "eyebrow": "Error 404",
+    "titleLine1": "Esta página",
+    "titleLine2": "se nos perdió.",
+    "instruction": "Toca cada pieza para armar el camino de regreso.",
+    "progressTemplate": "{placed} / {total} piezas",
+    "success": "Listo. Por aquí sí se llega.",
+    "cta": "Volver al inicio"
+  }
+}

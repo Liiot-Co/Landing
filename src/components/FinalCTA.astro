@@ -5,27 +5,26 @@
  * dar el paso. Fondo naranja sólido (Brandbook tonalGradient.orange —
  * "CTAs grandes, banners de sección Humanidad") + morph gradient "human"
  * en textura, rompe el negro dominante del resto del sitio.
+ * Bajo el botón, las 4 piezas del isotipo son bloques con física (liiot-physics.ts).
  * Fuente: vault §7.
  */
-import MorphGradient from "@/components/ui/MorphGradient.astro";
 import { LIIOT_CALENDLY_URL } from "@/constants/contact";
+import { t } from "@/i18n";
 ---
 
 <section
   id="agendar"
-  class="relative flex min-h-[80vh] items-center overflow-hidden py-28"
-  style="background: linear-gradient(160deg, #B84A22 0%, #FF6A33 45%, #FF8A5C 100%);"
+  class="relative z-10 flex items-center pt-20 pb-0 sm:pt-24 lg:pt-28 scroll-mt-24"
 >
-  <MorphGradient recipe="human" blend="soft-light" opacity={0.5} />
 
   <div class="container relative z-10 mx-auto px-4 text-center sm:px-6 lg:px-8">
-    <div id="final-cta-card" class="mx-auto max-w-3xl translate-y-6 opacity-0">
-      <h2 class="headline-editorial text-4xl text-[#07040F] sm:text-6xl lg:text-7xl">
-        <span>Crezcamos</span> juntos
+    <div id="final-cta-card" class="mx-auto max-w-3xl">
+      <h2 class="headline-editorial text-4xl text-white sm:text-6xl lg:text-7xl">
+        <span class="text-white">{t.finalCta.titleHighlight}</span> <span class="text-white">{t.finalCta.titleSuffix}</span>
       </h2>
 
-      <p class="mx-auto mt-9 max-w-lg text-base font-semibold leading-relaxed text-[#07040F]/80 sm:text-lg">
-        Cuéntanos qué necesitas, lo construimos juntos.
+      <p class="mx-auto mt-9 max-w-lg text-base font-semibold leading-relaxed text-white/80 sm:text-lg">
+        {t.finalCta.subtitle}
       </p>
 
       <div class="mt-12">
@@ -33,12 +32,115 @@ import { LIIOT_CALENDLY_URL } from "@/constants/contact";
           href={LIIOT_CALENDLY_URL}
           target="_blank"
           rel="noopener noreferrer"
-          class="btn-physical btn-physical--dark inline-flex items-center gap-3 rounded-xl px-10 py-5 text-sm uppercase tracking-[0.1em]"
+          class="btn-editorial btn-editorial--violet inline-flex items-center gap-3 px-10 py-5 text-sm uppercase tracking-[0.1em]"
         >
-          Agendar consultoría
+          {t.finalCta.cta}
           <span aria-hidden="true">&rarr;</span>
         </a>
+      </div>
+
+      {/* Patio de física: las 4 piezas del isotipo caen, se apilan y se pueden arrastrar */}
+      <div
+        id="logo-yard"
+        class="logo-yard relative mx-auto mt-10 h-[200px] w-full max-w-5xl sm:h-[230px] lg:h-[250px]"
+        aria-hidden="true"
+      >
+          <svg
+            data-logo-block="1"
+            viewBox="0 0 48 48"
+            class="logo-block"
+            overflow="visible"
+          >
+            <path d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19" fill="#FFFFFF" />
+          </svg>
+          <svg
+            data-logo-block="2"
+            viewBox="0 0 48 48"
+            class="logo-block"
+            overflow="visible"
+          >
+            <path d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19" fill="#FFFFFF" />
+          </svg>
+          <svg
+            data-logo-block="3"
+            viewBox="0 0 48 48"
+            class="logo-block"
+            overflow="visible"
+          >
+            <path d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38" fill="#FFFFFF" />
+          </svg>
+          <svg
+            data-logo-block="4"
+            viewBox="0 0 48 48"
+            class="logo-block"
+            overflow="visible"
+          >
+            <path d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38" fill="#FFFFFF" />
+          </svg>
       </div>
     </div>
   </div>
 </section>
+
+<style>
+  .logo-yard {
+    border-bottom: 1px solid rgb(255 255 255 / 0.18);
+  }
+
+  .logo-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    will-change: transform;
+    filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.28));
+    transition: opacity 0.4s ease;
+  }
+
+  .logo-yard.is-ready .logo-block {
+    opacity: 1;
+  }
+
+  .logo-yard.is-dragging .logo-block {
+    cursor: grabbing;
+  }
+
+  /* Solo la silueta de la pieza recibe el puntero; el resto del patio deja pasar el scroll */
+  .logo-block {
+    pointer-events: none;
+  }
+
+  .logo-block path {
+    pointer-events: auto;
+  }
+</style>
+
+<script>
+  import { initLogoPhysics, type CleanupFn } from "@/scripts/liiot-physics";
+
+  let cleanup: CleanupFn | null = null;
+  let token = 0;
+
+  async function init() {
+    cleanup?.();
+    cleanup = null;
+    const yard = document.getElementById("logo-yard");
+    if (!yard) return;
+    const current = ++token;
+    const dispose = await initLogoPhysics(yard);
+    if (current !== token) dispose();
+    else cleanup = dispose;
+  }
+
+  init();
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("astro:before-swap", () => {
+    token++;
+    cleanup?.();
+    cleanup = null;
+  });
+</script>

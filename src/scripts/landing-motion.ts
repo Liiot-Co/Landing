@@ -17,7 +17,7 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-// Evita que el pin de setupStory() se re-mida cuando la barra de
+// Evita que el scrub de setupStory() se re-mida cuando la barra de
 // direcciones del navegador móvil aparece/desaparece durante el scroll.
 ScrollTrigger.config({ ignoreMobileResize: true });
 
@@ -26,17 +26,26 @@ const INIT_ATTR = "data-landing-motion-init";
 /** Standard "fade up" reveal — the one entrance pattern used sitewide. */
 function reveal(selector: string, delay = 0, fast = false) {
   const preset = fast ? motionEnterFast : motionEnter;
-  gsap.to(selector, { opacity: 1, y: 0, duration: preset.duration, delay, ease: preset.ease });
+  gsap.fromTo(
+    selector,
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: preset.duration, delay, ease: preset.ease, overwrite: "auto" }
+  );
 }
 
 function revealGroup(elements: NodeListOf<Element> | Element[], each = 0.1) {
-  gsap.to(elements, {
-    opacity: 1,
-    y: 0,
-    duration: motionEnter.duration,
-    ease: motionEnter.ease,
-    stagger: staggerFromStart(each),
-  });
+  gsap.fromTo(
+    elements,
+    { opacity: 0, y: 20 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: motionEnter.duration,
+      ease: motionEnter.ease,
+      stagger: staggerFromStart(each),
+      overwrite: "auto",
+    }
+  );
 }
 
 /** Fires `run` once, the first time `trigger` scrolls to `start` — the ScrollTrigger take on Motion's `inView`. */
@@ -46,8 +55,12 @@ function onSectionEnter(trigger: string, start: string, run: (element: Element) 
     start,
     once: true,
     onEnter: (self) => run(self.trigger as Element),
+    onRefresh: (self) => {
+      if (self.progress > 0) run(self.trigger as Element);
+    },
   });
 }
+
 
 function applyReducedMotionStates() {
   const setBulk = (selector: string, styles: Record<string, string>) => {
@@ -62,8 +75,8 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, #story-bridge, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark",
-    { opacity: "1", transform: "translateY(0px)" },
+    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio, #editorial-piece-team",
+    { opacity: "1", transform: "none" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
     opacity: "1",
@@ -82,25 +95,25 @@ function applyReducedMotionStates() {
 }
 
 function setupHero() {
-  reveal("#hero-bg", 0);
-  reveal("#hero-title", 0.28);
-  reveal("#hero-body", 0.46, true);
-  reveal("#hero-cta", 0.58, true);
+  reveal("#hero-title", 0.1);
+  reveal("#hero-body", 0.25, true);
+  reveal("#hero-cta", 0.35, true);
 }
 
 /**
  * "El reto" → "Nuestra filosofía" as a cinematic diagonal wipe.
  *
- * The stage pins full-viewport (all breakpoints — `ScrollTrigger.config({
- * ignoreMobileResize: true })` at the top of this file keeps the pin from
- * re-measuring when the mobile address bar hides/shows) and a diagonal
+ * The stage sticks full-viewport via CSS sticky inside its section, which
+ * acts as the scroll track (all breakpoints — `ScrollTrigger.config({
+ * ignoreMobileResize: true })` keeps the scrub from re-measuring when the
+ * mobile address bar hides/shows) and a diagonal
  * clip-path on the philosophy panel sweeps in from the right as the user
  * scrolls, uncovering it over the villain panel beneath. The wipe geometry
  * is a single `center` value (100 → -100, i.e. fully off-screen right →
  * fully covering) offset by a fixed `skew` on each edge, clamped with
  * `Math.min` so the philosophy panel starts at exactly zero width (no
- * pre-scroll peek). Villain content plays its entrance stagger once, right
- * as the pin engages; the philosophy word-reveal fires once the wipe has
+ * pre-scroll peek). Villain content is static (no fade) so re-entering the
+ * stage never replays it; the philosophy word-reveal fires once the wipe has
  * crossed roughly its midpoint, so the words resolve just as they become
  * legible.
  *
@@ -111,46 +124,86 @@ function setupStory() {
   const stage = document.getElementById("story-stage");
   const reto = document.getElementById("story-reto");
   const filosofia = document.getElementById("por-que-existimos");
-  if (!stage || !reto || !filosofia) return;
+  const track = stage?.parentElement;
+  if (!stage || !reto || !filosofia || !track) return;
 
   stage.classList.add("is-cinematic");
 
-  const SKEW = 14; // total diagonal spread (percentage points) between the top and bottom edge
+  const isMobile = window.innerWidth < 768;
+  // Sticky instead of a GSAP pin: the pin swaps the stage to position:fixed
+  // from JS one frame after the browser has already scrolled, which reads as
+  // a shift when entering/leaving. Sticky is resolved by the compositor, so
+  // the stage stays glued with no handoff. The parent section becomes the
+  // scroll track (viewport + wipe distance) and ScrollTrigger only scrubs.
+  const WIPE_DISTANCE_VH = isMobile ? 55 : 90;
+  track.style.height = `calc(100svh + ${WIPE_DISTANCE_VH}vh)`;
+  stage.style.position = "sticky";
+  stage.style.top = "0";
+  const SKEW = isMobile ? 8 : 14;
   let philRevealed = false;
+  let scrubActive = false;
+  let scrubTimer: ReturnType<typeof setTimeout> | 0 = 0;
+  function setScrub(active: boolean) {
+    if (active === scrubActive) return;
+    scrubActive = active;
+    window.dispatchEvent(new CustomEvent("filosofia-scrub", { detail: { active } }));
+  }
 
   ScrollTrigger.create({
-    trigger: stage,
+    trigger: track,
     start: "top top",
-    end: "+=140%",
-    scrub: 0.4,
-    pin: true,
-    anticipatePin: 1,
-    onEnter: () => {
-      reveal("#villain-header");
-      revealGroup(reto.querySelectorAll(".js-villain-item"), 0.1);
-      reveal("#villain-pivot", 0.3, true);
-      reveal("#story-bridge", 0.5, true);
+    end: "bottom bottom",
+    // Scrub prácticamente sincrónico (0.05/0.08) para eliminar el lag y evitar el snap al scrollear hacia arriba
+    scrub: isMobile ? 0.05 : 0.08,
+    fastScrollEnd: true,
+    preventOverlaps: true,
+    onLeaveBack: () => {
+      // Ocultar capa de filosofía al salir hacia arriba para liberar GPU
+      filosofia.style.visibility = "hidden";
+      filosofia.style.clipPath = "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)";
+      setScrub(false);
+      clearTimeout(scrubTimer);
     },
     onUpdate: (self) => {
-      const center = 100 + SKEW / 2 - self.progress * (200 + SKEW);
-      const top = Math.min(100, center + SKEW / 2);
-      const bottom = Math.min(100, center - SKEW / 2);
-      filosofia.style.setProperty("--wipe-top", `${top}%`);
-      filosofia.style.setProperty("--wipe-bottom", `${bottom}%`);
+      // Si el progreso llega a cero (scroll up completo), ocultar la capa para 60fps constantes
+      if (self.progress <= 0.001) {
+        filosofia.style.visibility = "hidden";
+        filosofia.style.clipPath = "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)";
+        setScrub(false);
+        return;
+      }
 
-      if (!philRevealed && self.progress > 0.52) {
+      filosofia.style.visibility = "visible";
+
+      // Cuando ya cubre el 100%, liberar clip-path para no forzar máscara GPU
+      if (self.progress >= 0.999) {
+        filosofia.style.clipPath = "none";
+        setScrub(false);
+      } else {
+        const center = (100 + SKEW) - self.progress * (100 + SKEW * 2);
+        const top = Math.max(0, Math.min(100, center));
+        const bottom = Math.max(0, Math.min(100, center - SKEW));
+        filosofia.style.clipPath = `polygon(${top}% 0%, 100% 0%, 100% 100%, ${bottom}% 100%)`;
+        setScrub(true);
+        clearTimeout(scrubTimer);
+        scrubTimer = setTimeout(() => setScrub(false), 180);
+      }
+
+      // En móviles revelamos el texto desde el 20% de avance para feedback visual inmediato
+      const threshold = isMobile ? 0.20 : 0.38;
+      if (!philRevealed && self.progress > threshold) {
         philRevealed = true;
         gsap.fromTo(
           filosofia.querySelectorAll(".js-phil-word"),
-          { filter: "blur(12px)", willChange: "transform,filter,opacity" },
+          { filter: "blur(8px)", willChange: "transform,filter,opacity" },
           {
             opacity: 1,
             filter: "blur(0px)",
             y: 0,
             scale: 1,
-            duration: 0.8,
+            duration: 0.6,
             ease: motionEnter.ease,
-            stagger: staggerFromStart(0.05),
+            stagger: staggerFromStart(0.03),
             onComplete: function () {
               gsap.set(filosofia.querySelectorAll(".js-phil-word"), { willChange: "auto" });
             },
@@ -162,7 +215,9 @@ function setupStory() {
 }
 
 function setupHowWeWork() {
-  onSectionEnter("#como-trabajamos", triggerStart.section, () => reveal("#how-header"));
+  onSectionEnter("#como-trabajamos", triggerStart.section, () => {
+    reveal("#how-header");
+  });
 }
 
 function setupPortfolio() {
@@ -188,9 +243,98 @@ function setupFooter() {
 }
 
 /**
+ * Perf: suspends card-hover transitions while the user is actively
+ * scrolling — toggles `.is-scrolling` on <html> (see `.how-card`,
+ * `.team-photo` CSS rules), removed 150ms after scroll settles. Passive
+ * listener, single reused timeout id, no per-frame work.
+ */
+function setupScrollHoverSuspend() {
+  const root = document.documentElement;
+  let scrollEndTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const onScroll = () => {
+    root.classList.add("is-scrolling");
+    clearTimeout(scrollEndTimer);
+    scrollEndTimer = setTimeout(() => {
+      root.classList.remove("is-scrolling");
+    }, 150);
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+}
+
+function setupEditorialLogoPieces() {
+  const pieces = [
+    { id: "#editorial-piece-how", trigger: "#como-trabajamos" },
+    { id: "#editorial-piece-portfolio", trigger: "#proyectos" },
+    { id: "#editorial-piece-team", trigger: "#equipo" },
+  ];
+
+  // Scrub ScrollTriggers from the micro-parallax tweens below. Disabled
+  // (without resetting) while their piece is out of the viewport and while
+  // the story wipe is scrubbing (`filosofia-scrub`), so this never keeps
+  // recalculating off-screen or competing with the wipe for frame budget.
+  const parallaxTriggers: ScrollTrigger[] = [];
+
+  pieces.forEach(({ id, trigger }) => {
+    const el = document.querySelector<HTMLElement>(id);
+    if (!el) return;
+
+    // Entrada editorial elegante y nítida a la altura del headline
+    gsap.fromTo(
+      el,
+      { opacity: 0, y: 20, scale: 0.94 },
+      {
+        opacity: 0.85,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger,
+          start: "top 80%",
+          once: true,
+        },
+      }
+    );
+
+    // Micro-parallax editorial sutil a lo largo del scroll de la sección
+    const parallaxTween = gsap.to(el, {
+      y: -14,
+      ease: "none",
+      scrollTrigger: {
+        trigger,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.2,
+      },
+    });
+
+    const st = parallaxTween.scrollTrigger;
+    if (!st) return;
+    parallaxTriggers.push(st);
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) st.enable();
+        else st.disable(false);
+      },
+      { threshold: 0 }
+    );
+    io.observe(el);
+  });
+
+  if (!parallaxTriggers.length) return;
+  window.addEventListener("filosofia-scrub", (e: Event) => {
+    const active = (e as CustomEvent<{ active: boolean }>).detail.active;
+    parallaxTriggers.forEach((st) => (active ? st.disable(false) : st.enable()));
+  });
+}
+
+/**
  * Smooth-scrolls in-page `#anchor` links via GSAP's ScrollToPlugin instead
  * of the native `scroll-behavior: smooth` (disabled in global.css — it
- * fights ScrollTrigger's pin in setupStory(), producing a visible jump when
+ * fought the story scroll track in setupStory(), producing a visible jump when
  * entering the cinematic mode). ScrollToPlugin drives the same scroll
  * position ScrollTrigger reads, so the two cooperate instead of racing.
  * `offsetY` mirrors the site's `scroll-padding-top` (fixed nav clearance) by
@@ -220,10 +364,11 @@ function setupSmoothAnchors() {
 }
 
 function init() {
-  if (document.body.getAttribute(INIT_ATTR) === "1") return;
-  document.body.setAttribute(INIT_ATTR, "1");
+  // Limpiar instancias previas de ScrollTrigger para soportar HMR y reloads sin bloquearse
+  ScrollTrigger.getAll().forEach((t) => t.kill());
 
   setupSmoothAnchors();
+  setupScrollHoverSuspend();
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     applyReducedMotionStates();
@@ -237,9 +382,11 @@ function init() {
   setupTeam();
   setupFinalCta();
   setupFooter();
+  setupEditorialLogoPieces();
 
   // Late-loading media (hero photo, portfolio images) can shift section
   // offsets after ScrollTrigger has already measured them.
+  ScrollTrigger.refresh();
   window.addEventListener("load", () => ScrollTrigger.refresh());
 }
 
@@ -248,4 +395,11 @@ if (document.readyState === "complete" || document.readyState === "interactive")
   init();
 } else {
   document.addEventListener("DOMContentLoaded", init);
+}
+
+// Resiliencia para HMR en Vite durante desarrollo
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    init();
+  });
 }

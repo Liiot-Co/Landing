@@ -4,6 +4,8 @@
  */
 
 import { LIIOT_BOOKING_URL } from "./contact";
+import { IMAGES } from "./images";
+import { t } from "@/i18n";
 
 export interface PortfolioProject {
   slug: string;
@@ -17,31 +19,34 @@ export interface PortfolioProject {
   ctaLink: string;
 }
 
-export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
-  {
-    slug: "liiot-custom",
-    title: "Liiot Custom",
-    subtitle: "Herramienta a medida · Caso SG-SST",
-    description:
-      "Automatizamos la seguridad laboral para que la prevención sea parte de la cultura, no una obligación que nadie cumple.",
-    image:
-      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
-    imageAlt: "Liiot Custom — Herramienta a medida para seguridad laboral",
-    themeColor: "violet",
-    ctaText: "Empecemos juntos",
-    ctaLink: LIIOT_BOOKING_URL,
-  },
-  {
-    slug: "bleepy",
-    title: "Bleepy",
-    subtitle: "Plataforma de creadores & empresas · Coming soon",
-    description:
-      "Unimos marcas y creadores para crear contenido auténtico que conecta, sin depender de publicidad fría.",
-    image:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1400&auto=format&fit=crop",
-    imageAlt: "Bleepy — Plataforma de creadores y marcas",
-    themeColor: "pink",
-    ctaText: "Unirme a la lista de espera",
-    ctaLink: "#agendar",
-  },
-];
+export const PROJECT_IMAGE_WIDTHS = IMAGES.portfolio.widths;
+
+export function getPortfolioProjects(currentTranslations = t): PortfolioProject[] {
+  const p = currentTranslations.portfolio.projects;
+  return [
+    {
+      slug: "liiot-custom",
+      title: p["liiot-custom"].title,
+      subtitle: p["liiot-custom"].subtitle,
+      description: p["liiot-custom"].description,
+      image: IMAGES.portfolio.liiotCustom,
+      imageAlt: p["liiot-custom"].imageAlt,
+      themeColor: "violet",
+      ctaText: p["liiot-custom"].ctaText,
+      ctaLink: LIIOT_BOOKING_URL,
+    },
+    {
+      slug: "bleepy",
+      title: p.bleepy.title,
+      subtitle: p.bleepy.subtitle,
+      description: p.bleepy.description,
+      image: IMAGES.portfolio.bleepy,
+      imageAlt: p.bleepy.imageAlt,
+      themeColor: "pink",
+      ctaText: p.bleepy.ctaText,
+      ctaLink: "#agendar",
+    },
+  ];
+}
+
+export const PORTFOLIO_PROJECTS: PortfolioProject[] = getPortfolioProjects();

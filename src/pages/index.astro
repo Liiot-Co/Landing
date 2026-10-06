@@ -8,6 +8,7 @@ import Portfolio from "@/components/Portfolio.astro";
 import Team from "@/components/Team.astro";
 import FinalCTA from "@/components/FinalCTA.astro";
 import Footer from "@/components/Footer.astro";
+import SectionFade from "@/components/ui/SectionFade.astro";
 ---
 
 <Layout>
@@ -18,7 +19,25 @@ import Footer from "@/components/Footer.astro";
     <HowWeWork />
     <Portfolio />
     <Team />
-    <FinalCTA />
+
+    {/* Cierre de página: CTA final y footer comparten un degradado CSS estático (sin WebGL) */}
+    <div class="closing-bg relative overflow-hidden">
+      {/* Fade superior suave desde Equipo */}
+      <SectionFade position="top" color="surface-secondary" height="h-32 sm:h-52 lg:h-64" zIndex="z-[2]" />
+
+      <FinalCTA />
+      <Footer />
+    </div>
   </main>
-  <Footer />
 </Layout>
+
+<style>
+  .closing-bg {
+    background-color: #280948;
+    background-image:
+      radial-gradient(60% 55% at 14% 10%, rgb(124 58 237 / 0.5), transparent 70%),
+      radial-gradient(55% 50% at 86% 22%, rgb(236 72 153 / 0.32), transparent 70%),
+      radial-gradient(85% 60% at 50% 108%, rgb(255 106 51 / 0.78), transparent 70%),
+      radial-gradient(40% 35% at 72% 92%, rgb(255 181 140 / 0.35), transparent 70%);
+  }
+</style>

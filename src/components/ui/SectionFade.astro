@@ -1,0 +1,65 @@
+---
+/**
+ * SectionFade.astro
+ *
+ * Scrim gradient overlay con curva de atenuación suave (cubic easing).
+ * Disuelve las divisiones fijas entre secciones creando transiciones
+ * atmosféricas e inmersivas sin saltos abruptos de color ni banding.
+ */
+interface Props {
+  position?: "top" | "bottom" | "both";
+  color?: "background" | "surface-secondary" | string;
+  height?: string;
+  class?: string;
+  zIndex?: string;
+}
+
+const {
+  position = "both",
+  color = "background",
+  height = "h-24 sm:h-36 lg:h-48",
+  class: className = "",
+  zIndex = "z-[5]",
+} = Astro.props;
+
+const rgbMap: Record<string, string> = {
+  background: "7, 4, 15",
+  "surface-secondary": "15, 10, 26",
+};
+
+function hexToRgb(hex: string): string {
+  const clean = hex.replace("#", "");
+  const num = parseInt(
+    clean.length === 3
+      ? clean.split("").map((c) => c + c).join("")
+      : clean,
+    16
+  );
+  return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+}
+
+const rgb = rgbMap[color] || (color.startsWith("#") ? hexToRgb(color) : "7, 4, 15");
+
+// Easing scrim de 7 paradas ópticas para máxima fluidez
+const topGradient = `linear-gradient(to bottom, rgb(${rgb}) 0%, rgba(${rgb}, 0.85) 15%, rgba(${rgb}, 0.62) 32%, rgba(${rgb}, 0.38) 50%, rgba(${rgb}, 0.18) 70%, rgba(${rgb}, 0.05) 86%, transparent 100%)`;
+const bottomGradient = `linear-gradient(to top, rgb(${rgb}) 0%, rgba(${rgb}, 0.85) 15%, rgba(${rgb}, 0.62) 32%, rgba(${rgb}, 0.38) 50%, rgba(${rgb}, 0.18) 70%, rgba(${rgb}, 0.05) 86%, transparent 100%)`;
+---
+
+{
+  (position === "top" || position === "both") && (
+    <div
+      class={`pointer-events-none absolute inset-x-0 top-0 ${height} ${zIndex} ${className}`}
+      style={{ background: topGradient }}
+      aria-hidden="true"
+    />
+  )
+}
+{
+  (position === "bottom" || position === "both") && (
+    <div
+      class={`pointer-events-none absolute inset-x-0 bottom-0 ${height} ${zIndex} ${className}`}
+      style={{ background: bottomGradient }}
+      aria-hidden="true"
+    />
+  )
+}

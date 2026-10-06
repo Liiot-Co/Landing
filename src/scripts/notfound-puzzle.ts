@@ -14,9 +14,15 @@ function initNotfoundPuzzle() {
 
   const total = pieces.length;
   let placed = 0;
+  const progressTemplate = root.dataset.progressTemplate || "{placed} / {total} piezas";
+  const piecePlacedTemplate = root.dataset.piecePlacedTemplate || "Pieza {id} colocada";
 
   function updateProgress() {
-    if (progress) progress.textContent = `${placed} / ${total} piezas`;
+    if (progress) {
+      progress.textContent = progressTemplate
+        .replace("{placed}", String(placed))
+        .replace("{total}", String(total));
+    }
   }
 
   function complete() {
@@ -29,7 +35,10 @@ function initNotfoundPuzzle() {
     piece.classList.add("is-placed");
     piece.tabIndex = -1;
     piece.setAttribute("aria-disabled", "true");
-    piece.setAttribute("aria-label", `Pieza ${piece.dataset.piece} colocada`);
+    piece.setAttribute(
+      "aria-label",
+      piecePlacedTemplate.replace("{id}", piece.dataset.piece || "")
+    );
     placed += 1;
     updateProgress();
     if (placed === total) complete();

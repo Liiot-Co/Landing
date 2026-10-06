@@ -1,61 +1,97 @@
 /**
- * LiiotMark SVG morph — each click cycles the logo through brand values:
- * futuro → soluciones → propósito → impacto → comunidad → confianza → logo
+ * LiiotMark SVG morph — each click morphs the 4 isotype pieces
+ * (`.liiot-path`) INDEPENDENTLY into their own geometric figure
+ * (circle/square/triangle/diamond), each with its own brand color.
+ * Cycles: logo → figuras → contraste → logo. Pieces never borrow
+ * another piece's shape or position — each one only interpolates
+ * between its own original `d` and its own figure variants.
  *
- * Uses flubber for path interpolation and GSAP for crossfade.
+ * Uses flubber for per-path interpolation.
  * The component (LiiotMarkAnimated.astro) emits the DOM; this script
  * wires up click handlers on every .liiot-mark on the page.
  */
 import { interpolate } from "flubber";
-import { gsap } from "gsap";
+import { initBoops } from "./liiot-boop";
+import { burst } from "./liiot-burst";
 
 const MORPH_DURATION = 500;
 const LABEL_FADE = 300;
+/** Stagger entre piezas al animar un morph, para que no se vean como una
+ *  sola unidad (especificación ODD: 40-60ms). */
+const PIECE_STAGGER_MS = 50;
 
-interface MorphState {
-  label: string;
-  color: string;
+interface PieceFigure {
+  /** `d` del path de la figura, ya posicionado dentro del viewBox 48x48
+   *  en el área que ocupa esa pieza en el isotipo original. */
   d: string;
+  color: string;
 }
 
-const MORPH_STATES: MorphState[] = [
+interface PieceMorphState {
+  label: string;
+  /** Una entrada por pieza, en el mismo orden que `.liiot-path--1..4`. */
+  pieces: PieceFigure[];
+}
+
+/**
+ * Figuras geométricas por pieza, precalculadas una sola vez (no por frame)
+ * a partir del centro/radio real de cada pieza en el isotipo original:
+ * cada pieza recorre figuras propias que ninguna otra pieza usa
+ * (1: círculo → hexágono, 2: cuadrado → estrella, 3: triángulo → cruz,
+ * 4: rombo → pentágono), así nunca parece convertirse en otra pieza.
+ */
+const PIECE_MORPH_STATES: PieceMorphState[] = [
   {
-    label: "futuro",
-    color: "#FF6A33",
-    d: "M24,4 L42,36 Q42,44 24,44 Q6,44 6,36 Z",
+    label: "figuras",
+    pieces: [
+      {
+        // piece 1 → círculo
+        d: "M10.04,29.98 C10.04,34.4 13.62,37.98 18.04,37.98 C22.46,37.98 26.04,34.4 26.04,29.98 C26.04,25.56 22.46,21.98 18.04,21.98 C13.62,21.98 10.04,25.56 10.04,29.98 Z",
+        color: "#5A228B",
+      },
+      {
+        // piece 2 → cuadrado
+        d: "M22.21,9.93 L38.21,9.93 L38.21,25.93 L22.21,25.93 Z",
+        color: "#FF6A33",
+      },
+      {
+        // piece 3 → triángulo
+        d: "M30.21,36.81 L34.54,44.31 L25.88,44.31 Z",
+        color: "#e04b66",
+      },
+      {
+        // piece 4 → rombo
+        d: "M18.04,1.11 L23.04,6.11 L18.04,11.11 L13.04,6.11 Z",
+        color: "#e2b31c",
+      },
+    ],
   },
   {
-    label: "soluciones",
-    color: "#8B45CC",
-    d: "M24,4 L40,14 L40,34 L24,44 L8,34 L8,14 Z",
-  },
-  {
-    label: "propósito",
-    color: "#FF4D6D",
-    d: "M24,40 C14,32 2,24 2,14 C2,6 8,2 14,2 C18,2 22,5 24,9 C26,5 30,2 34,2 C40,2 46,6 46,14 C46,24 34,32 24,40 Z",
-  },
-  {
-    label: "impacto",
-    color: "#FFC300",
-    d: "M24,2 L29,17 L46,17 L32,27 L37,44 L24,34 L11,44 L16,27 L2,17 L19,17 Z",
-  },
-  {
-    label: "comunidad",
-    color: "#FF6A33",
-    d: "M24,6 C32,6 38,12 38,20 C38,28 32,34 24,34 C16,34 10,28 10,20 C10,12 16,6 24,6 M24,14 C28,14 31,17 31,21 C31,25 28,28 24,28 C20,28 17,25 17,21 C17,17 20,14 24,14",
-  },
-  {
-    label: "confianza",
-    color: "#FF4D6D",
-    d: "M24,2 L40,10 L40,24 C40,34 32,42 24,46 C16,42 8,34 8,24 L8,10 Z",
+    label: "contraste",
+    pieces: [
+      {
+        // piece 1 → hexágono
+        d: "M26.54,29.98 L22.29,37.34 L13.79,37.34 L9.54,29.98 L13.79,22.62 L22.29,22.62 Z",
+        color: "#8B45CC",
+      },
+      {
+        // piece 2 → estrella
+        d: "M30.21,8.93 L32.59,14.65 L38.77,15.15 L34.06,19.18 L35.5,25.21 L30.21,21.98 L24.92,25.21 L26.36,19.18 L21.65,15.15 L27.83,14.65 Z",
+        color: "#e2b31c",
+      },
+      {
+        // piece 3 → cruz
+        d: "M28.41,36.81 L32.01,36.81 L32.01,40.01 L35.21,40.01 L35.21,43.61 L32.01,43.61 L32.01,46.81 L28.41,46.81 L28.41,43.61 L25.21,43.61 L25.21,40.01 L28.41,40.01 Z",
+        color: "#FF6A33",
+      },
+      {
+        // piece 4 → pentágono
+        d: "M18.04,0.81 L23.08,4.47 L21.16,10.4 L14.92,10.4 L13,4.47 Z",
+        color: "#e04b66",
+      },
+    ],
   },
 ];
-
-const LOGO_D =
-  "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19" +
-  " M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19" +
-  " M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38" +
-  " M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38";
 
 const prefersReduced =
   typeof window !== "undefined" &&
@@ -78,20 +114,121 @@ function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+/** Chequeo en vivo (el usuario puede togglear la preferencia en sesión). */
+function isReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true
+  );
+}
+
+/**
+ * Anima el atributo `d` de un path entre dos formas con flubber,
+ * interpolando el fill en paralelo. Parametrizado por path + estados para
+ * reutilizarlo tanto en el logo completo como en las piezas editoriales
+ * (medallones de headings y fondo de HowWeWork).
+ */
+function animatePathD(
+  path: SVGPathElement,
+  fromD: string,
+  toD: string,
+  fromColor: string,
+  toColor: string,
+  duration: number,
+  cb?: () => void,
+) {
+  if (isReducedMotion()) {
+    path.setAttribute("d", toD);
+    path.style.fill = toColor;
+    cb?.();
+    return;
+  }
+
+  let interpolator: ((t: number) => string) | null = null;
+  try {
+    interpolator = interpolate(fromD, toD, { maxSegmentLength: 2 });
+  } catch {
+    interpolator = null;
+  }
+
+  const start = performance.now();
+  path.setAttribute("d", fromD);
+  path.style.fill = fromColor;
+
+  function tick(now: number) {
+    const elapsed = now - start;
+    const raw = Math.min(elapsed / duration, 1);
+    const t = easeInOutCubic(raw);
+
+    if (interpolator) {
+      path.setAttribute("d", interpolator(t));
+    }
+    path.style.fill = lerpColor(fromColor, toColor, t);
+
+    if (raw < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      cb?.();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/**
+ * Anima las 4 piezas EN PARALELO pero con un leve stagger (cada una
+ * interpola su propio `d`, nunca el de otra pieza), y dispara `cb` una
+ * vez que las 4 terminaron. Reduced-motion resuelve sin stagger: como
+ * `animatePathD` llama a `cb` de forma síncrona en ese modo, el contador
+ * de pendientes llega a 0 en la misma vuelta sin necesitar una rama aparte.
+ */
+function animatePieces(
+  paths: SVGPathElement[],
+  fromDs: string[],
+  toFigures: PieceFigure[],
+  fromColors: string[],
+  duration: number,
+  cb: () => void,
+) {
+  let pending = paths.length;
+  const reduced = isReducedMotion();
+
+  paths.forEach((path, i) => {
+    const run = () => {
+      animatePathD(
+        path,
+        fromDs[i],
+        toFigures[i].d,
+        fromColors[i],
+        toFigures[i].color,
+        duration,
+        () => {
+          pending -= 1;
+          if (pending === 0) cb();
+        },
+      );
+    };
+    if (reduced) {
+      run();
+    } else {
+      setTimeout(run, i * PIECE_STAGGER_MS);
+    }
+  });
+}
+
 /** Fixed phase offsets for the4 paths in the helix — they never change,
  *  so the form at any mouse position is deterministic. */
 const HELIX_PHASES = [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5];
 
 function initMark(svg: SVGElement) {
   const originalFill = (svg as HTMLElement).dataset.fill || "#8B45CC";
-  const originalGroup = svg.querySelector<SVGGElement>(".liiot-original")!;
-  const morphPath = svg.querySelector<SVGPathElement>(".liiot-morph-path")!;
   const label = svg.querySelector<SVGTextElement>(".liiot-label")!;
   const paths = Array.from(svg.querySelectorAll<SVGPathElement>(".liiot-path"));
+  /** `d` original de cada pieza, leído del DOM (misma fuente que usan los
+   *  medallones editoriales), para poder volver a él al cerrar el ciclo. */
+  const originalDs = paths.map((p) => p.getAttribute("d") ?? "");
 
   let currentState = -1;
   let isAnimating = false;
-  let currentInterpolator: ((t: number) => string) | null = null;
 
   // ── DNA helix mouse-tracking ──
   let helixRaf: number | null = null;
@@ -128,6 +265,11 @@ function initMark(svg: SVGElement) {
 
   function helixStart(e: MouseEvent) {
     if (prefersReduced || isAnimating || currentState !== -1) return;
+    // Hélice DNA solo en Navbar: el logo de Footer y los medallones usan
+    // boop (gsap) en su lugar. Dos escritores sobre el mismo nodo/trigger
+    // pelearían por el transform en cada mousemove, así que se elige uno
+    // por instancia: header → hélice, resto → boop.
+    if (!svg.closest("header")) return;
     mx = e.clientX;
     my = e.clientY;
     helixActive = true;
@@ -164,42 +306,10 @@ function initMark(svg: SVGElement) {
   svg.addEventListener("mousemove", helixMove);
   svg.addEventListener("mouseleave", helixStop);
 
-  function animateMorph(
-    fromD: string,
-    toD: string,
-    fromColor: string,
-    toColor: string,
-    duration: number,
-    cb?: () => void,
-  ) {
-    if (prefersReduced) {
-      morphPath.setAttribute("d", toD);
-      morphPath.style.fill = toColor;
-      cb?.();
-      return;
-    }
-
-    const start = performance.now();
-    morphPath.setAttribute("d", fromD);
-    morphPath.style.fill = fromColor;
-
-    function tick(now: number) {
-      const elapsed = now - start;
-      const raw = Math.min(elapsed / duration, 1);
-      const t = easeInOutCubic(raw);
-
-      if (currentInterpolator) {
-        morphPath.setAttribute("d", currentInterpolator(t));
-      }
-      morphPath.style.fill = lerpColor(fromColor, toColor, t);
-
-      if (raw < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        cb?.();
-      }
-    }
-    requestAnimationFrame(tick);
+  /** Burst confinado al contenedor del logo al completar cada morph. */
+  function burstOnHost() {
+    const host = svg.parentElement;
+    if (host) burst(host);
   }
 
   function showLabel(text: string, color: string) {
@@ -225,74 +335,54 @@ function initMark(svg: SVGElement) {
     // Kill any active helix before morphing
     helixStop();
     svg.classList.add("is-morphing");
+    hideLabel();
 
-    const nextIdx = (currentState + 1) % MORPH_STATES.length;
-    const next = MORPH_STATES[nextIdx];
+    const nextIdx = (currentState + 1) % PIECE_MORPH_STATES.length;
+    const next = PIECE_MORPH_STATES[nextIdx];
 
-    if (currentState === -1) {
-      // Logo → first morph state
-      currentInterpolator = interpolate(LOGO_D, next.d, {
-        maxSegmentLength: 2,
-      });
+    // Logo → first state: from each piece's own original `d`/fill.
+    // State → next state: from each piece's own current figure/color.
+    const fromDs =
+      currentState === -1
+        ? originalDs
+        : PIECE_MORPH_STATES[currentState].pieces.map((f) => f.d);
+    const fromColors =
+      currentState === -1
+        ? paths.map(() => originalFill)
+        : PIECE_MORPH_STATES[currentState].pieces.map((f) => f.color);
 
-      gsap.to(originalGroup, {
-        opacity: 0,
-        duration: 0.3,
-        ease: "power2.in",
-        onComplete: () => {
-          originalGroup.style.display = "none";
-          morphPath.style.opacity = "1";
-          animateMorph(LOGO_D, next.d, originalFill, next.color, MORPH_DURATION, () => {
-            showLabel(next.label, next.color);
-            currentState = nextIdx;
-            isAnimating = false;
-          });
-        },
-      });
-    } else {
-      // Morph state → next morph state
-      const current = MORPH_STATES[currentState];
-      currentInterpolator = interpolate(current.d, next.d, {
-        maxSegmentLength: 2,
-      });
+    animatePieces(paths, fromDs, next.pieces, fromColors, MORPH_DURATION, () => {
+      // Representative label color: first piece of the new state.
+      showLabel(next.label, next.pieces[0].color);
+      currentState = nextIdx;
+      isAnimating = false;
+      burstOnHost();
 
-      hideLabel();
-      animateMorph(current.d, next.d, current.color, next.color, MORPH_DURATION, () => {
-        showLabel(next.label, next.color);
-        currentState = nextIdx;
-        isAnimating = false;
-
-        // After the last state (confianza), auto-return to logo
-        if (nextIdx === MORPH_STATES.length - 1) {
-          setTimeout(returnToLogo, 1200);
-        }
-      });
-    }
+      // After the last state, auto-return to the original logo.
+      if (nextIdx === PIECE_MORPH_STATES.length - 1) {
+        setTimeout(returnToLogo, 1200);
+      }
+    });
   }
 
   function returnToLogo() {
     if (isAnimating || currentState === -1) return;
     isAnimating = true;
-
-    const current = MORPH_STATES[currentState];
-    currentInterpolator = interpolate(current.d, LOGO_D, {
-      maxSegmentLength: 2,
-    });
-
     hideLabel();
-    animateMorph(current.d, LOGO_D, current.color, originalFill, MORPH_DURATION, () => {
-      morphPath.style.opacity = "0";
-      originalGroup.style.display = "";
-      gsap.to(originalGroup, {
-        opacity: 1,
-        duration: 0.3,
-        ease: "power2.out",
-        onComplete: () => {
-          currentState = -1;
-          isAnimating = false;
-          svg.classList.remove("is-morphing");
-        },
-      });
+
+    const current = PIECE_MORPH_STATES[currentState];
+    const fromDs = current.pieces.map((f) => f.d);
+    const fromColors = current.pieces.map((f) => f.color);
+    const toFigures: PieceFigure[] = originalDs.map((d) => ({
+      d,
+      color: originalFill,
+    }));
+
+    animatePieces(paths, fromDs, toFigures, fromColors, MORPH_DURATION, () => {
+      currentState = -1;
+      isAnimating = false;
+      svg.classList.remove("is-morphing");
+      burstOnHost();
     });
   }
 
@@ -309,12 +399,105 @@ export function initLiiotMarks() {
   document.querySelectorAll<SVGElement>(".liiot-mark").forEach(initMark);
 }
 
+// ── L3: morph en piezas editoriales (medallones de headings + fondo) ──
+
+interface TinyState {
+  color: string;
+  d: string;
+}
+
+/**
+ * Set pequeño de 4 formas derivadas de las piezas 1-4 del isotipo, cada una
+ * con su color propio (morph MULTICOLOR por decisión de producto). Se usan
+ * los mismos `d` del fondo de HowWeWork para que flubber interpole entre
+ * piezas hermanas.
+ */
+const TINY_STATES: TinyState[] = [
+  {
+    color: "#8B45CC",
+    d: "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19",
+  },
+  {
+    color: "#FF6A33",
+    d: "M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19",
+  },
+  {
+    color: "#e04b66",
+    d: "M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38",
+  },
+  {
+    color: "#e2b31c",
+    d: "M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38",
+  },
+];
+
+/**
+ * Click en una pieza editorial cicla formas tiny (multicolor) + burst.
+ * Solo anima el atributo `d`: el parallax del fondo escribe únicamente
+ * `style.transform` en el contenedor, así no hay pelea de escritores.
+ * Las piezas siguen `aria-hidden` y no son focusables (mouse-only).
+ */
+function initEditorialPiece(el: HTMLElement) {
+  if (el.dataset.morphWired === "true") return;
+  el.dataset.morphWired = "true";
+
+  const paths = Array.from(el.querySelectorAll<SVGPathElement>("path"));
+  if (paths.length === 0) return;
+
+  const originalDs = paths.map((p) => p.getAttribute("d") ?? "");
+  const baseColor = el.dataset.color || "#FFFFFF";
+  let idx = -1;
+  let busy = false;
+
+  el.addEventListener("click", () => {
+    if (busy) return;
+    const nextIdx = (idx + 1) % TINY_STATES.length;
+    const next = TINY_STATES[nextIdx];
+    const fromColor = idx === -1 ? baseColor : TINY_STATES[idx].color;
+
+    if (isReducedMotion()) {
+      paths.forEach((p) => {
+        p.setAttribute("d", next.d);
+        p.style.fill = next.color;
+      });
+      idx = nextIdx;
+      return;
+    }
+
+    busy = true;
+    let pending = paths.length;
+    paths.forEach((p, i) => {
+      const fromD = idx === -1 ? originalDs[i] : TINY_STATES[idx].d;
+      animatePathD(p, fromD, next.d, fromColor, next.color, MORPH_DURATION, () => {
+        pending -= 1;
+        if (pending === 0) {
+          idx = nextIdx;
+          busy = false;
+          burst(el);
+        }
+      });
+    });
+  });
+}
+
+export function initEditorialMorphs(scope: ParentNode = document) {
+  scope.querySelectorAll<HTMLElement>(".js-morph-piece").forEach(initEditorialPiece);
+}
+
 // Auto-init on page load (Astro)
+function initLiiotInteractions() {
+  initLiiotMarks();
+  initEditorialMorphs();
+  initBoops(document, ".js-boop", (_el, i) => ({
+    rotation: i % 2 === 0 ? 6 : -6,
+  }));
+}
+
 if (typeof document !== "undefined") {
-  document.addEventListener("astro:page-load", initLiiotMarks);
+  document.addEventListener("astro:page-load", initLiiotInteractions);
   if (document.readyState === "complete" || document.readyState === "interactive") {
-    initLiiotMarks();
+    initLiiotInteractions();
   } else {
-    document.addEventListener("DOMContentLoaded", initLiiotMarks);
+    document.addEventListener("DOMContentLoaded", initLiiotInteractions);
   }
 }

@@ -21,98 +21,149 @@ import {
   Sprout,
 } from "lucide-astro";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
+import SectionFade from "@/components/ui/SectionFade.astro";
+import { IMAGES } from "@/constants/images";
+import { t } from "@/i18n";
+import { LIIOT_CALENDLY_URL } from "@/constants/contact";
 
-const STEP_IMAGE_WIDTHS = [480, 800, 1100];
+const STEP_IMAGE_WIDTHS = IMAGES.howWeWork.widths;
 
-const steps = [
-  {
-    title: "Entendemos tu negocio",
-    emotion:
-      "Nos sentamos contigo a escuchar sin supuestos para entender qué mueve a tu gente.",
-    image:
-      "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1200&auto=format&fit=crop",
-    theme: "violet",
-    textColor: "light",
-    rotation: "-2deg",
-    points: [
-      {
-        icon: HeartHandshake,
-        text: "Escucha honesta, cero tecnicismos vacíos",
-      },
-      {
-        icon: Sparkles,
-        text: "Tecnología que nace de las personas, no al revés",
-      },
-    ],
-  },
-  {
-    title: "Construimos juntos",
-    emotion:
-      "Sin burocracia ni intermediarios, cada avance es tuyo porque lo construimos hombro a hombro.",
-    image:
-      "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=1200&auto=format&fit=crop",
-    theme: "orange",
-    textColor: "dark",
-    rotation: "2deg",
-    points: [
-      {
-        icon: Zap,
-        text: "Avances cada semana, sin esperas largas",
-      },
-      {
-        icon: Users,
-        text: "Equipo directo y cercano, sin intermediarios",
-      },
-    ],
-  },
-  {
-    title: "Crecemos juntos",
-    emotion:
-      "Lanzar es el inicio, no el final, aprendemos de tu gente para que siga creciendo.",
-    image:
-      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
-    theme: "pink",
-    textColor: "light",
-    rotation: "-2deg",
-    points: [
-      {
-        icon: TrendingUp,
-        text: "Gente usando y disfrutando lo que construimos",
-      },
-      {
-        icon: Sprout,
-        text: "Una relación que sigue viva después del lanzamiento",
-      },
-    ],
-  },
+const ICON_MAP = {
+  HeartHandshake,
+  Sparkles,
+  Zap,
+  Users,
+  TrendingUp,
+  Sprout,
+} as const;
+
+const stepImages = [
+  IMAGES.howWeWork.step1,
+  IMAGES.howWeWork.step2,
+  IMAGES.howWeWork.step3,
 ];
+
+const steps = t.howWeWork.steps.map((step, index) => ({
+  ...step,
+  image: stepImages[index] ?? "",
+  points: step.points.map((pt) => ({
+    icon: ICON_MAP[pt.icon as keyof typeof ICON_MAP] ?? Sparkles,
+    text: pt.text,
+  })),
+}));
 ---
 
-<section id="como-trabajamos" class="relative bg-surface-secondary py-24 lg:py-32">
-  <div class="container relative mx-auto px-4 sm:px-6 lg:px-8">
-    {/* Encabezado editorial con eyebrow vertical lateral */}
-    <div id="how-header" class="mb-12 flex items-start gap-4 sm:gap-6 translate-y-6 opacity-0 lg:mb-16">
-      {/* Eyebrow vertical lateral (de arriba hacia abajo) */}
-      <div class="flex flex-col items-center pt-2 select-none flex-shrink-0" aria-hidden="true">
-        <span class="size-2 rounded-full bg-accent mb-3"></span>
-        <span class="section-eyebrow-vertical">
-          Nuestro método
-        </span>
-        <span class="w-[1px] h-10 bg-gradient-to-b from-border to-transparent mt-3"></span>
-      </div>
+<section id="como-trabajamos" class="relative bg-surface-secondary pt-20 pb-16 sm:py-20 lg:py-28 scroll-mt-24">
+  {/* Fade suave superior e inferior para disolver divisiones fijas */}
+  <SectionFade position="both" color="background" height="h-28 sm:h-44" zIndex="z-[2]" />
 
-      <div class="max-w-2xl">
+  {/* Fondo interactivo con piezas gigantes del isotipo Liiot en posiciones orgánicas y baja opacidad */}
+  <div class="editorial-pieces-bg pointer-events-none absolute inset-0 overflow-hidden select-none" aria-hidden="true">
+    {/* Pieza 1: Columna izquierda - Violeta translúcido, grande arriba a la derecha */}
+    <div
+      class="js-editorial-piece js-morph-piece absolute -right-12 top-8 size-64 sm:size-80 lg:size-[24rem] opacity-[0.09] text-primary transition-opacity duration-500 hover:opacity-25 pointer-events-auto cursor-pointer"
+      data-speed="0.04"
+      data-rotate="16"
+      data-color="#8B45CC"
+      style="transform: rotate(16deg);"
+    >
+      <span class="js-boop block size-full will-change-transform">
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_4px_30px_rgba(90,34,139,0.35)]">
+        <path
+          d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+          fill="currentColor"
+        />
+      </svg>
+      </span>
+    </div>
+
+    {/* Pieza 2: Columna derecha - Naranja cálido translúcido, grande a la izquierda */}
+    <div
+      class="js-editorial-piece js-morph-piece absolute -left-16 top-[38%] size-72 sm:size-96 lg:size-[28rem] opacity-[0.08] text-accent transition-opacity duration-500 hover:opacity-25 pointer-events-auto cursor-pointer"
+      data-speed="-0.035"
+      data-rotate="-24"
+      data-color="#FF6A33"
+      style="transform: rotate(-24deg);"
+    >
+      <span class="js-boop block size-full will-change-transform">
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_4px_30px_rgba(255,106,51,0.35)]">
+        <path
+          d="M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19"
+          fill="currentColor"
+        />
+      </svg>
+      </span>
+    </div>
+
+    {/* Pieza 3: Curva inferior - Magenta translúcido, flotando a la derecha */}
+    <div
+      class="js-editorial-piece js-morph-piece absolute right-[5%] top-[65%] size-56 sm:size-72 lg:size-88 opacity-[0.08] text-brand-pink transition-opacity duration-500 hover:opacity-25 pointer-events-auto cursor-pointer"
+      data-speed="0.045"
+      data-rotate="42"
+      data-color="#e04b66"
+      style="transform: rotate(42deg);"
+    >
+      <span class="js-boop block size-full will-change-transform">
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_4px_30px_rgba(224,75,102,0.35)]">
+        <path
+          d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
+          fill="currentColor"
+        />
+      </svg>
+      </span>
+    </div>
+
+    {/* Pieza 4: Curva superior - Amarillo translúcido, abajo a la izquierda */}
+    <div
+      class="js-editorial-piece js-morph-piece absolute left-[12%] bottom-10 size-52 sm:size-64 lg:size-80 opacity-[0.07] text-brand-yellow transition-opacity duration-500 hover:opacity-25 pointer-events-auto cursor-pointer"
+      data-speed="-0.04"
+      data-rotate="-14"
+      data-color="#e2b31c"
+      style="transform: rotate(-14deg);"
+    >
+      <span class="js-boop block size-full will-change-transform">
+      <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_4px_30px_rgba(226,179,28,0.35)]">
+        <path
+          d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
+          fill="currentColor"
+        />
+      </svg>
+      </span>
+    </div>
+  </div>
+
+  <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+    {/* Encabezado editorial con elemento decorativo de revista en el espacio vacío */}
+    <div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end lg:mb-14">
+      <div id="how-header" class="max-w-2xl">
         <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          Trabajamos contigo,<br />no para ti
+          {t.howWeWork.titleLine1}<br />{t.howWeWork.titleLine2}
         </h2>
         <p class="mt-4 max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-lg">
-          Cada paso lo damos juntos, construido con la energía de crear contigo.
+          {t.howWeWork.subtitle}
         </p>
+      </div>
+
+      {/* Pieza decorativa editorial a nivel del headline (sin texto FIG) */}
+      <div
+        id="editorial-piece-how"
+        class="js-boop js-morph-piece hidden sm:flex flex-col items-center justify-end select-none pointer-events-auto cursor-pointer pb-2"
+        aria-hidden="true"
+        data-color="#8B45CC"
+      >
+        <div class="relative size-20 sm:size-24 lg:size-28 opacity-75 text-primary transition-transform duration-500 will-change-transform">
+          <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_2px_16px_rgba(90,34,139,0.25)]">
+            <path
+              d="M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
       </div>
     </div>
 
     {/* Contenedor de Tarjetas Apiladas (Sticky Stack) */}
-    <div class="how-cards-stack relative flex flex-col gap-6 pb-12 sm:gap-10 lg:gap-14 lg:pb-20">
+    <div class="how-cards-stack relative flex flex-col gap-6 pb-6 sm:gap-10 sm:pb-12 lg:gap-14 lg:pb-20">
       {
         steps.map((step, index) => {
           const isDarkText = step.textColor === "dark";
@@ -176,6 +227,21 @@ const steps = [
           );
         })
       }
+    </div>
+
+    {/* CTA intermedio: el lector ya vio el método y todavía no ha visto un botón */}
+    <div class="flex flex-col items-center gap-6 text-center">
+      <p class="max-w-xl text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+        {t.howWeWork.cta.text}
+      </p>
+      <a
+        href={LIIOT_CALENDLY_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-editorial btn-editorial--violet inline-flex items-center justify-center px-8 py-4 text-sm uppercase tracking-[0.1em]"
+      >
+        {t.howWeWork.cta.button}
+      </a>
     </div>
   </div>
 </section>
@@ -334,6 +400,51 @@ const steps = [
       transform: none !important;
     }
   }
+
+  /* Perf: suspend card hover while actively scrolling (`html.is-scrolling`,
+     toggled from landing-motion.ts) so transitions don't recompute mid-scroll;
+     resumes 150ms after scrolling stops. */
+  html.is-scrolling .how-card {
+    pointer-events: none;
+  }
+
+  html.is-scrolling .how-card-img,
+  html.is-scrolling .media-frame,
+  html.is-scrolling .chroma-veil,
+  html.is-scrolling .chroma-sheen {
+    transition: none !important;
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     EDITORIAL PIECES: STATIC TRANSFORM + ONE-SHOT CSS REVEAL
+     Replaces the previous pointer-tracked ("magnetic") rAF parallax, which
+     kept running every frame even off-screen. The transform stays exactly
+     as set inline (static); only opacity transitions, once, staggered per
+     piece, the first time the section enters the viewport.
+     ════════════════════════════════════════════════════════════════════ */
+  @media (prefers-reduced-motion: no-preference) {
+    .js-editorial-piece {
+      transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .editorial-pieces-bg:not(.is-revealed) .js-editorial-piece {
+      opacity: 0 !important;
+      transition: none;
+    }
+
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(1) {
+      transition-delay: 0ms;
+    }
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(2) {
+      transition-delay: 90ms;
+    }
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(3) {
+      transition-delay: 180ms;
+    }
+    .editorial-pieces-bg.is-revealed .js-editorial-piece:nth-of-type(4) {
+      transition-delay: 270ms;
+    }
+  }
 </style>
 
 <script>
@@ -383,10 +494,42 @@ const steps = [
     onScroll();
   }
 
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    initCardStackMotion();
-  } else {
-    document.addEventListener("DOMContentLoaded", initCardStackMotion);
+  /**
+   * One-shot reveal for the decorative background pieces: replaces the
+   * previous pointer-tracked ("magnetic") rAF parallax, which kept
+   * recalculating every frame regardless of scroll position or visibility.
+   * The pieces keep their static inline rotation; only a staggered CSS
+   * opacity transition (see `.editorial-pieces-bg.is-revealed` above) fires
+   * once, the first time the section enters the viewport.
+   */
+  function initEditorialPiecesReveal() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const section = document.getElementById("como-trabajamos");
+    const bg = section?.querySelector<HTMLElement>(".editorial-pieces-bg");
+    if (!bg) return;
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        if (entries[0]?.isIntersecting) {
+          bg.classList.add("is-revealed");
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(bg);
   }
-  document.addEventListener("astro:page-load", initCardStackMotion);
+
+  function initHowMotion() {
+    initCardStackMotion();
+    initEditorialPiecesReveal();
+  }
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initHowMotion();
+  } else {
+    document.addEventListener("DOMContentLoaded", initHowMotion);
+  }
+  document.addEventListener("astro:page-load", initHowMotion);
 </script>
