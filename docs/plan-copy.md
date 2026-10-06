@@ -92,7 +92,7 @@
 - **Bleepy:** "Conectamos marcas con creadores que cuentan su historia con voz propia." CTA se mantiene.
 
 #### Misión y visión (antes "Equipo")
-- La sección ya no lleva el título "Las personas detrás de Liiot". A la izquierda van la misión y la visión de la empresa y a la derecha el equipo fundador en disposición radial alrededor del isotipo.
+- La sección ya no lleva el título "Las personas detrás de Liiot". A la izquierda van la misión y la visión de la empresa (ambos títulos en blanco para no saturar la lectura) y a la derecha el equipo fundador en media luna abierta hacia el texto.
 - **Misión:** "Convertimos la tecnología en una fuerza que potencia a las personas…"
 - **Visión:** "Para 2032, seremos la empresa latinoamericana que lidera la tecnología del bienestar…"
 - El menú muestra "Misión y visión" y apunta a la misma sección.

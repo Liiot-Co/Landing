@@ -1,30 +1,44 @@
 ---
 /**
  * "Misión y visión" — a la izquierda el texto de propósito de Liiot; a la derecha
- * el equipo fundador en disposición radial alrededor del isotipo.
+ * el equipo fundador en media luna alrededor del texto: los nodos se reparten sobre
+ * un arco cuyo centro está del lado del texto, así la curva "abraza" la lectura.
  *
- * Radial: cada integrante se coloca sobre una órbita (coordenadas polares en %
- * del cuadro, así escala igual en cualquier ancho). Los nodos reparten el círculo
- * en partes iguales empezando arriba. El `translate(-50%, -50%)` vive en el
- * contenedor `.team-node`; la animación de entrada (`.js-team-card`, GSAP) va en
- * el enlace interior para que no se pisen los `transform`.
+ * Coordenadas en un lienzo de 100×152 unidades (mismo viewBox del SVG del arco),
+ * así los nodos y el trazo escalan igual en cualquier ancho. El
+ * `translate(-50%, -50%)` vive en `.team-node`; la animación de entrada
+ * (`.js-team-card`, GSAP) va en el enlace interior para que no se pisen los
+ * `transform`.
  */
 import { Linkedin } from "lucide-astro";
-import LiiotMark from "@/components/ui/LiiotMark.astro";
 import { TEAM_MEMBERS, PHOTO_WIDTHS } from "@/constants/team";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 import SectionFade from "@/components/ui/SectionFade.astro";
 import { t } from "@/i18n";
 
-const ORBIT_RADIUS = 33; // % del cuadro
+const W = 100;
+const H = 152;
+const CX = 2; // centro del arco, pegado al lado del texto
+const CY = H / 2;
+const RADIUS = 62;
+const SPAN_DEG = 104; // apertura total de la media luna entre el primer y el último nodo
+const rad = (deg: number) => (deg * Math.PI) / 180;
+
 const nodes = TEAM_MEMBERS.map((member, i) => {
-  const angle = (-90 + (i * 360) / TEAM_MEMBERS.length) * (Math.PI / 180);
+  const t0 = TEAM_MEMBERS.length === 1 ? 0 : -SPAN_DEG / 2 + (i * SPAN_DEG) / (TEAM_MEMBERS.length - 1);
   return {
     member,
-    x: +(50 + ORBIT_RADIUS * Math.cos(angle)).toFixed(2),
-    y: +(50 + ORBIT_RADIUS * Math.sin(angle)).toFixed(2),
+    x: +((CX + RADIUS * Math.cos(rad(t0))) / W * 100).toFixed(2),
+    y: +((CY + RADIUS * Math.sin(rad(t0))) / H * 100).toFixed(2),
   };
 });
+
+/** Trazo del arco (de arriba hacia abajo por el lado derecho) a un radio dado. */
+const arcPath = (r: number, halfSpan: number) => {
+  const p = (deg: number) =>
+    `${(CX + r * Math.cos(rad(deg))).toFixed(2)},${(CY + r * Math.sin(rad(deg))).toFixed(2)}`;
+  return `M${p(-halfSpan)} A${r},${r} 0 0 1 ${p(halfSpan)}`;
+};
 ---
 
 <section id="equipo" class="relative overflow-hidden bg-surface-secondary pt-20 pb-16 sm:py-20 lg:py-32 scroll-mt-24">
@@ -45,7 +59,7 @@ const nodes = TEAM_MEMBERS.map((member, i) => {
         </div>
 
         <div>
-          <h2 class="headline-editorial text-4xl text-brand-pink sm:text-5xl lg:text-6xl">
+          <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
             {t.team.vision.title}
           </h2>
           <p class="mt-5 text-base font-medium leading-relaxed text-foreground/85 sm:text-lg">
@@ -54,28 +68,20 @@ const nodes = TEAM_MEMBERS.map((member, i) => {
         </div>
       </div>
 
-      {/* Derecha: equipo en órbita alrededor del isotipo */}
+      {/* Derecha: equipo en media luna abierta hacia el texto */}
       <div
-        class="team-orbit relative mx-auto aspect-square w-full max-w-[460px] sm:max-w-[540px] lg:max-w-none"
+        class="team-arc relative mx-auto aspect-[100/152] w-full max-w-[320px] sm:max-w-[380px]"
         role="group"
         aria-label={t.team.orbitAria}
       >
-        <svg class="pointer-events-none absolute inset-0 size-full" viewBox="0 0 100 100" aria-hidden="true">
-          <circle class="team-ring-outer" cx="50" cy="50" r="48" fill="none" stroke="currentColor" stroke-width="0.25" stroke-dasharray="1.2 2.4" />
-          <circle cx="50" cy="50" r={ORBIT_RADIUS} fill="none" stroke="currentColor" stroke-width="0.3" opacity="0.55" />
-          {nodes.map((n) => (
-            <line x1="50" y1="50" x2={n.x} y2={n.y} stroke="currentColor" stroke-width="0.2" opacity="0.4" />
-          ))}
+        <svg class="pointer-events-none absolute inset-0 size-full overflow-visible" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+          <path d={arcPath(RADIUS + 10, 60)} fill="none" stroke="currentColor" stroke-width="0.25" stroke-dasharray="1.2 2.4" opacity="0.7" />
+          <path d={arcPath(RADIUS, 56)} fill="none" stroke="currentColor" stroke-width="0.35" opacity="0.6" />
         </svg>
-
-        {/* Centro: isotipo */}
-        <div class="team-core absolute left-1/2 top-1/2 flex size-[22%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full" aria-hidden="true">
-          <LiiotMark class="size-[48%]" color="white" />
-        </div>
 
         {
           nodes.map(({ member, x, y }) => (
-            <div class="team-node absolute w-[30%]" style={`left:${x}%;top:${y}%`}>
+            <div class="team-node absolute w-[26%]" style={`left:${x}%;top:${y}%`}>
               <a
                 href={member.linkedin}
                 target="_blank"
@@ -86,7 +92,7 @@ const nodes = TEAM_MEMBERS.map((member, i) => {
                   <img
                     src={unsplashResize(member.photo, 400, 70)}
                     srcset={unsplashSrcSet(member.photo, PHOTO_WIDTHS, 70)}
-                    sizes="(min-width: 1024px) 160px, 30vw"
+                    sizes="(min-width: 1024px) 100px, 26vw"
                     alt={member.photoAlt}
                     class="team-photo-img h-full w-full object-cover"
                     loading="lazy"
@@ -114,35 +120,12 @@ const nodes = TEAM_MEMBERS.map((member, i) => {
 </section>
 
 <style>
-  .team-orbit {
+  .team-arc {
     color: rgb(255 255 255 / 0.22);
   }
 
   .team-node {
     transform: translate(-50%, -50%);
-  }
-
-  .team-core {
-    background: radial-gradient(circle at 50% 40%, rgb(139 69 204 / 0.45), rgb(139 69 204 / 0.12) 70%);
-    border: 1px solid rgb(255 255 255 / 0.16);
-    box-shadow: 0 0 40px -6px rgb(139 69 204 / 0.6);
-  }
-
-  .team-ring-outer {
-    transform-origin: 50% 50%;
-    animation: team-orbit-spin 90s linear infinite;
-  }
-
-  @keyframes team-orbit-spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .team-ring-outer {
-      animation: none;
-    }
   }
 
   .team-photo {
