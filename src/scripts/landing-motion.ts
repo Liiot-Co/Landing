@@ -75,7 +75,7 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio, #editorial-piece-team, #consolidate-p1, #consolidate-p2, #consolidate-p3, #consolidate-p4",
+    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio, #editorial-piece-team",
     { opacity: "1", transform: "none" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
@@ -332,59 +332,6 @@ function setupEditorialLogoPieces() {
 }
 
 /**
- * Consolidación física del isotipo Liiot en la sección final (#agendar).
- * Las 4 piezas inician dispersas en los extremos del espacio de la sección,
- * y al hacer scroll hacia la tarjeta "Crezcamos juntos", convergen
- * simultáneamente hacia el centro, rotan a 0° y se consolidan en el isotipo completo.
- */
-function setupLogoConsolidation() {
-  const finalCta = document.getElementById("agendar");
-  const finalTarget = document.getElementById("final-logo-target");
-  const cp1 = document.getElementById("consolidate-p1");
-  const cp2 = document.getElementById("consolidate-p2");
-  const cp3 = document.getElementById("consolidate-p3");
-  const cp4 = document.getElementById("consolidate-p4");
-
-  if (!finalCta || !finalTarget || !cp1 || !cp2 || !cp3 || !cp4) return;
-
-  // Estado inicial disperso en el espacio del CTA final (piezas grandes y asimétricas)
-  gsap.set(cp1, { x: "-26vw", y: "-16vh", scale: 2.2, rotation: -50, opacity: 0.15 });
-  gsap.set(cp2, { x: "26vw", y: "-14vh", scale: 2.2, rotation: 45, opacity: 0.15 });
-  gsap.set(cp3, { x: "-22vw", y: "15vh", scale: 2.2, rotation: 65, opacity: 0.15 });
-  gsap.set(cp4, { x: "22vw", y: "13vh", scale: 2.2, rotation: -55, opacity: 0.15 });
-
-  // Timeline con scrub: conforme el scroll entra a la sección, las 4 piezas viajan físicamente
-  // y se ensamblan con precisión en el centro exacto (0, 0)
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: finalCta,
-      start: "top 85%",
-      end: "center 52%",
-      scrub: 1.2,
-      onUpdate: (self) => {
-        if (self.progress > 0.9) {
-          finalTarget.classList.add("is-consolidated");
-        } else {
-          finalTarget.classList.remove("is-consolidated");
-        }
-      },
-    },
-  });
-
-  tl.to(
-    [cp1, cp2, cp3, cp4],
-    {
-      x: 0,
-      y: 0,
-      scale: 1,
-      rotation: 0,
-      opacity: 1,
-      ease: "power2.out",
-    }
-  );
-}
-
-/**
  * Smooth-scrolls in-page `#anchor` links via GSAP's ScrollToPlugin instead
  * of the native `scroll-behavior: smooth` (disabled in global.css — it
  * fought the story scroll track in setupStory(), producing a visible jump when
@@ -436,7 +383,6 @@ function init() {
   setupFinalCta();
   setupFooter();
   setupEditorialLogoPieces();
-  setupLogoConsolidation();
 
   // Late-loading media (hero photo, portfolio images) can shift section
   // offsets after ScrollTrigger has already measured them.

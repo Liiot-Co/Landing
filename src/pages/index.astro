@@ -20,15 +20,8 @@ import SectionFade from "@/components/ui/SectionFade.astro";
     <Portfolio />
     <Team />
 
-    {/* Atmósfera unificada: Final CTA y Footer comparten el mismo canvas procedural WebGL2 */}
-    <div class="relative overflow-hidden bg-[#280948]">
-      {/* Canvas WebGL2 a pantalla completa para todo el cierre de página */}
-      <canvas
-        id="final-cta-canvas"
-        class="absolute inset-0 size-full block pointer-events-none"
-        aria-hidden="true"
-      ></canvas>
-
+    {/* Cierre de página: CTA final y footer comparten un degradado CSS estático (sin WebGL) */}
+    <div class="closing-bg relative overflow-hidden">
       {/* Fade superior suave desde Equipo */}
       <SectionFade position="top" color="surface-secondary" height="h-32 sm:h-52 lg:h-64" zIndex="z-[2]" />
 
@@ -37,3 +30,14 @@ import SectionFade from "@/components/ui/SectionFade.astro";
     </div>
   </main>
 </Layout>
+
+<style>
+  .closing-bg {
+    background-color: #280948;
+    background-image:
+      radial-gradient(60% 55% at 14% 10%, rgb(124 58 237 / 0.5), transparent 70%),
+      radial-gradient(55% 50% at 86% 22%, rgb(236 72 153 / 0.32), transparent 70%),
+      radial-gradient(85% 60% at 50% 108%, rgb(255 106 51 / 0.78), transparent 70%),
+      radial-gradient(40% 35% at 72% 92%, rgb(255 181 140 / 0.35), transparent 70%);
+  }
+</style>
