@@ -75,7 +75,7 @@ function applyReducedMotionStates() {
   );
 
   setBulk(
-    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio, #editorial-piece-team",
+    "#villain-header, #villain-pivot, .js-villain-item, #how-header, #portfolio-header, #team-header, #footer-mark, #editorial-piece-how, #editorial-piece-portfolio",
     { opacity: "1", transform: "none" },
   );
   setBulk(".js-portfolio-item, .js-team-card", {
@@ -267,7 +267,6 @@ function setupEditorialLogoPieces() {
   const pieces = [
     { id: "#editorial-piece-how", trigger: "#como-trabajamos" },
     { id: "#editorial-piece-portfolio", trigger: "#proyectos" },
-    { id: "#editorial-piece-team", trigger: "#equipo" },
   ];
 
   // Scrub ScrollTriggers from the micro-parallax tweens below. Disabled

@@ -1,99 +1,152 @@
 ---
 /**
- * "Somos tres" — humaniza al equipo. Fuente: vault §6.
+ * "Misión y visión" — a la izquierda el texto de propósito de Liiot; a la derecha
+ * el equipo fundador en disposición radial alrededor del isotipo.
+ *
+ * Radial: cada integrante se coloca sobre una órbita (coordenadas polares en %
+ * del cuadro, así escala igual en cualquier ancho). Los nodos reparten el círculo
+ * en partes iguales empezando arriba. El `translate(-50%, -50%)` vive en el
+ * contenedor `.team-node`; la animación de entrada (`.js-team-card`, GSAP) va en
+ * el enlace interior para que no se pisen los `transform`.
  */
 import { Linkedin } from "lucide-astro";
+import LiiotMark from "@/components/ui/LiiotMark.astro";
 import { TEAM_MEMBERS, PHOTO_WIDTHS } from "@/constants/team";
 import { unsplashResize, unsplashSrcSet } from "@/lib/images";
 import SectionFade from "@/components/ui/SectionFade.astro";
 import { t } from "@/i18n";
+
+const ORBIT_RADIUS = 33; // % del cuadro
+const nodes = TEAM_MEMBERS.map((member, i) => {
+  const angle = (-90 + (i * 360) / TEAM_MEMBERS.length) * (Math.PI / 180);
+  return {
+    member,
+    x: +(50 + ORBIT_RADIUS * Math.cos(angle)).toFixed(2),
+    y: +(50 + ORBIT_RADIUS * Math.sin(angle)).toFixed(2),
+  };
+});
 ---
 
 <section id="equipo" class="relative overflow-hidden bg-surface-secondary pt-20 pb-16 sm:py-20 lg:py-32 scroll-mt-24">
   {/* Fade suave superior para disolver el salto desde proyectos */}
   <SectionFade position="top" color="background" height="h-28 sm:h-44" zIndex="z-[2]" />
-  <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end lg:mb-18">
-      <div id="team-header" class="max-w-2xl">
-        <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
-          {t.team.titlePrefix} <span data-annotate="equipo">{t.team.titleHighlight}</span>
-        </h2>
-        <p class="mt-6 max-w-md text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
-          {t.team.subtitle}
-        </p>
-      </div>
 
-      {/* Pieza decorativa editorial (Curvas de Liiot) a nivel del headline en espacio vacío */}
-      <div
-        id="editorial-piece-team"
-        class="js-boop js-morph-piece hidden sm:flex flex-col items-center justify-end select-none pointer-events-auto cursor-pointer pb-2"
-        aria-hidden="true"
-        data-color="#FFFFFF"
-      >
-        <div class="relative size-20 sm:size-24 lg:size-28 opacity-80 transition-transform duration-500 will-change-transform">
-          <svg viewBox="0 0 48 48" class="size-full overflow-visible drop-shadow-[0_2px_12px_rgba(255,255,255,0.12)]">
-            <path
-              d="M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38"
-              fill="#FFFFFF"
-            />
-            <path
-              d="M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38"
-              fill="#FFFFFF"
-            />
-          </svg>
+  <div class="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 items-center gap-14 lg:grid-cols-2 lg:gap-16">
+      {/* Izquierda: misión y visión */}
+      <div id="team-header" class="flex max-w-xl flex-col gap-12 lg:gap-14">
+        <div>
+          <h2 class="headline-editorial text-4xl text-foreground sm:text-5xl lg:text-6xl">
+            <span data-annotate="equipo">{t.team.mission.title}</span>
+          </h2>
+          <p class="mt-5 text-base font-medium leading-relaxed text-foreground/85 sm:text-lg">
+            {t.team.mission.text}
+          </p>
+        </div>
+
+        <div>
+          <h2 class="headline-editorial text-4xl text-brand-pink sm:text-5xl lg:text-6xl">
+            {t.team.vision.title}
+          </h2>
+          <p class="mt-5 text-base font-medium leading-relaxed text-foreground/85 sm:text-lg">
+            {t.team.vision.text}
+          </p>
         </div>
       </div>
-    </div>
 
-    <div class="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-3">
-      {
-        TEAM_MEMBERS.map((member) => (
-          <a
-            href={member.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="js-team-card group block"
-          >
-            <div class="media-duotone media-duotone-reveal team-photo relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
-              <img
-                src={unsplashResize(member.photo, 700, 70)}
-                srcset={unsplashSrcSet(member.photo, PHOTO_WIDTHS, 70)}
-                sizes="(min-width: 640px) 33vw, 90vw"
-                alt={member.photoAlt}
-                class="team-photo-img h-full w-full object-cover"
-                loading="lazy"
-              />
-              <span
-                class="absolute right-3 top-3 z-[2] flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100"
-                aria-hidden="true"
+      {/* Derecha: equipo en órbita alrededor del isotipo */}
+      <div
+        class="team-orbit relative mx-auto aspect-square w-full max-w-[460px] sm:max-w-[540px] lg:max-w-none"
+        role="group"
+        aria-label={t.team.orbitAria}
+      >
+        <svg class="pointer-events-none absolute inset-0 size-full" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="team-ring-outer" cx="50" cy="50" r="48" fill="none" stroke="currentColor" stroke-width="0.25" stroke-dasharray="1.2 2.4" />
+          <circle cx="50" cy="50" r={ORBIT_RADIUS} fill="none" stroke="currentColor" stroke-width="0.3" opacity="0.55" />
+          {nodes.map((n) => (
+            <line x1="50" y1="50" x2={n.x} y2={n.y} stroke="currentColor" stroke-width="0.2" opacity="0.4" />
+          ))}
+        </svg>
+
+        {/* Centro: isotipo */}
+        <div class="team-core absolute left-1/2 top-1/2 flex size-[22%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full" aria-hidden="true">
+          <LiiotMark class="size-[48%]" color="white" />
+        </div>
+
+        {
+          nodes.map(({ member, x, y }) => (
+            <div class="team-node absolute w-[30%]" style={`left:${x}%;top:${y}%`}>
+              <a
+                href={member.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="js-team-card group block text-center"
               >
-                <span class="size-1.5 animate-pulse rounded-full bg-destructive"></span>
-                {t.team.liveBadge}
-              </span>
+                <div class="team-photo relative aspect-square w-full overflow-hidden rounded-full">
+                  <img
+                    src={unsplashResize(member.photo, 400, 70)}
+                    srcset={unsplashSrcSet(member.photo, PHOTO_WIDTHS, 70)}
+                    sizes="(min-width: 1024px) 160px, 30vw"
+                    alt={member.photoAlt}
+                    class="team-photo-img h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="-mx-3 mt-2.5 sm:-mx-6 sm:mt-3.5">
+                  <p class="text-[11px] font-bold leading-tight tracking-tight text-foreground sm:text-base">
+                    {member.name}
+                  </p>
+                  <p class="mt-1 flex items-center justify-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.15em] text-accent sm:text-xs">
+                    {member.role}
+                    <Linkedin
+                      class="size-3 text-muted-foreground transition-colors duration-300 group-hover:text-foreground sm:size-3.5"
+                      aria-hidden="true"
+                    />
+                  </p>
+                </div>
+              </a>
             </div>
-
-            <div class="mt-4 flex items-center justify-between">
-              <div>
-                <p class="text-lg font-bold tracking-tight text-foreground">{member.name}</p>
-                <p class="text-xs font-bold uppercase tracking-[0.15em] text-accent">
-                  {member.role}
-                </p>
-              </div>
-              <Linkedin
-                class="size-4 text-muted-foreground transition-colors duration-300 group-hover:text-foreground"
-                aria-hidden="true"
-              />
-            </div>
-          </a>
-        ))
-      }
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
 
 <style>
+  .team-orbit {
+    color: rgb(255 255 255 / 0.22);
+  }
+
+  .team-node {
+    transform: translate(-50%, -50%);
+  }
+
+  .team-core {
+    background: radial-gradient(circle at 50% 40%, rgb(139 69 204 / 0.45), rgb(139 69 204 / 0.12) 70%);
+    border: 1px solid rgb(255 255 255 / 0.16);
+    box-shadow: 0 0 40px -6px rgb(139 69 204 / 0.6);
+  }
+
+  .team-ring-outer {
+    transform-origin: 50% 50%;
+    animation: team-orbit-spin 90s linear infinite;
+  }
+
+  @keyframes team-orbit-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .team-ring-outer {
+      animation: none;
+    }
+  }
+
   .team-photo {
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     transition: box-shadow 450ms cubic-bezier(0.4, 0, 0.2, 1), border-color 450ms ease;
   }
 
@@ -105,8 +158,8 @@ import { t } from "@/i18n";
 
   /* Chroma Pop & Neon Glow en hover (sin zoom ni translate) */
   .js-team-card:hover .team-photo,
-  .js-team-card:focus-within .team-photo {
-    border-color: rgba(255, 255, 255, 0.45);
+  .js-team-card:focus-visible .team-photo {
+    border-color: rgba(255, 255, 255, 0.5);
     box-shadow:
       0 0 34px -4px rgba(139, 69, 204, 0.65),
       0 0 16px rgba(255, 106, 51, 0.5),
@@ -114,7 +167,7 @@ import { t } from "@/i18n";
   }
 
   .js-team-card:hover .team-photo-img,
-  .js-team-card:focus-within .team-photo-img {
+  .js-team-card:focus-visible .team-photo-img {
     filter: grayscale(0) saturate(1.45) contrast(1.18) brightness(1.04);
   }
 

@@ -35,6 +35,11 @@ Ubicación: Colombia (cobertura global)
 2. **Construimos juntos**: Avances tangibles cada semana, prototipado rápido y feedback continuo.
 3. **Crecemos juntos**: Medición de adopción, soporte técnico y acompañamiento continuo post-lanzamiento.
 
+## Misión y Visión
+
+- **Misión**: Convertimos la tecnología en una fuerza que potencia a las personas. Transformamos la complejidad técnica en soluciones simples y elegantes que siguen el ritmo de cada equipo, para que las organizaciones liberen todo su potencial y quienes las integran trabajen con más tiempo, energía y propósito.
+- **Visión**: Para 2032, seremos la empresa latinoamericana que lidera la tecnología del bienestar. Desde Colombia, acompañaremos a miles de equipos en la región con herramientas que elevan la manera de trabajar y demuestran que una empresa puede crecer mientras sus personas florecen.
+
 ## Equipo Fundador y Liderazgo
 
 - **Dana Sofia Sánchez** — Chief Executive Officer (CEO)

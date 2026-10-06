@@ -14,11 +14,11 @@ import { interpolate } from "flubber";
 import { initBoops } from "./liiot-boop";
 import { burst } from "./liiot-burst";
 
-const MORPH_DURATION = 500;
+const MORPH_DURATION = 340;
 const LABEL_FADE = 300;
 /** Stagger entre piezas al animar un morph, para que no se vean como una
  *  sola unidad (especificación ODD: 40-60ms). */
-const PIECE_STAGGER_MS = 50;
+const PIECE_STAGGER_MS = 35;
 
 interface PieceFigure {
   /** `d` del path de la figura, ya posicionado dentro del viewBox 48x48
@@ -108,6 +108,14 @@ function lerpColor(a: string, b: string, t: number): string {
   const rg = Math.round(ag + (bg - ag) * t);
   const rb = Math.round(ab + (bb - ab) * t);
   return "#" + ((1 << 24) + (rr << 16) + (rg << 8) + rb).toString(16).slice(1);
+}
+
+/**
+ * Las chispas salen DESPUÉS del morph: se espera al siguiente frame para que la
+ * forma final ya esté pintada antes de emitirlas (nunca durante la transición).
+ */
+function burstAfterPaint(host: HTMLElement) {
+  requestAnimationFrame(() => burst(host));
 }
 
 function easeInOutCubic(t: number): number {
@@ -306,10 +314,10 @@ function initMark(svg: SVGElement) {
   svg.addEventListener("mousemove", helixMove);
   svg.addEventListener("mouseleave", helixStop);
 
-  /** Burst confinado al contenedor del logo al completar cada morph. */
+  /** Burst confinado al contenedor del logo. Solo se llama cuando el morph ya terminó. */
   function burstOnHost() {
     const host = svg.parentElement;
-    if (host) burst(host);
+    if (host) burstAfterPaint(host);
   }
 
   function showLabel(text: string, color: string) {
@@ -407,37 +415,40 @@ interface TinyState {
 }
 
 /**
- * Set pequeño de 4 formas derivadas de las piezas 1-4 del isotipo, cada una
- * con su color propio (morph MULTICOLOR por decisión de producto). Se usan
- * los mismos `d` del fondo de HowWeWork para que flubber interpole entre
- * piezas hermanas.
+ * Figuras de marca (círculo, cuadrado, triángulo, rombo), centradas en el
+ * viewBox 48×48 y cada una con su color. Las piezas editoriales NUNCA se
+ * transforman en otra pieza del isotipo: pasan de su forma original a estas
+ * figuras, que son el lenguaje geométrico de Liiot (las mismas del morph del
+ * logo completo).
  */
 const TINY_STATES: TinyState[] = [
   {
     color: "#8B45CC",
-    d: "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19",
+    d: "M8,24 C8,15.16 15.16,8 24,8 C32.84,8 40,15.16 40,24 C40,32.84 32.84,40 24,40 C15.16,40 8,32.84 8,24 Z",
   },
   {
     color: "#FF6A33",
-    d: "M24.64,7.37l-.03,26.58c0,1.17,1.33,1.84,2.26,1.14,2.77-2.1,5.53-4.2,8.3-6.3.35-.27.56-.68.56-1.13.03-8.58.06-17.16.09-25.74,0-1.13-1.24-1.81-2.18-1.2-2.79,1.82-5.57,3.64-8.36,5.45-.4.26-.64.71-.64,1.19",
+    d: "M9,9 L39,9 L39,39 L9,39 Z",
   },
   {
     color: "#e04b66",
-    d: "M35.73,41.84c0,2.93-2.41,5.31-5.39,5.31s-5.65-2.49-5.65-5.56v-5.12h5.58c3.02,0,5.47,2.41,5.47,5.38",
+    d: "M24,6 L43,40 L5,40 Z",
   },
   {
     color: "#e2b31c",
-    d: "M12.52,6.08c0-2.93,2.41-5.31,5.39-5.31s5.65,2.49,5.65,5.56v5.12h-5.58c-3.02,0-5.47-2.41-5.47-5.38",
+    d: "M24,4 L44,24 L24,44 L4,24 Z",
   },
 ];
 
 /**
- * Click en una pieza editorial cicla formas tiny (multicolor) + burst.
+ * Click en una pieza editorial cicla las figuras de marca (multicolor) + burst.
+ * Cada pieza arranca en una figura distinta (según su posición en la página)
+ * para que varias piezas juntas no muestren la misma figura a la vez.
  * Solo anima el atributo `d`: el parallax del fondo escribe únicamente
  * `style.transform` en el contenedor, así no hay pelea de escritores.
  * Las piezas siguen `aria-hidden` y no son focusables (mouse-only).
  */
-function initEditorialPiece(el: HTMLElement) {
+function initEditorialPiece(el: HTMLElement, order = 0) {
   if (el.dataset.morphWired === "true") return;
   el.dataset.morphWired = "true";
 
@@ -451,7 +462,7 @@ function initEditorialPiece(el: HTMLElement) {
 
   el.addEventListener("click", () => {
     if (busy) return;
-    const nextIdx = (idx + 1) % TINY_STATES.length;
+    const nextIdx = idx === -1 ? order % TINY_STATES.length : (idx + 1) % TINY_STATES.length;
     const next = TINY_STATES[nextIdx];
     const fromColor = idx === -1 ? baseColor : TINY_STATES[idx].color;
 
@@ -473,7 +484,7 @@ function initEditorialPiece(el: HTMLElement) {
         if (pending === 0) {
           idx = nextIdx;
           busy = false;
-          burst(el);
+          burstAfterPaint(el);
         }
       });
     });
@@ -481,7 +492,9 @@ function initEditorialPiece(el: HTMLElement) {
 }
 
 export function initEditorialMorphs(scope: ParentNode = document) {
-  scope.querySelectorAll<HTMLElement>(".js-morph-piece").forEach(initEditorialPiece);
+  scope
+    .querySelectorAll<HTMLElement>(".js-morph-piece")
+    .forEach((el, i) => initEditorialPiece(el, i));
 }
 
 // Auto-init on page load (Astro)

@@ -6,7 +6,9 @@
  * - Arrastrar y lanzar con mouse o touch.
  * - Doble clic o doble toque sobre un bloque: cambia a la siguiente figura y al
  *   siguiente color de la marca (el cuerpo físico se reemplaza conservando
- *   posición, ángulo y velocidad).
+ *   posición, ángulo y velocidad). Una pieza del isotipo nunca se convierte en
+ *   otra pieza del isotipo: pasa por las figuras de marca y, al terminar el
+ *   ciclo, vuelve a su propia forma. Las figuras solo ciclan entre figuras.
  *
  * Rendimiento:
  * - Matter se carga con import dinámico solo cuando el patio está cerca de la pantalla.
@@ -82,10 +84,10 @@ const PILL: Pt[] = [
   ...arc(14, 24, 10, Math.PI / 2, (3 * Math.PI) / 2, 6),
 ];
 
-/**
- * Orden del ciclo de doble clic. Los 4 primeros son las piezas del isotipo, así que
- * al dar la vuelta completa cada bloque vuelve a ser parte del logo.
- */
+/** Índices de `SHAPES`: 0-3 piezas del isotipo, 4-9 figuras de marca. */
+const PIECE_COUNT = 4;
+const FIGURE_START = PIECE_COUNT;
+
 const SHAPES: Shape[] = [
   {
     d: "M23.61,40.54l.03-26.58c0-1.17-1.33-1.84-2.26-1.14-2.77,2.1-5.53,4.2-8.3,6.3-.35.27-.56.68-.56,1.13-.03,8.58-.06,17.16-.09,25.74,0,1.13,1.24,1.81,2.18,1.2,2.79-1.82,5.57-3.64,8.36-5.45.4-.26.64-.71.64-1.19",
@@ -118,6 +120,8 @@ interface Block {
   el: SVGSVGElement;
   path: SVGPathElement;
   shape: number;
+  /** Pieza del isotipo a la que vuelve al terminar el ciclo; -1 si nació como figura. */
+  home: number;
   color: number;
   body: Matter.Body | null;
   centroid: Pt;
@@ -150,7 +154,7 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     path.setAttribute("fill", COLORS[color]);
     el.appendChild(path);
     yard.appendChild(el);
-    return { el, path, shape: i, color, body: null, centroid: [0, 0] };
+    return { el, path, shape: i, home: i < PIECE_COUNT ? i : -1, color, body: null, centroid: [0, 0] };
   });
   const blockByEl = new Map<Element, Block>(blocks.map((b) => [b.el, b]));
 
@@ -270,6 +274,14 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
   }
 
   /* ── Doble clic / doble toque: siguiente figura y color ─────────────── */
+  /** Una pieza del isotipo salta a una figura (nunca a otra pieza) y las figuras ciclan entre figuras. */
+  function nextShape(block: Block): number {
+    if (block.shape < PIECE_COUNT) return FIGURE_START + (block.home % (SHAPES.length - FIGURE_START));
+    const next = block.shape + 1;
+    if (next < SHAPES.length) return next;
+    return block.home >= 0 ? block.home : FIGURE_START;
+  }
+
   function morph(block: Block) {
     const old = block.body;
     if (!old || !engine) return;
@@ -283,7 +295,7 @@ export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
     }
     Composite.remove(engine.world, old);
 
-    block.shape = (block.shape + 1) % SHAPES.length;
+    block.shape = nextShape(block);
     block.color = (block.color + 1) % COLORS.length;
     block.path.setAttribute("d", SHAPES[block.shape].d);
     block.path.setAttribute("fill", COLORS[block.color]);

@@ -40,7 +40,7 @@
         "path": "#proyectos"
       },
       {
-        "name": "Equipo",
+        "name": "Misión y visión",
         "path": "#equipo"
       },
       {
@@ -218,10 +218,15 @@
     }
   },
   "team": {
-    "titlePrefix": "Las personas detrás de",
-    "titleHighlight": "Liiot",
-    "subtitle": "Liiot es una empresa nueva y por eso cada proyecto lo llevan sus fundadores de principio a fin. Durante todo el trabajo hablarás directamente con nosotros.",
-    "liveBadge": "Live",
+    "mission": {
+      "title": "Misión",
+      "text": "Convertimos la tecnología en una fuerza que potencia a las personas. Transformamos la complejidad técnica en soluciones simples y elegantes que siguen el ritmo de cada equipo, para que las organizaciones liberen todo su potencial y quienes las integran trabajen con más tiempo, energía y propósito."
+    },
+    "vision": {
+      "title": "Visión",
+      "text": "Para 2032, seremos la empresa latinoamericana que lidera la tecnología del bienestar. Desde Colombia, acompañaremos a miles de equipos en la región con herramientas que elevan la manera de trabajar y demuestran que una empresa puede crecer mientras sus personas florecen."
+    },
+    "orbitAria": "Equipo fundador de Liiot",
     "members": {
       "dana": {
         "name": "Dana Sofia Sánchez",
