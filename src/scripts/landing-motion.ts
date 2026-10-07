@@ -7,7 +7,6 @@
  */
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import {
   motionEnter,
   motionEnterFast,
@@ -15,7 +14,7 @@ import {
   triggerStart,
 } from "@/lib/motion/landing";
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+gsap.registerPlugin(ScrollTrigger);
 
 // Evita que el scrub de setupStory() se re-mida cuando la barra de
 // direcciones del navegador móvil aparece/desaparece durante el scroll.
@@ -331,14 +330,37 @@ function setupEditorialLogoPieces() {
 }
 
 /**
- * Smooth-scrolls in-page `#anchor` links via GSAP's ScrollToPlugin instead
- * of the native `scroll-behavior: smooth` (disabled in global.css — it
- * fought the story scroll track in setupStory(), producing a visible jump when
- * entering the cinematic mode). ScrollToPlugin drives the same scroll
- * position ScrollTrigger reads, so the two cooperate instead of racing.
+ * Smooth-scrolls in-page `#anchor` links with a small rAF tween that writes
+ * `window.scrollY` directly (same mechanism the removed ScrollToPlugin used, so
+ * ScrollTrigger keeps reading a position it understands and both cooperate
+ * instead of racing). The native `scroll-behavior: smooth` stays disabled in
+ * global.css — it fought the story scroll track in setupStory(), producing a
+ * visible jump when entering the cinematic mode.
  * `offsetY` mirrors the site's `scroll-padding-top` (fixed nav clearance) by
  * reading it straight from computed style, so both stay in sync.
  */
+function tweenScrollTo(targetY: number, durationMs: number) {
+  if (durationMs <= 0 || targetY === window.scrollY) {
+    window.scrollTo(0, targetY);
+    return;
+  }
+  const startY = window.scrollY;
+  const dist = targetY - startY;
+  const t0 = performance.now();
+  let raf = 0;
+  // Ceder ante el usuario: su propio scroll cancela el tween.
+  const cancel = () => cancelAnimationFrame(raf);
+  window.addEventListener("wheel", cancel, { once: true, passive: true });
+  window.addEventListener("touchmove", cancel, { once: true, passive: true });
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - t0) / durationMs);
+    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    window.scrollTo(0, startY + dist * eased);
+    if (t < 1) raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+}
+
 function setupSmoothAnchors() {
   document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => {
     const id = link.getAttribute("href")?.slice(1);
@@ -352,11 +374,7 @@ function setupSmoothAnchors() {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const offsetY = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
 
-      gsap.to(window, {
-        duration: reduced ? 0 : 1,
-        scrollTo: { y: target, offsetY },
-        ease: "power2.inOut",
-      });
+      tweenScrollTo(target.getBoundingClientRect().top + window.scrollY - offsetY, reduced ? 0 : 1000);
       history.pushState(null, "", `#${id}`);
     });
   });

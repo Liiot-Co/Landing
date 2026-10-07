@@ -123,8 +123,8 @@ import { t } from "@/i18n";
                 <div class="media-frame squircle relative aspect-[16/11] w-full overflow-hidden lg:aspect-[4/3]">
                   <div class="chroma-media h-full w-full">
                     <img
-                      src={unsplashResize(project.image, 800, 70)}
-                      srcset={unsplashSrcSet(project.image, PROJECT_IMAGE_WIDTHS, 70)}
+                      src={unsplashResize(project.image, 640, 60)}
+                      srcset={unsplashSrcSet(project.image, PROJECT_IMAGE_WIDTHS, 60)}
                       sizes="(min-width: 1024px) 500px, 90vw"
                       alt={project.imageAlt}
                       class="project-card-img h-full w-full object-cover"
@@ -329,13 +329,21 @@ import { t } from "@/i18n";
      INDICADORES
      ════════════════════════════════════════════════════════════════════ */
   .carousel-indicator {
-    width: 24px;
+    /* Ancho fijo + scaleX en vez de animar `width`: el cambio de ancho
+       invalidaba layout por frame (animación no compuesta según Lighthouse).
+       Inactivo ≈ 24px visuales (52 * 0.46), activo 52px, mismo look. */
+    width: 52px;
+    transform: scaleX(0.46);
+    transform-origin: left center;
+    opacity: 0.55;
     background-color: rgba(255, 255, 255, 0.2);
     border: none;
     box-shadow: none !important;
+    transition: transform 300ms ease, background-color 300ms ease, opacity 300ms ease;
   }
   .carousel-indicator.is-active {
-    width: 52px;
+    transform: scaleX(1);
+    opacity: 1;
     background-color: var(--accent);
   }
 </style>

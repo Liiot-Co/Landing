@@ -140,8 +140,36 @@ interface Block {
   centroid: Pt;
 }
 
+/** Resuelve `true` cuando el patio entra a `margin` px del viewport. */
+function whenNearViewport(el: HTMLElement, margin: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof IntersectionObserver === "undefined") return resolve(true);
+    try {
+      if (el.getBoundingClientRect().top < window.innerHeight + margin) return resolve(true);
+    } catch {
+      return resolve(true);
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting || !el.isConnected) {
+          io.disconnect();
+          resolve(entry.isIntersecting && el.isConnected);
+        }
+      },
+      { rootMargin: `${margin}px 0px` },
+    );
+    io.observe(el);
+  });
+}
+
 export async function initLogoPhysics(yard: HTMLElement): Promise<CleanupFn> {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Matter (~84KB) se descarga solo cuando el patio está cerca: fuera de la
+  // ruta crítica inicial y del reporte de "JS sin usar" de Lighthouse.
+  // (MPA sin transiciones SPA: si la página se descarga esperando, la
+  // promesa pendiente muere con ella, sin leak.)
+  const near = await whenNearViewport(yard, 600);
+  if (!near || !yard.isConnected) return () => {};
   const Matter = (await import("matter-js")).default;
   const { Engine, Bodies, Body, Composite, Constraint, Sleeping, Vertices } = Matter;
 

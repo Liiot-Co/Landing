@@ -479,11 +479,27 @@ const { class: className = "" } = Astro.props;
     let scrubDpr = false;
     let lastScrubRender = 0;
 
+    // Rect del canvas cacheado: `onPointerMove` corre en CADA movimiento del
+    // puntero en toda la página; leer `getBoundingClientRect()` ahí forzaba
+    // un reflow sincrónico si los estilos se habían invalidado (Lighthouse:
+    // "reprocesamiento forzado"). Se refresca como máximo 1 vez por frame
+    // desde el loop, más resize/scroll que solo marcan el flag (sin lecturas).
+    let cachedRect: { left: number; top: number; right: number; bottom: number } | null = null;
+    let rectDirty = true;
+
+    function refreshRect() {
+      if (!canvas) return;
+      const r = canvas.getBoundingClientRect();
+      cachedRect = { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      rectDirty = false;
+    }
+
     function resize() {
       if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      width = Math.max(1, Math.floor(rect.width));
-      height = Math.max(1, Math.floor(rect.height));
+      refreshRect();
+      const rect = cachedRect!;
+      width = Math.max(1, Math.floor(rect.right - rect.left));
+      height = Math.max(1, Math.floor(rect.bottom - rect.top));
 
       isMobile = window.innerWidth <= 768;
       // En celular un tope de 1.0 estiraba el render 2-3x y lo dejaba borroso (efecto cristal).
@@ -544,7 +560,8 @@ const { class: className = "" } = Astro.props;
 
     const onPointerMove = (e: PointerEvent) => {
       if (!canvas || width === 0 || height === 0) return;
-      const rect = canvas.getBoundingClientRect();
+      if (!cachedRect) refreshRect();
+      const rect = cachedRect!;
       const isInside =
         e.clientX >= rect.left &&
         e.clientX <= rect.right &&
@@ -562,7 +579,8 @@ const { class: className = "" } = Astro.props;
 
     const onPointerDown = (e: PointerEvent) => {
       if (!canvas || width === 0 || height === 0) return;
-      const rect = canvas.getBoundingClientRect();
+      if (!cachedRect) refreshRect();
+      const rect = cachedRect!;
       if (
         e.clientX >= rect.left &&
         e.clientX <= rect.right &&
@@ -590,8 +608,14 @@ const { class: className = "" } = Astro.props;
     let rafId = 0;
     let isVisible = true;
 
+    // El scroll mueve el canvas: invalida el rect cacheado sin leer nada
+    // (leer aquí también forzaría reflow en pleno scroll).
+    window.addEventListener("scroll", () => { rectDirty = true; }, { passive: true });
+
     function renderFrame(now: number) {
       if (!gl || gl.isContextLost()) return;
+      // Como máximo una lectura geométrica por frame, solo si algo la invalidó.
+      if (rectDirty) refreshRect();
 
       // Suavizado elástico del puntero y hover
       currentPointerX += (targetPointerX - currentPointerX) * 0.08;

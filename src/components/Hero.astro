@@ -163,13 +163,24 @@ import { t } from "@/i18n";
 
 <style>
   .hero-skeleton {
+    background: rgba(15, 9, 28, 0.95);
+    overflow: hidden;
+  }
+
+  /* Barrido de carga en pseudo-elemento con transform (compuesto por GPU):
+     `background-position` animado forzaba repaint por frame y Lighthouse lo
+     marca como animación no compuesta. Mismo visual, cero repaint. */
+  .hero-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
     background: linear-gradient(
       90deg,
-      rgba(15, 9, 28, 0.95) 0%,
+      transparent 0%,
       rgba(42, 22, 68, 0.45) 50%,
-      rgba(15, 9, 28, 0.95) 100%
+      transparent 100%
     );
-    background-size: 200% 100%;
+    transform: translateX(-100%);
     /* Single pass only — the skeleton is hidden by the image's opacity
        fade-in well before a loop would matter, so looping it forever just
        burns frames in the background. */
@@ -178,10 +189,10 @@ import { t } from "@/i18n";
 
   @keyframes heroShimmer {
     0% {
-      background-position: 200% 0;
+      transform: translateX(-100%);
     }
     100% {
-      background-position: -200% 0;
+      transform: translateX(100%);
     }
   }
 

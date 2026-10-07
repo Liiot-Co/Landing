@@ -210,8 +210,8 @@ const steps = t.howWeWork.steps.map((step, index) => ({
                   <div class="media-frame squircle relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/11] lg:aspect-[4/3]">
                     <div class="chroma-media h-full w-full">
                       <img
-                        src={unsplashResize(step.image, 800, 70)}
-                        srcset={unsplashSrcSet(step.image, STEP_IMAGE_WIDTHS, 70)}
+                        src={unsplashResize(step.image, 640, 60)}
+                        srcset={unsplashSrcSet(step.image, STEP_IMAGE_WIDTHS, 60)}
                         sizes="(min-width: 1024px) 500px, 90vw"
                         alt={`Liiot · ${step.title}`}
                         class="how-card-img h-full w-full object-cover"
