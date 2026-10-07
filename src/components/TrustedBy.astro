@@ -1,0 +1,92 @@
+---
+/**
+ * "Confían en nosotros" — franja de empresas cliente.
+ *
+ * Va separada de las tarjetas del portafolio: cada marca aparece como
+ * portafolio propio, sin unirse al relato de ningún proyecto. Sin logos
+ * externos: wordmark tipográfico + detalle del caso. Para sumar empresas,
+ * agregar entradas a `trustedBy.clients` en `es.json`.
+ */
+import { t } from "@/i18n";
+
+const clients = t.trustedBy.clients;
+---
+
+<section id="confian" aria-label={t.trustedBy.label} class="relative bg-background pt-2 pb-16 sm:pb-20 lg:pb-24 scroll-mt-24">
+  <div class="container mx-auto px-4 text-center sm:px-6 lg:px-8">
+    <p class="trusted-label">{t.trustedBy.label}</p>
+    <ul class="trusted-list">
+      {clients.map((client) => (
+        <li class="trusted-item">
+          <span class="trusted-name">{client.name}</span>
+          <span class="trusted-detail">{client.detail}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .trusted-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  .trusted-list {
+    margin: 1.1rem auto 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem 2.25rem;
+    max-width: 56rem;
+  }
+
+  .trusted-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.6rem;
+    opacity: 0.72;
+    transition: opacity 300ms ease;
+  }
+
+  .trusted-item:hover {
+    opacity: 1;
+  }
+
+  .trusted-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+
+  .trusted-detail {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+  }
+
+  @media (min-width: 640px) {
+    .trusted-name {
+      font-size: 1.9rem;
+    }
+    .trusted-detail {
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trusted-item {
+      opacity: 1;
+      transition: none;
+    }
+  }
+</style>

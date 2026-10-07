@@ -193,7 +193,7 @@
   },
   "portfolio": {
     "title": "Qué hemos logrado",
-    "subtitle": "Lo que hemos construido para que los equipos dejen el papeleo atrás.",
+    "subtitle": "Lo que hemos construido para que los equipos disfruten de sus herramientas.",
     "aria": {
       "prev": "Proyecto anterior",
       "next": "Siguiente proyecto",
@@ -203,10 +203,10 @@
     "projects": {
       "liiot-custom": {
         "title": "Liiot Custom",
-        "subtitle": "Herramienta a medida · Caso SG-SST",
+        "subtitle": "Herramientas a medida",
         "description": "Automatizamos la seguridad laboral para que cuidar a cada trabajador sea parte natural del día.",
-        "imageAlt": "Liiot Custom — Herramienta a medida para seguridad laboral",
-        "ctaText": "Quiero algo así para mi empresa"
+        "imageAlt": "Liiot Custom — Herramienta a medida",
+        "ctaText": "Quiero algo así para mi"
       },
       "bleepy": {
         "title": "Bleepy",
@@ -216,6 +216,12 @@
         "ctaText": "Cuéntanos si te interesa"
       }
     }
+  },
+  "trustedBy": {
+    "label": "Confían en nosotros",
+    "clients": [
+      { "name": "Quality AV", "detail": "Plataforma SST" }
+    ]
   },
   "team": {
     "mission": {
