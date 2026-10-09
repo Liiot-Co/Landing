@@ -12,6 +12,9 @@ const siteUrl = env.SITE_URL || process.env.SITE_URL || 'https://www.liiot.app';
 export default defineConfig({
   site: siteUrl,
   integrations: [sitemap()],
+  build: {
+    inlineStylesheets: 'auto',
+  },
   vite: {
     plugins: [tailwindcss()],
     server: {

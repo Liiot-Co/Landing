@@ -40,7 +40,7 @@ const schemaGraph = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": ["Organization", "ProfessionalService"],
+      "@type": "Organization",
       "@id": `${siteUrl}/#organization`,
       "name": "Liiot",
       "legalName": "Liiot",
@@ -56,19 +56,20 @@ const schemaGraph = {
       "sameAs": [
         LIIOT_LINKEDIN_URL,
         LIIOT_INSTAGRAM_URL,
-        LIIOT_CALENDLY_URL,
       ],
       "founder": TEAM_MEMBERS.map((member) => ({
         "@type": "Person",
         "name": member.name,
         "jobTitle": member.role,
         "url": member.linkedin,
+        "sameAs": [member.linkedin],
       })),
       "employee": TEAM_MEMBERS.map((member) => ({
         "@type": "Person",
         "name": member.name,
         "jobTitle": member.role,
         "url": member.linkedin,
+        "sameAs": [member.linkedin],
       })),
       "contactPoint": [
         {

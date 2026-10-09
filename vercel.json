@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "liiot.app" }],
+      "destination": "https://www.liiot.app/:path*",
+      "permanent": true
+    }
+  ]
+}
