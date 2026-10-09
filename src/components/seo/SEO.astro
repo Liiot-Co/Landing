@@ -35,6 +35,22 @@ const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, "") : "https:/
 const canonicalURL = canonical || new URL(Astro.url.pathname, siteUrl).toString();
 const ogImageURL = image.startsWith("http") ? image : new URL(image, siteUrl).toString();
 
+// Slug estable derivado del propio perfil de LinkedIn (no inventa datos nuevos).
+// Se mantiene el path tal cual (ya percent-encoded) para que el fragmento sea un URI válido en ASCII.
+const linkedinSlug = (url: string) =>
+  new URL(url).pathname.replace(/^\/in\//, "").replace(/\/$/, "");
+
+// Un nodo Person por persona, con @id estable, para referenciarlo desde founder/employee
+// en vez de duplicar el objeto completo dos veces por persona.
+const personNodes = TEAM_MEMBERS.map((member) => ({
+  "@type": "Person",
+  "@id": `${siteUrl}/#person-${linkedinSlug(member.linkedin)}`,
+  "name": member.name,
+  "jobTitle": member.role,
+  "url": member.linkedin,
+  "sameAs": [member.linkedin],
+}));
+
 // Schema.org JSON-LD estructurado bajo especificación @graph
 const schemaGraph = {
   "@context": "https://schema.org",
@@ -44,7 +60,7 @@ const schemaGraph = {
       "@id": `${siteUrl}/#organization`,
       "name": "Liiot",
       "legalName": "Liiot",
-      "url": siteUrl,
+      "url": `${siteUrl}/`,
       "logo": `${siteUrl}${IMAGES.seo.favicon}`,
       "image": ogImageURL,
       "description": t.seo.schema.organizationDescription,
@@ -57,20 +73,8 @@ const schemaGraph = {
         LIIOT_LINKEDIN_URL,
         LIIOT_INSTAGRAM_URL,
       ],
-      "founder": TEAM_MEMBERS.map((member) => ({
-        "@type": "Person",
-        "name": member.name,
-        "jobTitle": member.role,
-        "url": member.linkedin,
-        "sameAs": [member.linkedin],
-      })),
-      "employee": TEAM_MEMBERS.map((member) => ({
-        "@type": "Person",
-        "name": member.name,
-        "jobTitle": member.role,
-        "url": member.linkedin,
-        "sameAs": [member.linkedin],
-      })),
+      "founder": personNodes.map((person) => ({ "@id": person["@id"] })),
+      "employee": personNodes.map((person) => ({ "@id": person["@id"] })),
       "contactPoint": [
         {
           "@type": "ContactPoint",
@@ -89,10 +93,11 @@ const schemaGraph = {
         "Arquitectura de Software Cloud",
       ],
     },
+    ...personNodes,
     {
       "@type": "WebSite",
       "@id": `${siteUrl}/#website`,
-      "url": siteUrl,
+      "url": `${siteUrl}/`,
       "name": "Liiot",
       "description": t.seo.schema.websiteDescription,
       "publisher": {
